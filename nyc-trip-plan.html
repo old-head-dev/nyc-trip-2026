@@ -1,0 +1,1131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NYC Trip · June 21–24, 2026</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --cream: #f7f3ee;
+    --ink: #1a1714;
+    --gold: #c9973a;
+    --gold-light: #e8c97a;
+    --rust: #b85c38;
+    --sage: #6b7c6e;
+    --muted: #7a7570;
+    --border: #ddd8d0;
+    --card: #ffffff;
+    --section-bg: #f0ebe4;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--cream);
+    color: var(--ink);
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 400;
+    line-height: 1.6;
+  }
+
+  /* HEADER */
+  .hero {
+    background: var(--ink);
+    padding: 60px 40px 50px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: repeating-linear-gradient(
+      45deg,
+      transparent,
+      transparent 40px,
+      rgba(201,151,58,0.04) 40px,
+      rgba(201,151,58,0.04) 41px
+    );
+  }
+  .hero-eyebrow {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 16px;
+    position: relative;
+  }
+  .hero h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(42px, 7vw, 72px);
+    font-weight: 900;
+    color: #fff;
+    line-height: 1.05;
+    position: relative;
+  }
+  .hero h1 em {
+    font-style: italic;
+    color: var(--gold-light);
+  }
+  .hero-sub {
+    margin-top: 18px;
+    font-size: 15px;
+    color: rgba(255,255,255,0.55);
+    letter-spacing: 1px;
+    position: relative;
+  }
+  .hero-meta {
+    display: flex;
+    justify-content: center;
+    gap: 40px;
+    margin-top: 36px;
+    position: relative;
+  }
+  .hero-stat {
+    text-align: center;
+  }
+  .hero-stat-val {
+    display: block;
+    font-family: 'Playfair Display', serif;
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--gold-light);
+  }
+  .hero-stat-label {
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.4);
+  }
+
+  /* LAYOUT */
+  .container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 0 24px;
+  }
+
+  /* SECTION HEADERS */
+  .section {
+    padding: 52px 0 12px;
+  }
+  .section-label {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 8px;
+  }
+  .section-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 30px;
+    font-weight: 700;
+    color: var(--ink);
+    border-bottom: 2px solid var(--gold);
+    padding-bottom: 14px;
+    margin-bottom: 24px;
+  }
+
+  /* ALERT / PRIORITY BOX */
+  .alert {
+    background: var(--rust);
+    color: #fff;
+    border-radius: 6px;
+    padding: 18px 22px;
+    margin: 28px 0;
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+  }
+  .alert-icon { font-size: 20px; flex-shrink: 0; margin-top: 1px; }
+  .alert-title { font-weight: 600; font-size: 14px; margin-bottom: 4px; }
+  .alert p { font-size: 13.5px; opacity: 0.92; line-height: 1.5; }
+  .alert a { color: #ffd; }
+
+  /* DAY CARDS */
+  .day-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    margin-bottom: 20px;
+    overflow: hidden;
+  }
+  .day-header {
+    background: var(--ink);
+    padding: 16px 22px;
+    display: flex;
+    align-items: baseline;
+    gap: 14px;
+  }
+  .day-num {
+    font-family: 'Playfair Display', serif;
+    font-size: 38px;
+    font-weight: 900;
+    color: var(--gold);
+    line-height: 1;
+  }
+  .day-info { }
+  .day-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 18px;
+    font-weight: 700;
+    color: #fff;
+    line-height: 1.1;
+  }
+  .day-date {
+    font-size: 12px;
+    color: rgba(255,255,255,0.5);
+    letter-spacing: 1px;
+  }
+  .day-body { padding: 22px; }
+
+  /* TIMELINE */
+  .timeline { list-style: none; }
+  .tl-item {
+    display: flex;
+    gap: 16px;
+    padding-bottom: 22px;
+    position: relative;
+  }
+  .tl-item:not(:last-child)::before {
+    content: '';
+    position: absolute;
+    left: 37px;
+    top: 32px;
+    bottom: 0;
+    width: 1px;
+    background: var(--border);
+  }
+  .tl-time {
+    flex-shrink: 0;
+    width: 74px;
+    text-align: right;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--muted);
+    letter-spacing: 0.5px;
+    padding-top: 3px;
+  }
+  .tl-dot {
+    flex-shrink: 0;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: var(--gold);
+    margin-top: 5px;
+    position: relative;
+    z-index: 1;
+  }
+  .tl-dot.optional { background: var(--sage); }
+  .tl-dot.drive { background: var(--rust); }
+  .tl-content { flex: 1; }
+  .tl-title {
+    font-weight: 600;
+    font-size: 14.5px;
+    color: var(--ink);
+    margin-bottom: 3px;
+  }
+  .tl-desc {
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 1.5;
+  }
+  .tl-desc a { color: var(--rust); text-decoration: none; }
+  .tl-desc a:hover { text-decoration: underline; }
+  .badge {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    padding: 2px 7px;
+    border-radius: 3px;
+    margin-left: 6px;
+    vertical-align: middle;
+  }
+  .badge-opt { background: #e8f0ea; color: var(--sage); }
+  .badge-book { background: #fef3e2; color: #9a6800; }
+  .badge-free { background: #edf2f7; color: #4a6080; }
+
+  /* HOTEL TABLE */
+  .hotel-grid {
+    display: grid;
+    gap: 14px;
+  }
+  .hotel-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 18px 20px;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 8px 20px;
+    align-items: start;
+  }
+  .hotel-card.top-pick {
+    border-color: var(--gold);
+    border-width: 2px;
+  }
+  .hotel-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--ink);
+  }
+  .hotel-tag {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--gold);
+    background: #fef7ea;
+    padding: 3px 8px;
+    border-radius: 3px;
+    white-space: nowrap;
+  }
+  .hotel-tag.mid { color: var(--sage); background: #edf2ee; }
+  .hotel-meta {
+    font-size: 12px;
+    color: var(--muted);
+    grid-column: 1 / -1;
+    line-height: 1.5;
+  }
+  .hotel-price {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--ink);
+    white-space: nowrap;
+  }
+  .hotel-why {
+    font-size: 13px;
+    color: var(--sage);
+    grid-column: 1 / -1;
+    font-style: italic;
+  }
+
+  /* LOGISTICS */
+  .logistics-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+  }
+  @media (max-width: 600px) {
+    .logistics-grid { grid-template-columns: 1fr; }
+    .hero-meta { gap: 24px; }
+  }
+  .logistic-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 18px 20px;
+  }
+  .logistic-title {
+    font-weight: 700;
+    font-size: 13px;
+    letter-spacing: 0.5px;
+    margin-bottom: 8px;
+    color: var(--ink);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .logistic-icon { font-size: 16px; }
+  .logistic-body {
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 1.6;
+  }
+  .logistic-body strong { color: var(--ink); }
+
+  /* BROADWAY */
+  .show-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+  }
+  @media (max-width: 600px) { .show-grid { grid-template-columns: 1fr; } }
+  .show-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 18px 20px;
+  }
+  .show-card.recommended { border-color: var(--gold); border-width: 2px; }
+  .show-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 16px;
+    font-weight: 700;
+    margin-bottom: 4px;
+  }
+  .show-meta { font-size: 12px; color: var(--muted); margin-bottom: 6px; }
+  .show-why { font-size: 13px; color: var(--ink); line-height: 1.5; }
+
+  /* SAFETY */
+  .safety-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    margin-top: 4px;
+  }
+  @media (max-width: 600px) {
+    .safety-grid { grid-template-columns: 1fr; }
+    .pre-trip-apps { grid-template-columns: 1fr !important; }
+    .pre-trip-physical { grid-template-columns: 1fr 1fr !important; }
+    .food-grid { grid-template-columns: 1fr !important; }
+  }
+  .safety-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px 18px;
+  }
+  .safety-title {
+    font-weight: 700;
+    font-size: 13px;
+    margin-bottom: 6px;
+    display: flex;
+    gap: 7px;
+    align-items: center;
+  }
+  .safety-body { font-size: 13px; color: var(--muted); line-height: 1.55; }
+
+  /* BOOKING CHECKLIST */
+  .checklist {
+    background: var(--ink);
+    border-radius: 8px;
+    padding: 28px 28px 24px;
+    margin-top: 8px;
+  }
+  .checklist-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--gold-light);
+    margin-bottom: 18px;
+  }
+  .check-item {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    padding: 10px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+  }
+  .check-item:last-child { border-bottom: none; }
+  .check-box {
+    width: 18px;
+    height: 18px;
+    border: 2px solid rgba(201,151,58,0.5);
+    border-radius: 3px;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+  .check-label { font-size: 13.5px; color: rgba(255,255,255,0.85); line-height: 1.5; }
+  .check-label strong { color: var(--gold-light); }
+  .check-urgency {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--rust);
+    margin-left: 6px;
+  }
+
+  /* FOOTER */
+  footer {
+    text-align: center;
+    padding: 40px 24px;
+    font-size: 12px;
+    color: var(--muted);
+    border-top: 1px solid var(--border);
+    margin-top: 48px;
+  }
+  footer strong { color: var(--ink); }
+
+  /* PRINT */
+  @media print {
+    .hero { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    body { background: white; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-eyebrow">Girls Trip · New York City</div>
+  <h1>June <em>21–24</em><br>2026</h1>
+  <div class="hero-sub">Manhattan · 3 Nights · Road Trip from Fort Wayne</div>
+  <div class="hero-meta">
+    <div class="hero-stat">
+      <span class="hero-stat-val">3</span>
+      <span class="hero-stat-label">Nights</span>
+    </div>
+    <div class="hero-stat">
+      <span class="hero-stat-val">~640</span>
+      <span class="hero-stat-label">Miles Each Way</span>
+    </div>
+    <div class="hero-stat">
+      <span class="hero-stat-val">2</span>
+      <span class="hero-stat-label">Travelers</span>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+
+  <!-- URGENT BOOKING ALERT -->
+  <div class="alert">
+    <div class="alert-icon">⚠️</div>
+    <div>
+      <div class="alert-title">Book Jellycat Diner First — Window Opens May 25th</div>
+      <p>Reservations open 4 weeks in advance, <strong>Mondays 3–5 PM ET only.</strong> The May 25th window covers your June 22–23 dates. Have a second device ready and refresh at exactly 3:00 PM. Book at <a href="https://faoschwarz.com/pages/reservations" target="_blank">faoschwarz.com/pages/reservations</a> — $70+ per person, required reservation. <strong>Calendar reminder already set for May 25th at 1 PM.</strong></p>
+    </div>
+  </div>
+
+  <!-- PRE-TRIP CHECKLIST -->
+  <div class="section">
+    <div class="section-label">Before You Leave Fort Wayne</div>
+    <div class="section-title">Pre-Trip Checklist</div>
+
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px;">
+
+      <!-- APPS -->
+      <div style="background:var(--card); border:1px solid var(--border); border-radius:8px; padding:20px 22px; grid-column: 1 / -1;">
+        <div style="font-size:11px; font-weight:700; letter-spacing:3px; text-transform:uppercase; color:var(--gold); margin-bottom:12px;">📱 Apps to Download & Set Up</div>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px 30px;">
+          <div style="font-size:13px; color:var(--ink); padding:8px 0; border-bottom:1px solid var(--border);">
+            <strong>NJ Transit</strong> — <span style="color:var(--muted);">Free · iOS App Store. Create an account before the trip. This is how they buy train tickets (MyTix feature). Do not wait until arriving at Metropark.</span>
+          </div>
+          <div style="font-size:13px; color:var(--ink); padding:8px 0; border-bottom:1px solid var(--border);">
+            <strong>NexPass</strong> — <span style="color:var(--muted);">nexusparkingsystems.com. Register the car's license plate before arrival so parking payment is fully automatic. No ticket to deal with.</span>
+          </div>
+          <div style="font-size:13px; color:var(--ink); padding:8px 0; border-bottom:1px solid var(--border);">
+            <strong>Uber</strong> — <span style="color:var(--muted);">Both phones should have Uber installed and a payment method saved. Primary transport within NYC beyond walking. Also use for trip-sharing so Jon can track rides.</span>
+          </div>
+          <div style="font-size:13px; color:var(--ink); padding:8px 0; border-bottom:1px solid var(--border);">
+            <strong>Find My (iOS)</strong> — <span style="color:var(--muted);">Enable location sharing with Jon on both phones before leaving. Stays on the whole trip. This is the single most important safety step.</span>
+          </div>
+          <div style="font-size:13px; color:var(--ink); padding:8px 0; border-bottom:1px solid var(--border);">
+            <strong>Resy</strong> — <span style="color:var(--muted);">resy.com or app. Create account and book Serendipity 3 for June 23 lunch once the date opens on the platform.</span>
+          </div>
+          <div style="font-size:13px; color:var(--ink); padding:8px 0; border-bottom:1px solid var(--border);">
+            <strong>TodayTix</strong> — <span style="color:var(--muted);">Optional. If doing Broadway, this app finds same-week discount tickets. Free to download. Good backup to Broadway.com.</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- RESERVATIONS -->
+      <div style="background:var(--card); border:2px solid var(--rust); border-radius:8px; padding:20px 22px;">
+        <div style="font-size:11px; font-weight:700; letter-spacing:3px; text-transform:uppercase; color:var(--rust); margin-bottom:12px;">🗓️ Reservations Required</div>
+        <div style="display:flex; flex-direction:column; gap:0;">
+          <div style="font-size:13px; padding:10px 0; border-bottom:1px solid var(--border);">
+            <div style="font-weight:700; color:var(--ink);">Jellycat Diner <span style="font-size:10px; background:#fde8e3; color:var(--rust); padding:2px 7px; border-radius:3px; font-weight:700; letter-spacing:1px; text-transform:uppercase; margin-left:6px;">Time-Sensitive</span></div>
+            <div style="color:var(--muted); margin-top:3px;">faoschwarz.com/pages/reservations · <strong>May 25 at 3 PM ET</strong> — slots for June 22–23 drop then. Two devices, refresh at exactly 3:00. $70+/person.</div>
+          </div>
+          <div style="font-size:13px; padding:10px 0; border-bottom:1px solid var(--border);">
+            <div style="font-weight:700; color:var(--ink);">Serendipity 3</div>
+            <div style="color:var(--muted); margin-top:3px;">resy.com · Original location, 225 E. 60th St · June 23 mid-afternoon (~2:30 PM). This is a dessert stop, not a meal — book a specific time slot so there's no summer wait. Reserve as soon as 30–60 days out opens on Resy.</div>
+          </div>
+          <div style="font-size:13px; padding:10px 0;">
+            <div style="font-weight:700; color:var(--ink);">Central Park Carriage <span style="font-size:10px; background:#e8f0ea; color:var(--sage); padding:2px 7px; border-radius:3px; font-weight:700; letter-spacing:1px; text-transform:uppercase; margin-left:6px;">Optional</span></div>
+            <div style="color:var(--muted); margin-top:3px;">nycroyalcarriage.com · June 23 morning · ~$150/carriage for 45 min. Pre-book — don't rely on walk-up in June. Check weather forecast; horses don't operate above 89°F.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TICKETS -->
+      <div style="background:var(--card); border:1px solid var(--border); border-radius:8px; padding:20px 22px;">
+        <div style="font-size:11px; font-weight:700; letter-spacing:3px; text-transform:uppercase; color:var(--gold); margin-bottom:12px;">🎭 Tickets to Buy in Advance</div>
+        <div style="display:flex; flex-direction:column; gap:0;">
+          <div style="font-size:13px; padding:10px 0; border-bottom:1px solid var(--border);">
+            <div style="font-weight:700; color:var(--ink);">Broadway Show <span style="font-size:10px; background:#e8f0ea; color:var(--sage); padding:2px 7px; border-radius:3px; font-weight:700; letter-spacing:1px; text-transform:uppercase; margin-left:6px;">Optional</span></div>
+            <div style="color:var(--muted); margin-top:3px;">broadway.com or TodayTix · Recommended for June 22 evening. Best teen picks: <em>&amp; Juliet</em> or <em>SIX</em>. $80–200+/person. TKTS booth in Times Square sells day-of discounts at noon if you decide last minute.</div>
+          </div>
+          <div style="font-size:13px; padding:10px 0;">
+            <div style="font-weight:700; color:var(--ink);">NJ Transit Train Tickets</div>
+            <div style="color:var(--muted); margin-top:3px;">Via NJ Transit app (MyTix) · Buy each one-way trip as needed — no need to pre-purchase all at once, but have the app set up and a payment method saved so there's no scrambling at the station. ~$15/person each way.</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- PHYSICAL PREP -->
+    <div style="background:var(--section-bg); border:1px solid var(--border); border-radius:8px; padding:18px 22px; margin-top:14px;">
+      <div style="font-size:11px; font-weight:700; letter-spacing:3px; text-transform:uppercase; color:var(--muted); margin-bottom:10px;">🎒 Physical Prep Before Leaving</div>
+      <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px 24px;">
+        <div style="font-size:13px; color:var(--ink); padding:6px 0; border-bottom:1px solid var(--border);"><strong>Portable battery pack</strong> — <span style="color:var(--muted);">Full days in NYC drain phones fast. Essential.</span></div>
+        <div style="font-size:13px; color:var(--ink); padding:6px 0; border-bottom:1px solid var(--border);"><strong>Comfortable walking shoes</strong> — <span style="color:var(--muted);">Both. Plan 5–8 miles of walking per day.</span></div>
+        <div style="font-size:13px; color:var(--ink); padding:6px 0; border-bottom:1px solid var(--border);"><strong>Screenshot offline saves</strong> — <span style="color:var(--muted);">Hotel address, Metropark station address, reservation confirmations. Saved to camera roll.</span></div>
+        <div style="font-size:13px; color:var(--ink); padding:6px 0;"><strong>Cash</strong> — <span style="color:var(--muted);">$50–100 in small bills. Carriage ride tip, food carts, incidentals.</span></div>
+        <div style="font-size:13px; color:var(--ink); padding:6px 0;"><strong>Light day bag</strong> — <span style="color:var(--muted);">Small backpack or crossbody for carrying water, battery, purchases.</span></div>
+        <div style="font-size:13px; color:var(--ink); padding:6px 0;"><strong>Weather check</strong> — <span style="color:var(--muted);">June in NYC: avg high 80–85°F, humid. Light layers for evening A/C indoors.</span></div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- LOGISTICS -->
+  <div class="section">
+    <div class="section-label">Getting There</div>
+    <div class="section-title">Drive & Park Strategy</div>
+    <div class="logistics-grid">
+      <div class="logistic-card">
+        <div class="logistic-title"><span class="logistic-icon">🚗</span> June 21 Drive</div>
+        <div class="logistic-body">
+          <strong>Depart Fort Wayne by 6–7 AM.</strong><br>
+          Route: I-69 → I-80 East through Ohio/Pennsylvania → Garden State Parkway → Exit 131/132 (Metropark).<br><br>
+          ~640 miles, 10–11 hours drive time. Aim to arrive Metropark by 3–4 PM, giving time to park, board a train, and reach hotel before dinner.
+        </div>
+      </div>
+      <div class="logistic-card">
+        <div class="logistic-title"><span class="logistic-icon">🚉</span> Metropark Station — Iselin, NJ</div>
+        <div class="logistic-body">
+          <strong>Best park-and-ride in NJ for NYC visitors.</strong><br>
+          Covered multi-story garage, 24 hrs, ~$10–11/day. ~45 min to NYC Penn Station/Moynihan Train Hall via NJ Transit Northeast Corridor Line.<br><br>
+          <strong>Do before you go:</strong> Download the <strong>NexPass app</strong> — registers your plate so you just drive in/out. No ticket to lose. Confirm current rates at nexusparkingsystems.com.
+        </div>
+      </div>
+      <div class="logistic-card">
+        <div class="logistic-title"><span class="logistic-icon">🗽</span> Getting Around NYC</div>
+        <div class="logistic-body">
+          All core stops cluster within a 2-mile Midtown radius — walkable between most. Use <strong>Uber</strong> for Chelsea Market (further south) and anything after 10 PM. Avoid the subway late at night; Uber is the right call for two women solo after dark. Budget ~$15–25 per Uber trip within Midtown.
+        </div>
+      </div>
+      <div class="logistic-card">
+        <div class="logistic-title"><span class="logistic-icon">🚆</span> NJ Transit — How to Ride</div>
+        <div class="logistic-body">
+          <strong>Line:</strong> Northeast Corridor Line — direct, no transfers, Metropark → NYC Penn Station/Moynihan Hall (~43 min avg).<br><br>
+          <strong>Frequency:</strong> Every 20 minutes. First train 12:05 AM, last from Metropark 11:17 PM. They will never be stranded.<br><br>
+          <strong>Fare:</strong> ~$7–16/person one-way (peak vs. off-peak). Budget ~$15/person each way.<br><br>
+          <strong>Buy tickets:</strong> Download the free <strong>NJ Transit app</strong> before leaving Fort Wayne. Create an account. Purchase through <strong>MyTix</strong> in the app — displays on phone, no paper needed. Select: Northeast Corridor → Metropark → New York Penn Station (or reverse). <em>Don't activate the ticket until boarding.</em><br><br>
+          <strong>Critical:</strong> Amtrak trains share the same tracks — NJ Transit tickets are NOT valid on Amtrak. The app's DepartureVision screen shows which departing trains are NJ Transit vs. Amtrak. Always board the NJ Transit train.
+        </div>
+      </div>
+      <div class="logistic-card">
+        <div class="logistic-title"><span class="logistic-icon">🔙</span> June 24 Return</div>
+        <div class="logistic-body">
+          Check out, Uber to Penn Station, NJ Transit back to Metropark. Aim to be at Penn Station by <strong>10–11 AM</strong> to clear NJ before afternoon traffic builds. Back in Fort Wayne by 9–10 PM. Avoid departing after noon — NJ/PA weekend traffic is brutal by 1 PM.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- HOTELS -->
+  <div class="section">
+    <div class="section-label">Where to Stay</div>
+    <div class="section-title">Top Hotel Recommendations</div>
+    <p style="font-size:13.5px; color:var(--muted); margin-bottom:20px;">Ranked after extensive research across 30+ properties. All options are in central Midtown Manhattan with two-bed room configurations available. June is peak season; book immediately. Verify Google Hotels rating on-site for any hotel where noted — it is a hard requirement.</p>
+
+    <div class="hotel-grid">
+
+      <div class="hotel-card top-pick">
+        <div>
+          <div class="hotel-name">#1 — EVEN Hotel New York Midtown East by IHG</div>
+          <div class="hotel-meta">221 E 44th St · Midtown East · ⭐⭐⭐⭐ · Google Hotels 4.2 confirmed (~7,000 reviews)</div>
+        </div>
+        <div>
+          <div class="hotel-tag">Top Pick · Best Overall</div>
+          <div class="hotel-price">$327/night</div>
+        </div>
+        <div class="hotel-why">The only hotel in this list with a Google Hotels rating confirmed at 4.2 across ~7,000 reviews — the highest review count researched, making it the most statistically reliable choice. Guests specifically reference girls' weekends and solo female comfort. Amenities punch well above the price: two on-site restaurants, Peloton gym, rooftop terrace, library, arcade room. Two double beds confirmed. No resort fee. 7-minute walk to Grand Central, walkable to the Rockefeller area. The lowest-risk booking on this list.</div>
+      </div>
+
+      <div class="hotel-card top-pick">
+        <div>
+          <div class="hotel-name">#2 — Fitzpatrick Grand Central</div>
+          <div class="hotel-meta">141 E 44th St · Midtown East · ⭐⭐⭐⭐ · Verify Google Hotels rating on-site</div>
+        </div>
+        <div>
+          <div class="hotel-tag">Top Pick · Best Price</div>
+          <div class="hotel-price">$305/night</div>
+        </div>
+        <div class="hotel-why">Best price among all researched survivors at $305 — directly across from Grand Central Terminal. Boutique Irish hotel (155 rooms, independently owned) with the most praised staff of any hotel in this pool; guests describe being greeted by name. A solo female traveler specifically wrote she "felt very safe." Two double beds available. On-site Irish pub (Wheeltapper). The pick with the most character at the lowest price. Confirm Google Hotels rating is 4.0+ before booking.</div>
+      </div>
+
+      <div class="hotel-card top-pick">
+        <div>
+          <div class="hotel-name">#3 — Shelburne Sonesta New York</div>
+          <div class="hotel-meta">303 Lexington Ave at 37th St · Murray Hill · ⭐⭐⭐⭐ · Verify Google Hotels rating on-site</div>
+        </div>
+        <div>
+          <div class="hotel-tag">Top Pick · Best Value</div>
+          <div class="hotel-price">$271 listed / ~$313 effective</div>
+        </div>
+        <div class="hotel-why">Listed at $271 but carries a mandatory $42/night Hotel Facilities Fee — effective rate is ~$313, still the second-best total cost among quality options. Murray Hill is quiet, safe, and residential-adjacent. Two queen beds in standard rooms. The rooftop bar (Vintage Green) with 360° Empire State Building views is an exceptional bonus for this trip. Full-service 4-star with on-site dining and fitness. 0.3 miles from Grand Central. Confirm the mandatory fee is accurately captured in your booking total.</div>
+      </div>
+
+      <div class="hotel-card top-pick">
+        <div>
+          <div class="hotel-name">#4 — 3 West Club</div>
+          <div class="hotel-meta">3 W 51st St · 5th Ave / Rockefeller Center · Verify Google Hotels rating on-site</div>
+        </div>
+        <div>
+          <div class="hotel-tag">Top Pick · Verify Availability First</div>
+          <div class="hotel-price">$332/night</div>
+        </div>
+        <div class="hotel-why">Best physical location of any hotel researched — steps from Rockefeller Center, directly opposite Radio City Music Hall, 5th Ave corridor. Only 28 rooms in a landmarked 1921 building originally founded as the Women's National Republican Club by suffragettes; the art deco interior and history are especially fitting for a mother/daughter trip. <strong>Must verify June 21–24 availability before committing</strong> — 28 rooms sell out fast in June event season. If it's available and the Google Hotels rating confirms 4.0+, this moves to the top conversation.</div>
+      </div>
+
+      <div class="hotel-card">
+        <div>
+          <div class="hotel-name">#5 — Hilton New York Times Square</div>
+          <div class="hotel-meta">234 W 42nd St · Times Square · ⭐⭐⭐⭐ · Verify Google Hotels rating on-site</div>
+        </div>
+        <div>
+          <div class="hotel-tag mid">Good Option · Verify Rating</div>
+          <div class="hotel-price">$327/night</div>
+        </div>
+        <div class="hotel-why">Full-service Hilton with all guest rooms starting on the 22nd floor — unobstructed city views from every room, and rooms are among the largest standard rooms in Times Square. Three on-site restaurants. The caveat: Booking.com scores (7.3) run noticeably lower than the other options on this list, raising genuine doubt about whether the Google Hotels rating clears the 4.0 minimum. Verify the Google Hotels rating before booking. If it confirms 4.2+, the views and room size make this a strong choice.</div>
+      </div>
+
+      <div class="hotel-card">
+        <div>
+          <div class="hotel-name">#6 — Hilton Garden Inn Times Square South</div>
+          <div class="hotel-meta">Times Square area · Hilton · ⭐⭐⭐⭐ · Verify address &amp; fees on-site</div>
+        </div>
+        <div>
+          <div class="hotel-tag mid">Good Option</div>
+          <div class="hotel-price">$346/night</div>
+        </div>
+        <div class="hotel-why">Hilton's upper-select-service brand — consistent, clean, well-managed. At $346 this is at the top of the budget range with no margin for mandatory fees; confirm there is no destination or resort fee before booking, as HGI properties in NYC commonly carry them. Good fallback if the top five are sold out.</div>
+      </div>
+
+      <div class="hotel-card">
+        <div>
+          <div class="hotel-name">#7 — Hilton Garden Inn Midtown Park Ave</div>
+          <div class="hotel-meta">Park Ave · Midtown East · Hilton · ⭐⭐⭐⭐ · Verify address &amp; fees on-site</div>
+        </div>
+        <div>
+          <div class="hotel-tag mid">Good Option</div>
+          <div class="hotel-price">$346/night</div>
+        </div>
+        <div class="hotel-why">Same brand tier as #6 at the same price. Park Ave corridor has a quieter, more residential feel than Times Square. Same mandatory-fee caveat applies — confirm effective nightly cost stays under $350 before booking.</div>
+      </div>
+
+      <div class="hotel-card">
+        <div>
+          <div class="hotel-name">#8 — Hampton Inn Manhattan/Times Square Central</div>
+          <div class="hotel-meta">220 W 41st St · Times Square/Theater District · Hilton · ⭐⭐⭐</div>
+        </div>
+        <div>
+          <div class="hotel-tag mid">Solid Backup</div>
+          <div class="hotel-price">$333/night</div>
+        </div>
+        <div class="hotel-why">The only hotel in this top 11 that includes a complimentary hot breakfast — a meaningful perk for a 3-night stay. Two queen beds confirmed in multiple reviews. Rooftop observation deck. Free WiFi. Times Square/Theater District location. Hilton-brand cleanliness and reliability. Positioned a brand tier below the options above it, but a functionally strong and clean choice if the preferred picks are sold out.</div>
+      </div>
+
+      <div class="hotel-card">
+        <div>
+          <div class="hotel-name">#9 — Holiday Inn Times Square</div>
+          <div class="hotel-meta">Times Square area · IHG · ⭐⭐⭐⭐ · Rating &amp; room config unverified</div>
+        </div>
+        <div>
+          <div class="hotel-tag mid">Budget Option</div>
+          <div class="hotel-price">$295/night</div>
+        </div>
+        <div class="hotel-why">At $295 this is the lowest-cost 4-star-branded option in the list. Location passed the neighborhood screen. Google Hotels rating, two-bed availability, and any mandatory fees were not independently verified — confirm those three before booking. Good final fallback if everything above is unavailable.</div>
+      </div>
+
+      <div class="hotel-card">
+        <div>
+          <div class="hotel-name">#10 — Best Western Premier Empire State</div>
+          <div class="hotel-meta">Empire State Building area · Midtown · Rating &amp; details unverified</div>
+        </div>
+        <div>
+          <div class="hotel-tag mid">Budget Option</div>
+          <div class="hotel-price">$328/night</div>
+        </div>
+        <div class="hotel-why">Best Western Premier is BW's higher-end brand. Empire State Building corridor is a respectable Midtown location. Specific address, Google Hotels rating, two-bed availability, and any mandatory fees were not independently verified — treat this as a deep fallback and confirm all four before booking.</div>
+      </div>
+
+      <div class="hotel-card">
+        <div>
+          <div class="hotel-name">#11 — Best Western Premier Herald Square</div>
+          <div class="hotel-meta">Herald Square area · Midtown South · Rating &amp; details unverified</div>
+        </div>
+        <div>
+          <div class="hotel-tag mid">Budget Option · Lowest Price</div>
+          <div class="hotel-price">$253/night</div>
+        </div>
+        <div class="hotel-why">Lowest price on this entire list at $253. Herald Square is at the southern edge of the comfortable zone for this itinerary — slightly further from the core stops than ideal, but not a dealbreaker. Same caveat as #10: address, Google Hotels rating, two-bed availability, and mandatory fees all need verification before booking.</div>
+      </div>
+
+    </div>
+    <p style="font-size:12.5px; color:var(--muted); margin-top:16px; padding: 12px 16px; background: var(--section-bg); border-radius:6px;">
+      💡 <strong>Clear recommendation: EVEN Hotel Midtown East (#1, $327)</strong> — the only hotel on this list with a Google Hotels rating confirmed at 4.2 across ~7,000 reviews. Fitzpatrick Grand Central (#2, $305) is the immediate fallback and the best-priced quality option. Verify the Google Hotels rating on-site for any hotel marked as unconfirmed before booking. Book through the hotel directly after checking Booking.com — direct bookings typically carry better cancellation terms.
+    </p>
+  </div>
+
+  <!-- ITINERARY -->
+  <div class="section">
+    <div class="section-label">Day by Day</div>
+    <div class="section-title">Full Itinerary</div>
+
+    <!-- DAY 1 -->
+    <div class="day-card">
+      <div class="day-header">
+        <div class="day-num">1</div>
+        <div class="day-info">
+          <div class="day-name">Drive Day · Arrive & Orient</div>
+          <div class="day-date">Sunday, June 21</div>
+        </div>
+      </div>
+      <div class="day-body">
+        <ul class="timeline">
+          <li class="tl-item">
+            <div class="tl-time">6–7 AM</div>
+            <div class="tl-dot drive"></div>
+            <div class="tl-content">
+              <div class="tl-title">Depart Fort Wayne</div>
+              <div class="tl-desc">I-69 S → I-80 E (Ohio Turnpike) → I-78 E → Garden State Parkway → Exit 131/132. Build in 3–4 stops. Target Metropark arrival: 3–5 PM.</div>
+            </div>
+          </li>
+          <li class="tl-item">
+            <div class="tl-time">3–5 PM</div>
+            <div class="tl-dot"></div>
+            <div class="tl-content">
+              <div class="tl-title">Park at Metropark Station · Iselin, NJ</div>
+              <div class="tl-desc">Covered garage, ~$10–11/day, 24-hour access. NexPass app handles payment via license plate — no ticket needed. NJ Transit Northeast Corridor Line to NYC Penn Station/Moynihan Hall: ~45 min. Trains run frequently.</div>
+            </div>
+          </li>
+          <li class="tl-item">
+            <div class="tl-time">5–6 PM</div>
+            <div class="tl-dot"></div>
+            <div class="tl-content">
+              <div class="tl-title">Arrive NYC · Check Into Hotel</div>
+              <div class="tl-desc">Uber from Penn Station to hotel (~10 min, $15–20). Drop bags, freshen up. Don't overplan tonight — it's a recovery evening after a long drive.</div>
+            </div>
+          </li>
+          <li class="tl-item">
+            <div class="tl-time">7–8 PM</div>
+            <div class="tl-dot"></div>
+            <div class="tl-content">
+              <div class="tl-title">Times Square First Look</div>
+              <div class="tl-desc">Walk to Times Square — 10 min from most Midtown hotels. Best experienced at night when the lights are full. No need to rush anything tonight.</div>
+            </div>
+          </li>
+        </ul>
+        <div style="background:var(--section-bg); border-radius:6px; padding:16px 18px; margin-top:8px;">
+          <div style="font-size:10px; font-weight:700; letter-spacing:3px; text-transform:uppercase; color:var(--gold); margin-bottom:10px;">🍽️ Food — Day 1</div>
+          <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px 20px;">
+            <div style="font-size:13px;">
+              <div style="font-weight:700; color:var(--ink);">☕ Breakfast — Road</div>
+              <div style="color:var(--muted); margin-top:3px;">Starbucks drive-through before departure or on the road. Keep it simple — it's a travel day.</div>
+            </div>
+            <div style="font-size:13px;">
+              <div style="font-weight:700; color:var(--ink);">🥪 Lunch — Road Stop</div>
+              <div style="color:var(--muted); margin-top:3px;">Plan a real sit-down break around the Pennsylvania/Ohio border — ~4 hrs into the drive. Cracker Barrel or a local diner. Avoid fast food if possible; a proper meal keeps energy up.</div>
+            </div>
+            <div style="font-size:13px;">
+              <div style="font-weight:700; color:var(--ink);">🍔 Dinner — Ellen's Stardust Diner</div>
+              <div style="color:var(--muted); margin-top:3px;">1650 Broadway at 51st St. Times Square. Singing waitstaff — aspiring Broadway performers who belt show tunes while serving your food. <em>Perfect first-night NYC experience for a 16-year-old.</em> No reservations, arrive by 6:30 PM to avoid a long wait. Diner food — burgers, milkshakes, classic American. ~$20–30/person.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DAY 2 -->
+    <div class="day-card">
+      <div class="day-header">
+        <div class="day-num">2</div>
+        <div class="day-info">
+          <div class="day-name">Rockefeller · Jellycat · 5th Avenue</div>
+          <div class="day-date">Monday, June 22</div>
+        </div>
+      </div>
+      <div class="day-body">
+        <ul class="timeline">
+          <li class="tl-item">
+            <div class="tl-time">9–10 AM</div>
+            <div class="tl-dot"></div>
+            <div class="tl-content">
+              <div class="tl-title">5th Avenue Morning Stroll</div>
+              <div class="tl-desc">Start at the south end of 5th Ave near 34th St. Walk north. Window shopping, iconic storefronts, St. Patrick's Cathedral (~51st St). Morning is before the tourist crowds peak.</div>
+            </div>
+          </li>
+          <li class="tl-item">
+            <div class="tl-time">~11 AM</div>
+            <div class="tl-dot"></div>
+            <div class="tl-content">
+              <div class="tl-title">🪼 Jellycat Experience at FAO Schwarz <span class="badge badge-book">Reserve Required</span></div>
+              <div class="tl-desc">30 Rockefeller Plaza, 1st floor. Staff "cook" your order of Jellycat stuffed animals in a diner-themed setup — it's a retail experience, not an actual meal. Budget ~$70+/person for the plush toys. Book the 11 AM slot (or whatever you land on May 25). FAO Schwarz is worth browsing before and after.</div>
+            </div>
+          </li>
+          <li class="tl-item">
+            <div class="tl-time">1–3 PM</div>
+            <div class="tl-dot"></div>
+            <div class="tl-content">
+              <div class="tl-title">Herald Square & Macy's <span class="badge badge-free">Free</span></div>
+              <div class="tl-desc">15 min walk from Rockefeller. The original Macy's flagship (34th St) is worth the stop — 11 floors, world's largest department store. Budget shopping on 34th St nearby. Good afternoon break.</div>
+            </div>
+          </li>
+          <li class="tl-item">
+            <div class="tl-time">4–5 PM</div>
+            <div class="tl-dot"></div>
+            <div class="tl-content">
+              <div class="tl-title">Grand Central Terminal <span class="badge badge-free">Free</span></div>
+              <div class="tl-desc">15 min walk east from Macy's. Main Concourse celestial ceiling, the Whispering Gallery acoustic trick near the Oyster Bar (find two opposite corners and whisper — you'll hear each other), Grand Central Market gourmet food hall. A real NYC icon — worth 45 min.</div>
+            </div>
+          </li>
+          <li class="tl-item">
+            <div class="tl-time">Evening</div>
+            <div class="tl-dot optional"></div>
+            <div class="tl-content">
+              <div class="tl-title">Broadway Show <span class="badge badge-opt">Optional</span></div>
+              <div class="tl-desc">If doing a show, Monday is a good night — less crowded than weekends. Most shows curtain at 7 PM. See Broadway recommendations below. Book on Broadway.com or TodayTix for discount options.</div>
+            </div>
+          </li>
+        </ul>
+        <div style="background:var(--section-bg); border-radius:6px; padding:16px 18px; margin-top:8px;">
+          <div style="font-size:10px; font-weight:700; letter-spacing:3px; text-transform:uppercase; color:var(--gold); margin-bottom:10px;">🍽️ Food — Day 2</div>
+          <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px 20px;">
+            <div style="font-size:13px;">
+              <div style="font-weight:700; color:var(--ink);">☕ Breakfast — Black Seed Bagels</div>
+              <div style="color:var(--muted); margin-top:3px;">Multiple Midtown locations. Wood-fired New York bagels with creative spreads. Classic NYC breakfast, quick, ~$10–14/person. Grab and walk — great way to start the 5th Ave stroll.</div>
+            </div>
+            <div style="font-size:13px;">
+              <div style="font-weight:700; color:var(--ink);">🍚 Lunch — FieldTrip (Rockefeller Center)</div>
+              <div style="color:var(--muted); margin-top:3px;">Rink Level, 30 Rockefeller Plaza — right where they'll be after Jellycat. Fast-casual rice bowls from James Beard Award-winning Chef JJ Johnson. Healthy, flavorful, affordable. Crispy Chicken with Carolina Gold Rice is the order. ~$15–20/person, quick.</div>
+            </div>
+            <div style="font-size:13px;">
+              <div style="font-weight:700; color:var(--ink);">🥢 Dinner — TAO Uptown</div>
+              <div style="color:var(--muted); margin-top:3px;">42 E. 58th St. Dramatic pan-Asian restaurant with a towering Buddha, reflective pool, and genuinely great food. One of the coolest dining rooms in Midtown. Reservations strongly recommended — book on OpenTable. If doing Broadway, eat before the show (~5:30 PM). ~$40–60/person. <em>Teen-approved vibe.</em></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DAY 3 -->
+    <div class="day-card">
+      <div class="day-header">
+        <div class="day-num">3</div>
+        <div class="day-info">
+          <div class="day-name">Central Park · Serendipity · Chelsea</div>
+          <div class="day-date">Tuesday, June 23</div>
+        </div>
+      </div>
+      <div class="day-body">
+        <ul class="timeline">
+          <li class="tl-item">
+            <div class="tl-time">9–10 AM</div>
+            <div class="tl-dot optional"></div>
+            <div class="tl-content">
+              <div class="tl-title">Central Park Carriage Ride <span class="badge badge-opt">Optional Add-On</span> <span class="badge badge-book">Pre-Book</span></div>
+              <div class="tl-desc">Meet at 59th St & 5th Ave (south entrance to Central Park). <strong>NYC Royal Carriage</strong> is highest rated — 25 min from $99, 45 min from $150, 65 min full tour $217 (all per carriage, not per person). Pre-book at nycroyalcarriage.com. Morning is the most comfortable time in June heat. <em>Note: horses don't run above 89°F — June can be close to that. Check weather and have a backup plan.</em></div>
+            </div>
+          </li>
+          <li class="tl-item">
+            <div class="tl-time">10–12 PM</div>
+            <div class="tl-dot"></div>
+            <div class="tl-content">
+              <div class="tl-title">Central Park <span class="badge badge-free">Free</span></div>
+              <div class="tl-desc">Walk Bethesda Fountain, Bow Bridge, Strawberry Fields, The Mall. June is beautiful — green and full. Pick up a coffee from a cart. Plan 1.5–2 hrs here depending on pace. Comfortable walking shoes are a must.</div>
+            </div>
+          </li>
+          <li class="tl-item">
+            <div class="tl-time">12–1:30 PM</div>
+            <div class="tl-dot"></div>
+            <div class="tl-content">
+              <div class="tl-title">Lunch — Via Quadronno</div>
+              <div class="tl-desc">25 E. 73rd St · Upper East Side. A 10-min walk from the east side of Central Park. Italian café known for house-made pastas, excellent panini, and gelato. Casual but genuinely good — a local staple since 1999. No need to rush. ~$20–30/person.</div>
+            </div>
+          </li>
+          <li class="tl-item">
+            <div class="tl-time">2:30–3:30 PM</div>
+            <div class="tl-dot"></div>
+            <div class="tl-content">
+              <div class="tl-title">🍨 Serendipity 3 — Afternoon Treat <span class="badge badge-book">Reserve on Resy</span></div>
+              <div class="tl-desc">225 E. 60th St · 15 min walk south from Via Quadronno. This is a dessert experience, not a meal — the Frrrozen Hot Chocolate is the main event. Book on Resy for a specific time slot so there's no summer wait. Budget ~$20–30/person for drinks and a dessert each. The original location is the one worth going to.</div>
+            </div>
+          </li>
+          <li class="tl-item">
+            <div class="tl-time">4:30–7 PM</div>
+            <div class="tl-dot"></div>
+            <div class="tl-content">
+              <div class="tl-title">Chelsea Market <span class="badge badge-free">Free Entry</span></div>
+              <div class="tl-desc">75 9th Ave. Uber from Upper East Side (~$20–25, 25 min). 30+ food vendors, unique shops, exposed brick from the original Nabisco cookie factory. Pier 57 rooftop just 5 min away for free panoramic Hudson River views. Plan 2–2.5 hrs.</div>
+            </div>
+          </li>
+          <li class="tl-item">
+            <div class="tl-time">Evening</div>
+            <div class="tl-dot optional"></div>
+            <div class="tl-content">
+              <div class="tl-title">Last Night in NYC — Free Evening</div>
+              <div class="tl-desc">Dinner at Chelsea Market, then Uber back to Midtown for a final Times Square walk if they want it. Last full night — let the daughter call it.</div>
+            </div>
+          </li>
+        </ul>
+        <div style="background:var(--section-bg); border-radius:6px; padding:16px 18px; margin-top:8px;">
+          <div style="font-size:10px; font-weight:700; letter-spacing:3px; text-transform:uppercase; color:var(--gold); margin-bottom:10px;">🍽️ Food — Day 3</div>
+          <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px 20px;">
+            <div style="font-size:13px;">
+              <div style="font-weight:700; color:var(--ink);">☕ Breakfast — Friedman's</div>
+              <div style="color:var(--muted); margin-top:3px;">Multiple Midtown locations. Farm-to-table comfort food, great avocado toast and eggs. Sit-down, casual-cool vibe. ~$18–25/person. Good fuel before a Central Park morning.</div>
+            </div>
+            <div style="font-size:13px;">
+              <div style="font-weight:700; color:var(--ink);">🍝 Lunch — Via Quadronno</div>
+              <div style="color:var(--muted); margin-top:3px;">25 E. 73rd St. Pasta, panini, gelato — right off the east side of Central Park. Relaxed, no-rush lunch before the afternoon treat. ~$20–30/person.</div>
+            </div>
+            <div style="font-size:13px;">
+              <div style="font-weight:700; color:var(--ink);">🍨 Mid-Afternoon — Serendipity 3</div>
+              <div style="color:var(--muted); margin-top:3px;">225 E. 60th St. Dessert stop, not a meal. The Frrrozen Hot Chocolate is the reason to go. Reserve on Resy. ~2:30 PM slot. ~$20–30/person.</div>
+            </div>
+            <div style="font-size:13px; grid-column: 1 / -1; border-top: 1px solid var(--border); padding-top: 8px; margin-top: 4px;">
+              <div style="font-weight:700; color:var(--ink);">🌮 Dinner — Los Tacos No. 1 (Chelsea Market)</div>
+              <div style="color:var(--muted); margin-top:3px;">75 9th Ave, inside Chelsea Market. Consistently rated best tacos in NYC. Carne asada and adobada (marinated pork with pineapple) are the orders. Standing room only, fast line, ~$15–20/person. Perfect casual last dinner — snack through Chelsea Market then grab tacos before heading back to Midtown.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DAY 4 -->
+    <div class="day-card">
+      <div class="day-header">
+        <div class="day-num">4</div>
+        <div class="day-info">
+          <div class="day-name">Check Out & Drive Home</div>
+          <div class="day-date">Wednesday, June 24</div>
+        </div>
+      </div>
+      <div class="day-body">
+        <ul class="timeline">
+          <li class="tl-item">
+            <div class="tl-time">8–9 AM</div>
+            <div class="tl-dot"></div>
+            <div class="tl-content">
+              <div class="tl-title">Check Out & Breakfast</div>
+              <div class="tl-desc">Grab breakfast near the hotel before checkout. It's a travel day — keep it quick. Junior's (Broadway & 45th) is a NYC institution and opens early; great last meal before the drive. Or grab bagels from a cart and eat on the go.</div>
+            </div>
+          </li>
+          <li class="tl-item">
+            <div class="tl-time">10–11 AM</div>
+            <div class="tl-dot drive"></div>
+            <div class="tl-content">
+              <div class="tl-title">Uber to Penn Station · Train to Metropark</div>
+              <div class="tl-desc"><strong>Target Penn Station no later than 10 AM.</strong> ~45 min back to Metropark. Pick up car, depart NJ by 11–11:30 AM. This avoids the NJ/PA afternoon traffic that starts building around 12–1 PM on weekdays.</div>
+            </div>
+          </li>
+          <li class="tl-item">
+            <div class="tl-time">11 AM–9 PM</div>
+            <div class="tl-dot drive"></div>
+            <div class="tl-content">
+              <div class="tl-title">Drive Home to Fort Wayne</div>
+              <div class="tl-desc">Reverse route: Garden State Pkwy → I-78 W → I-80 W → I-69 N. 3–4 stops, ~10 hrs. Home by 9–10 PM.</div>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- BROADWAY -->
+  <div class="section">
+    <div class="section-label">Optional Add-On</div>
+    <div class="section-title">Broadway Show Recommendations</div>
+    <p style="font-size:13.5px; color:var(--muted); margin-bottom:20px;">Best fit is <strong>Monday June 22 evening</strong> — you'll already be near the Theater District from the day's activities. If doing a show, plan dinner before 6 PM so you're seated by curtain (~7 PM). Book on broadway.com or TodayTix (last-minute discount app).</p>
+    <div class="show-grid">
+      <div class="show-card recommended">
+        <div class="show-name">& Juliet</div>
+        <div class="show-meta">🌟 Top Pick for a 16-Year-Old</div>
+        <div class="show-why">Max Martin pop jukebox musical — Britney Spears, Katy Perry, Backstreet Boys hits reimagined. Written by the Schitt's Creek writer. Empowering story, LGBTQ+ inclusive, funny, energetic. Perfect for a teenage girl. Confirm it's still running June 2026.</div>
+      </div>
+      <div class="show-card recommended">
+        <div class="show-name">SIX</div>
+        <div class="show-meta">🌟 Strong Teens/Women Pick</div>
+        <div class="show-why">Henry VIII's six wives retold as a pop concert. Catchy, feminist, fast-paced. Long-running proven hit. Specifically praised for tweens and teens. 80 min, no intermission — great for first-time Broadway goers.</div>
+      </div>
+      <div class="show-card">
+        <div class="show-name">Cats: The Jellicle Ball</div>
+        <div class="show-meta">Bold & Unique · New in 2026</div>
+        <div class="show-why">Drag and ball culture reimagining of Cats. Bold, fresh take. If the daughter is into that world, this would be memorable and distinctly NYC. More avant-garde than the others.</div>
+      </div>
+      <div class="show-card">
+        <div class="show-name">Harry Potter & the Cursed Child</div>
+        <div class="show-meta">Safe Family Choice</div>
+        <div class="show-why">If she's a Harry Potter fan, the stagecraft is genuinely stunning. Longer show (~2.5 hrs with intermission). Well-reviewed for older kids and teens. Safe, known quantity.</div>
+      </div>
+    </div>
+    <p style="font-size:12.5px; color:var(--muted); margin-top:14px; padding:12px 16px; background:var(--section-bg); border-radius:6px;">
+      💡 <strong>Cost:</strong> Broadway tickets range $80–200+ per person depending on show and seat. TodayTix app often has same-week deals. TKTS booth in Times Square sells day-of discount tickets starting at noon.
+    </p>
+  </div>
+
+  <!-- SAFETY -->
+  <div class="section">
+    <div class="section-label">Peace of Mind</div>
+    <div class="section-title">Safety Notes</div>
+    <div class="safety-grid">
+      <div class="safety-card">
+        <div class="safety-title">🏙️ Neighborhood Reality</div>
+        <div class="safety-body">The entire itinerary — Times Square, 5th Ave, Rockefeller, Central Park, Herald Square, Grand Central — is in one of the most heavily policed tourist corridors on earth. Extremely safe during the day and evening. No concerns for this itinerary as planned.</div>
+      </div>
+      <div class="safety-card">
+        <div class="safety-title">🌙 After Dark</div>
+        <div class="safety-body">Times Square and Midtown are well-lit and busy until midnight. Stick to main streets, not side alleys after 10 PM. Uber over walking for anything after 10 PM, especially to/from Chelsea which is further from Midtown.</div>
+      </div>
+      <div class="safety-card">
+        <div class="safety-title">🚕 Transportation</div>
+        <div class="safety-body">Use Uber or Lyft exclusively. Avoid hailing random cabs. The app shows driver name, plate, and route — much safer. Share trip status with Jon from the Uber app so he can track in real time.</div>
+      </div>
+      <div class="safety-card">
+        <div class="safety-title">📱 Stay Connected</div>
+        <div class="safety-body">Both should have Find My (iOS) location sharing active with Jon. Keep phones charged — bring a portable battery. Screenshot hotel address and Metropark station address offline in case of connectivity issues.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BOOKING CHECKLIST -->
+  <div class="section">
+    <div class="section-label">Action Items</div>
+    <div class="section-title">Booking Checklist</div>
+    <div class="checklist">
+      <div class="checklist-title">Book in This Order</div>
+      <div class="check-item">
+        <div class="check-box"></div>
+        <div class="check-label"><strong>May 25, 3 PM ET</strong> — Jellycat Diner reservation at faoschwarz.com/pages/reservations <span class="check-urgency">Urgent · Sells Out</span></div>
+      </div>
+      <div class="check-item">
+        <div class="check-box"></div>
+        <div class="check-label"><strong>Now</strong> — Hotel for June 21–24. Top recommendation: <strong>EVEN Hotel Midtown East ($327)</strong> — Google 4.2 confirmed, girls-weekend reviews, no resort fee. Fitzpatrick Grand Central ($305) is the best-price backup. Both have two-bed rooms confirmed. Shelburne Sonesta lists at $271 but add $42/night mandatory fee (~$313 effective). Verify Google Hotels rating before booking Hilton Times Square or any HGI option.</div>
+      </div>
+      <div class="check-item">
+        <div class="check-box"></div>
+        <div class="check-label"><strong>Now</strong> — Serendipity 3 reservation on Resy (resy.com) for June 23 lunch. Book as soon as the date becomes available on the platform.</div>
+      </div>
+      <div class="check-item">
+        <div class="check-box"></div>
+        <div class="check-label"><strong>Before June 21</strong> — NexPass app (nexusparkingsystems.com). Register license plate for Metropark parking. Takes 5 min.</div>
+      </div>
+      <div class="check-item">
+        <div class="check-box"></div>
+        <div class="check-label"><strong>Before leaving</strong> — Download <strong>NJ Transit app</strong> (free, iOS). Create account. Use MyTix to buy Northeast Corridor tickets. Also download DepartureVision to see live train departures.</div>
+      </div>
+      <div class="check-item">
+        <div class="check-box"></div>
+        <div class="check-label"><strong>Optional</strong> — Broadway tickets. & Juliet or SIX recommended. Broadway.com or TodayTix app. Best for June 22 evening.</div>
+      </div>
+      <div class="check-item">
+        <div class="check-box"></div>
+        <div class="check-label"><strong>Optional</strong> — Central Park Carriage Ride. Pre-book at nycroyalcarriage.com. 45-min tour ~$150/carriage. Book for June 23 morning.</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<footer>
+  <strong>NYC Trip Plan · June 21–24, 2026</strong><br>
+  Generated May 2026 · Prices and availability subject to change · Always confirm reservations directly with venues
+</footer>
+
+</body>
+</html>

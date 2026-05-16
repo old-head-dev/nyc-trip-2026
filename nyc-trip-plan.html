@@ -437,8 +437,20 @@
     padding: 10px 0;
     border-bottom: 1px solid rgba(255,255,255,0.08);
   }
+  .check-item:not(.permanent) {
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    transition: background 120ms ease;
+    margin: 0 -10px;
+    padding: 10px;
+    border-radius: 4px;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+  }
+  .check-item:not(.permanent):hover { background: rgba(255,255,255,0.03); }
+  .check-item:not(.permanent):active .check-box { transform: scale(0.92); }
   .check-item:last-child { border-bottom: none; }
   .check-item.done .check-label { color: rgba(255,255,255,0.45); }
+  .check-item.done .check-label strong { color: rgba(232,196,118,0.55); }
   .check-box {
     width: 18px;
     height: 18px;
@@ -451,12 +463,36 @@
     justify-content: center;
     font-size: 11px;
     font-weight: 700;
+    transition: transform 100ms ease, background 120ms ease, border-color 120ms ease;
+    user-select: none;
   }
   .check-box.done {
     background: #2d6a4f;
     border-color: #2d6a4f;
     color: #fff;
   }
+  .sync-status {
+    margin-top: 16px;
+    font-size: 11.5px;
+    color: rgba(255,255,255,0.45);
+    letter-spacing: 0.4px;
+    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .sync-status::before {
+    content: '';
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.3);
+    display: inline-block;
+  }
+  .sync-status.synced::before { background: #2d6a4f; }
+  .sync-status.syncing::before { background: #c9973a; }
+  .sync-status.local-only::before { background: rgba(255,255,255,0.3); }
+  .sync-status.error::before { background: #c14242; }
   .check-label { font-size: 13.5px; color: rgba(255,255,255,0.85); line-height: 1.5; }
   .check-label strong { color: var(--gold-light); }
   .check-urgency {
@@ -1105,61 +1141,62 @@
     <div class="checklist">
       <div class="checklist-title">Book in This Order</div>
 
-      <div class="check-item done">
+      <div class="check-item done permanent" data-check-id="jewel-hotel">
         <div class="check-box done">✓</div>
         <div class="check-label"><strong>BOOKED — The Jewel New York, 11 W 51st St, New York, NY 10019</strong><br>Check-in June 21 at 3 PM · Check-out June 24 at 12 PM (noon)</div>
       </div>
 
-      <div class="check-item">
+      <div class="check-item" data-check-id="blue-box-may23">
         <div class="check-box"></div>
         <div class="check-label"><strong>May 23 (morning)</strong> — Blue Box Café on Resy for June 22 breakfast <span class="check-urgency">Time-Sensitive</span><br><span style="font-size:12.5px; color:rgba(255,255,255,0.5);">resy.com → Tiffany Blue Box Café, 727 5th Ave, 5th Floor. Breakfast for 2. Calendar reminder set.</span></div>
       </div>
 
-      <div class="check-item">
+      <div class="check-item" data-check-id="blue-box-may24">
         <div class="check-box"></div>
         <div class="check-label"><strong>May 24 (morning)</strong> — Blue Box Café on Resy for June 23 breakfast (backup) <span class="check-urgency">Time-Sensitive</span><br><span style="font-size:12.5px; color:rgba(255,255,255,0.5);">Same as above. Only needed if June 22 slot not available. Calendar reminder set.</span></div>
       </div>
 
-      <div class="check-item">
+      <div class="check-item" data-check-id="jellycat-may25">
         <div class="check-box"></div>
         <div class="check-label"><strong>May 25, 3 PM ET</strong> — Jellycat Diner at FAO Schwarz <span class="check-urgency">Urgent · Sells Out</span><br><span style="font-size:12.5px; color:rgba(255,255,255,0.5);">faoschwarz.com/pages/reservations · Two devices, refresh at exactly 3:00 PM. $70+/person. Calendar reminder already set.</span></div>
       </div>
 
-      <div class="check-item">
+      <div class="check-item" data-check-id="museum-ice-cream">
         <div class="check-box"></div>
         <div class="check-label"><strong>Now</strong> — Museum of Ice Cream tickets <span class="check-urgency">Required · Sells Out in Summer</span><br><span style="font-size:12.5px; color:rgba(255,255,255,0.5);">museumoficecream.com · 558 Broadway, SoHo · ~$38–42/person. Book for whichever day is the SoHo day (June 22 or 23).</span></div>
       </div>
 
-      <div class="check-item">
+      <div class="check-item" data-check-id="tao-uptown">
         <div class="check-box"></div>
         <div class="check-label"><strong>Now</strong> — TAO Uptown dinner reservation <span class="check-urgency">Reserve ASAP</span><br><span style="font-size:12.5px; color:rgba(255,255,255,0.5);">OpenTable · 42 E 58th St · Book for the Central Park day evening (June 22 or 23). Fills up weeks out in June.</span></div>
       </div>
 
-      <div class="check-item">
+      <div class="check-item" data-check-id="serendipity">
         <div class="check-box"></div>
         <div class="check-label"><strong>Now</strong> — Serendipity 3 reservation on Resy<br><span style="font-size:12.5px; color:rgba(255,255,255,0.5);">resy.com · 225 E 60th St · Book for the Central Park day (~2:30–3 PM slot). Book as soon as 30–60 days out opens on the platform.</span></div>
       </div>
 
-      <div class="check-item">
+      <div class="check-item" data-check-id="nexpass">
         <div class="check-box"></div>
         <div class="check-label"><strong>Before June 21</strong> — NexPass app (nexusparkingsystems.com)<br><span style="font-size:12.5px; color:rgba(255,255,255,0.5);">Register license plate for Metropark parking. 5 min setup.</span></div>
       </div>
 
-      <div class="check-item">
+      <div class="check-item" data-check-id="nj-transit">
         <div class="check-box"></div>
         <div class="check-label"><strong>Before leaving</strong> — NJ Transit app<br><span style="font-size:12.5px; color:rgba(255,255,255,0.5);">Free, iOS. Create account. Use MyTix for Northeast Corridor tickets. Also download DepartureVision for live train departures.</span></div>
       </div>
 
-      <div class="check-item">
+      <div class="check-item" data-check-id="broadway-show">
         <div class="check-box"></div>
         <div class="check-label"><strong>Optional</strong> — Broadway Show<br><span style="font-size:12.5px; color:rgba(255,255,255,0.5);">&amp; Juliet or SIX recommended. Broadway.com or TodayTix app. Best for whichever evening works. TKTS booth in Times Square sells day-of discounts at noon if deciding last minute.</span></div>
       </div>
 
-      <div class="check-item">
+      <div class="check-item" data-check-id="carriage-ride">
         <div class="check-box"></div>
         <div class="check-label"><strong>Optional</strong> — Central Park Carriage Ride<br><span style="font-size:12.5px; color:rgba(255,255,255,0.5);">nycroyalcarriage.com · 45-min tour ~$150/carriage · Book for Central Park morning (June 22 or 23). Doesn't run above 89°F.</span></div>
       </div>
 
+      <div class="sync-status" id="syncStatus" hidden></div>
     </div>
   </div>
 
@@ -1169,6 +1206,151 @@
   <strong>NYC Trip Plan · June 21–24, 2026</strong><br>
   Generated May 2026 · Prices and availability subject to change · Always confirm reservations directly with venues
 </footer>
+
+<script>
+/* ============================================================
+   CHECKLIST SYNC
+   ------------------------------------------------------------
+   Cross-device sync via JSONBin.io. To enable:
+     1. Sign up free at https://jsonbin.io (Google login works).
+     2. Create a new bin with the body:  {}
+        Copy the BIN ID from the URL (24-char hex string).
+     3. API Keys -> create an ACCESS KEY with permissions
+        Read + Update, restricted to that bin only.
+     4. Paste both values below and commit/push.
+
+   Until configured, the checklist still works — state is
+   saved per-device in localStorage.
+   ============================================================ */
+const SYNC_CONFIG = {
+  binId:     "REPLACE_WITH_BIN_ID",
+  accessKey: "REPLACE_WITH_ACCESS_KEY"
+};
+
+(function () {
+  const STORAGE_KEY = "nyc-trip-checklist-v1";
+  const DEBOUNCE_MS = 1200;
+  const API_BASE    = "https://api.jsonbin.io/v3/b";
+  const statusEl    = document.getElementById("syncStatus");
+  const items       = Array.from(document.querySelectorAll(".checklist .check-item"));
+  const syncEnabled = !SYNC_CONFIG.binId.startsWith("REPLACE_") && !SYNC_CONFIG.accessKey.startsWith("REPLACE_");
+  let syncTimer = null;
+
+  function setStatus(kind, text) {
+    if (!statusEl) return;
+    statusEl.hidden = false;
+    statusEl.className = "sync-status " + kind;
+    statusEl.textContent = text;
+  }
+
+  function getState() {
+    const state = {};
+    for (const item of items) {
+      if (item.classList.contains("permanent")) continue;
+      state[item.dataset.checkId] = item.classList.contains("done");
+    }
+    return state;
+  }
+
+  function applyState(state) {
+    if (!state) return;
+    for (const item of items) {
+      if (item.classList.contains("permanent")) continue;
+      const id = item.dataset.checkId;
+      if (!(id in state)) continue;
+      const done = !!state[id];
+      const box  = item.querySelector(".check-box");
+      item.classList.toggle("done", done);
+      box.classList.toggle("done", done);
+      box.textContent = done ? "✓" : "";
+    }
+  }
+
+  function saveLocal(state) {
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch (_) {}
+  }
+  function loadLocal() {
+    try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}"); }
+    catch (_) { return {}; }
+  }
+
+  async function loadRemote() {
+    const res = await fetch(`${API_BASE}/${SYNC_CONFIG.binId}/latest`, {
+      headers: { "X-Access-Key": SYNC_CONFIG.accessKey },
+      cache: "no-store"
+    });
+    if (!res.ok) throw new Error("Remote load failed: " + res.status);
+    const data = await res.json();
+    return data.record || {};
+  }
+
+  async function saveRemote(state) {
+    const res = await fetch(`${API_BASE}/${SYNC_CONFIG.binId}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        "X-Access-Key": SYNC_CONFIG.accessKey
+      },
+      body: JSON.stringify(state)
+    });
+    if (!res.ok) throw new Error("Remote save failed: " + res.status);
+  }
+
+  function scheduleSync() {
+    if (!syncEnabled) return;
+    clearTimeout(syncTimer);
+    setStatus("syncing", "Saving…");
+    syncTimer = setTimeout(async () => {
+      try {
+        await saveRemote(getState());
+        setStatus("synced", "Synced across devices");
+      } catch (e) {
+        console.warn(e);
+        setStatus("error", "Sync failed — saved locally");
+      }
+    }, DEBOUNCE_MS);
+  }
+
+  function toggleItem(item) {
+    if (item.classList.contains("permanent")) return;
+    const done = !item.classList.contains("done");
+    const box  = item.querySelector(".check-box");
+    item.classList.toggle("done", done);
+    box.classList.toggle("done", done);
+    box.textContent = done ? "✓" : "";
+    saveLocal(getState());
+    scheduleSync();
+  }
+
+  // 1. Apply local state immediately so the UI is correct on load.
+  applyState(loadLocal());
+
+  // 2. Wire up click handlers on each non-permanent row.
+  for (const item of items) {
+    if (item.classList.contains("permanent")) continue;
+    item.addEventListener("click", () => toggleItem(item));
+  }
+
+  // 3. Pull remote state (if configured) and overlay it.
+  if (syncEnabled) {
+    setStatus("syncing", "Loading from cloud…");
+    loadRemote()
+      .then(remote => {
+        if (remote && Object.keys(remote).length) {
+          applyState(remote);
+          saveLocal(remote);
+        }
+        setStatus("synced", "Synced across devices");
+      })
+      .catch(err => {
+        console.warn(err);
+        setStatus("error", "Cloud unavailable — using local only");
+      });
+  } else {
+    setStatus("local-only", "Local only — see SYNC_CONFIG in source to enable cross-device sync");
+  }
+})();
+</script>
 
 </body>
 </html>

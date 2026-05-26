@@ -111,7 +111,7 @@ struct Step: Identifiable {
     let title: String     // 1-2 lines
     let subtitle: String? // 1-2 lines, optional
     let reservation: ReservationDetail?  // optional booking card
-    let cta: CTA?         // optional action button
+    let ctas: [CTA]       // 0, 1, or 2 buttons (e.g., walk-or-drive)
     let background: Color
     let accent: Color
     let textPrimary: Color
@@ -119,18 +119,18 @@ struct Step: Identifiable {
 }
 
 struct ReservationDetail {
-    let time: String       // "10:00 AM"
+    let time: String       // "10:00 AM" or "Check-in 3:00 PM"
     let address: String    // "727 5th Ave, 5th Floor"
-    let bookingNumber: String?  // "#351207910" — optional
-    let partySize: String? // "Breakfast for 2"
+    let confirmation: String?  // "#351207910" or hotel confirmation number — optional
+    let extra: String?     // free-form: "Room: King Suite" or "Breakfast for 2" — optional
 }
 
 enum CTA {
-    case openInGoogleMaps(destination: String)   // address or coords
-    case openInUber(destination: String)
-    case openMyTix                                // best-effort scheme + fallback
-    case callPhone(number: String)                // for restaurants if needed
-    case openURL(URL, label: String)              // generic escape hatch
+    case openInGoogleMaps(destination: String?, label: String)  // nil destination = open Maps with no preset
+    case openInUber(destination: String, label: String)
+    case openMyTix(label: String)                  // opens NJ Transit Mobile app
+    case callPhone(number: String, label: String)  // for restaurants if needed
+    case openURL(URL, label: String)               // generic escape hatch
 }
 ```
 
@@ -153,11 +153,11 @@ Built via `UIApplication.shared.open(URL)` with universal links (HTTPS) which au
 |---------------------|-----------------------------------------------------------------------------|
 | Google Maps         | `https://www.google.com/maps/dir/?api=1&destination=<URL-encoded address>` |
 | Uber                | `https://m.uber.com/ul/?action=setPickup&pickup=my_location&dropoff[formatted_address]=<URL-encoded address>` |
-| MyTix (NJ Transit)  | Try `njtransit://`. If `canOpenURL` returns false, fall back to App Store link `https://apps.apple.com/us/app/nj-transit-mobile/id526181746`. |
+| MyTix (NJ Transit)  | Open the NJ Transit Mobile app via its URL scheme (`njtransit://`). No deep linking to a specific route — just launches the app, she taps to her tickets manually. Jon ensures the app is installed pre-trip. |
 | Phone               | `tel:<number>`                                                              |
 | Generic             | The URL itself.                                                             |
 
-Universal links open the native app if installed (Google Maps app, Uber app), otherwise the mobile site. Katy doesn't need to have any specific app pre-installed except MyTix (which Jon ensures pre-trip).
+Universal links open the native app if installed (Google Maps app, Uber app), otherwise the mobile site. For best experience, Jon ensures all three apps are installed on Katy's phone pre-trip: **Google Maps**, **Uber** (with payment method saved), and **NJ Transit Mobile** (with round-trip Metropark↔NY Penn tickets pre-bought).
 
 ### Welcome screen
 
@@ -168,10 +168,12 @@ Day 0 · pastel: soft peach background
 
          [sparkles symbol]
 
+         Katy and Jada...
+
          Welcome to your
          NYC trip!
 
-         Katy and Jada — June 21–24
+         June 21–24, 2026
 
          [Begin]   <— gold/accent pill button
 ```
@@ -198,50 +200,54 @@ Tapping anywhere does nothing — the trip is done. Re-opening the app returns h
 
 ### Step content (preliminary list, final at authoring)
 
-Estimated **~24 step screens** + Welcome + Closing = **~26 screens total**. Subject to refinement when Jon authors content.
+Estimated **~29 step screens** + Welcome + Closing = **~31 screens total**. Subject to refinement when Jon authors content.
 
 **Optional-step convention:** steps that are skippable (e.g., Via Quadronno lunch) prefix the title with `OPTIONAL:` in the same color as the rest of the title — no separate badge. The user simply taps Next to skip; they're still in the linear flow.
 
 **Day 1 — Drive day (Sunday, June 21)**
-1. Drive to Metropark Station (Google Maps CTA)
-2. Park at Metropark (NexPass note, no CTA)
-3. Open MyTix → buy train ticket (MyTix CTA + plain instructions)
-4. Take the Northeast Corridor train to NY Penn (no CTA, info only)
-5. Uber from Penn Station to The Jewel (Uber CTA, destination = hotel)
-6. Check in at The Jewel (no CTA)
-7. Dinner at Joe's Pizza (Google Maps CTA, address = 1435 Broadway)
-8. Times Square first look (Google Maps CTA)
+1. **Drive to Metropark Station** · CTA: Open in Google Maps (Iselin, NJ).
+2. **Park at Metropark** · No CTA. Subtitle reminds: NexPass reads the plate automatically — no ticket to deal with.
+3. **Take the train to NY Penn** · CTA: Open MyTix. Subtitle: Northeast Corridor line · activate ticket at the platform.
+4. **Uber to The Jewel** · CTA: Open in Uber (destination = 11 W 51st St).
+5. **Check in at The Jewel** · Reservation Card: confirmation # (TBD), room type (TBD), check-in 3:00 PM. No CTA.
+6. **Dinner at Joe's Pizza** · CTA: Open in Google Maps (1435 Broadway).
+7. **Times Square first look** · CTA: Open in Google Maps (Times Square).
+8. **Return to The Jewel** · CTA: Open in Google Maps (11 W 51st St). For when they're done wandering.
 
 **Day 2 — Midtown / Central Park / TAO (Monday, June 22)**
-9. Breakfast at Blue Box Café — Reservation Card: 10:00 AM, 727 5th Ave 5th Fl, party of 2 (Google Maps CTA)
-10. Jellycat at FAO Schwarz — Reservation Card: 11:50 AM, 30 Rock, Booking #351207910 (Google Maps CTA)
-11. Visit Grand Central Terminal (Google Maps CTA)
-12. OPTIONAL: Lunch at Via Quadronno — pastel signal that this is optional; no reservation (Google Maps CTA)
-13. Walk Central Park (Bow Bridge → Bethesda) (Google Maps CTA, dropoff at Bethesda Fountain)
-14. Herald Square + Macy's (Uber CTA from Central Park south)
-15. Back to hotel — freshen up for dinner (no CTA)
-16. Dinner at TAO Uptown — Reservation Card: 6:30 PM, 42 E 58th St (Google Maps CTA)
+9. **Breakfast at Blue Box Café** · Reservation Card: 10:00 AM, 727 5th Ave 5th Fl, breakfast for 2. CTA: Open in Google Maps.
+10. **Jellycat at FAO Schwarz** · Reservation Card: 11:50 AM, 30 Rockefeller Plaza, Booking #351207910. CTA: Open in Google Maps.
+11. **Visit Grand Central Terminal** · CTA: Open in Google Maps (89 E 42nd St).
+12. **OPTIONAL: Lunch at Via Quadronno** · CTA: Open in Google Maps (25 E 73rd St). Tap Next to skip.
+13. **Walk Central Park** (Bow Bridge → Bethesda) · TWO CTAs: Open in Google Maps · Walk  /  Open in Uber · Drive.
+14. **Herald Square + Macy's** · CTA: Open in Uber (151 W 34th St).
+15. **Back to hotel · Freshen up** · TWO CTAs: Open in Google Maps · Walk  /  Open in Uber · Drive.
+16. **Dinner at TAO Uptown** · Reservation Card: 6:30 PM, 42 E 58th St. CTA: Open in Google Maps.
 
 **Day 3 — Downtown / SoHo (Tuesday, June 23)**
-17. Breakfast at Sunday Morning (Uber CTA, 29 W 25th St)
-18. SoHo shopping — Broadway, Spring, Prince (Google Maps CTA)
-19. Canal Street (Google Maps CTA)
-20. Lunch at Jack's Wife Freda (Google Maps CTA, 226 Lafayette St)
-21. Museum of Ice Cream — Reservation Card: time TBD by ticket, 558 Broadway (Google Maps CTA)
-22. Uber back to hotel (Uber CTA, destination = The Jewel)
-23. Evening walk — 5th Ave & Madison (Google Maps CTA or no CTA)
-24. Dinner — pick a spot near the hotel (no CTA, decide day-of)
+17. **Breakfast at Sunday Morning** · CTA: Open in Uber (29 W 25th St).
+18. **SoHo shopping** · CTA: Open in Uber (SoHo, Broadway & Spring St). Walk once arrived.
+19. **Canal Street** · CTA: Open in Google Maps (Canal St, Chinatown).
+20. **Lunch at Jack's Wife Freda** · CTA: Open in Google Maps (226 Lafayette St).
+21. **Museum of Ice Cream** · Reservation Card: time set by ticket purchase, 558 Broadway. CTA: Open in Google Maps.
+22. **Uber back to hotel** · CTA: Open in Uber (11 W 51st St).
+23. **Evening walk · 5th Ave & Madison** · No CTA. Subtitle: stroll the storefronts at dusk.
+24. **Dinner — pick a spot near the hotel** · CTA: Open Google Maps (no destination preset — she can search/wander).
 
 **Day 4 — Drive home (Wednesday, June 24)**
-25. Breakfast at Liberty Bagels + check out (Google Maps CTA)
-26. Uber to Penn Station, train to Metropark (Uber CTA, destination = Penn Station)
-27. Drive home to Fort Wayne (Google Maps CTA, destination = home)
+25. **Breakfast at Liberty Bagels** · CTA: Open in Google Maps.
+26. **Back to The Jewel · Check out** · CTA: Open in Google Maps (11 W 51st St). Subtitle: checkout by 12:00 PM (noon).
+27. **Uber to Penn Station** · CTA: Open in Uber (NY Penn Station).
+28. **Take the train to Metropark** · CTA: Open MyTix. Subtitle: Northeast Corridor line · activate ticket at the platform.
+29. **Drive home to Fort Wayne** · CTA: Open in Google Maps (home address). Subtitle: NexPass reads the plate on the way out — no parking ticket to pay.
 
 Welcome and Closing bookend these. Final order/count finalized at authoring.
 
 ### Reservation card
 
-When a step has a `ReservationDetail`, a card renders below the subtitle showing time, address, booking number (if any), and party size. Card style: white-with-soft-shadow on the pastel background, rounded 14pt, small accent dot. Booking number is tappable to copy to clipboard with a brief haptic feedback + "Copied" toast.
+When a step has a `ReservationDetail`, a card renders below the subtitle showing time, address, confirmation number (if any), and an `extra` line for room type / party size / etc. Card style: white-with-soft-shadow on the pastel background, rounded 14pt, small accent dot. Confirmation number is tappable to copy to clipboard with a brief haptic feedback + "Copied" toast.
+
+Used by: Check-in at The Jewel, Blue Box Café, Jellycat at FAO Schwarz, TAO Uptown, Museum of Ice Cream.
 
 ### Accessibility
 
@@ -286,7 +292,7 @@ Custom icon — soft peach background with a small SF-Symbol-style sparkles or h
 
 ## Risks & open questions
 
-1. **MyTix deep link reliability** — `njtransit://` scheme may or may not exist. If `canOpenURL` returns false, we show App Store link. Verify at implementation time; design degrades gracefully either way.
+1. **MyTix URL scheme** — `njtransit://` should launch the NJ Transit Mobile app. Verify at implementation time. Worst case the button does nothing if the app isn't installed; Jon installs it pre-trip so this should not surface in practice.
 2. **DM Sans font licensing** — DM Sans is Open Font License (free for commercial and personal use). Confirm at bundle time.
 3. **Universal link routing** — Google Maps and Uber universal HTTPS links assume iOS routes them to installed apps. iOS 17 should but verify on Katy's device early.
 4. **Dynamic Type extreme sizes** — very large accessibility text may break the 2-line title constraint. Author titles short enough to survive at `.accessibility3` scale.

@@ -127,22 +127,6 @@
     margin-bottom: 24px;
   }
 
-  /* ALERT / PRIORITY BOX */
-  .alert {
-    background: var(--rust);
-    color: #fff;
-    border-radius: 6px;
-    padding: 18px 22px;
-    margin: 28px 0;
-    display: flex;
-    gap: 14px;
-    align-items: flex-start;
-  }
-  .alert-icon { font-size: 20px; flex-shrink: 0; margin-top: 1px; }
-  .alert-title { font-weight: 600; font-size: 14px; margin-bottom: 4px; }
-  .alert p { font-size: 13.5px; opacity: 0.92; line-height: 1.5; }
-  .alert a { color: #ffd; }
-
   /* DAY CARDS */
   .day-card {
     background: var(--card);
@@ -244,9 +228,7 @@
     margin-left: 6px;
     vertical-align: middle;
   }
-  .badge-opt { background: #e8f0ea; color: var(--sage); }
   .badge-book { background: #fef3e2; color: #9a6800; }
-  .badge-free { background: #edf2f7; color: #4a6080; }
   .badge-req { background: #fde8e3; color: var(--rust); }
 
   /* YOUR HOTEL */
@@ -363,29 +345,6 @@
     line-height: 1.6;
   }
   .logistic-body strong { color: var(--ink); }
-
-  /* BROADWAY */
-  .show-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 14px;
-  }
-  @media (max-width: 600px) { .show-grid { grid-template-columns: 1fr; } }
-  .show-card {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 18px 20px;
-  }
-  .show-card.recommended { border-color: var(--gold); border-width: 2px; }
-  .show-name {
-    font-family: 'Playfair Display', serif;
-    font-size: 16px;
-    font-weight: 700;
-    margin-bottom: 4px;
-  }
-  .show-meta { font-size: 12px; color: var(--muted); margin-bottom: 6px; }
-  .show-why { font-size: 13px; color: var(--ink); line-height: 1.5; }
 
   /* SAFETY */
   .safety-grid {
@@ -504,27 +463,6 @@
     margin-left: 6px;
   }
 
-  /* DAY ORDER NOTE */
-  .day-order-note {
-    background: var(--ink);
-    color: rgba(255,255,255,0.88);
-    border-radius: 8px;
-    padding: 18px 22px;
-    margin-bottom: 24px;
-    display: flex;
-    gap: 14px;
-    align-items: flex-start;
-    border-left: 4px solid var(--gold);
-  }
-  .day-order-note-icon { font-size: 20px; flex-shrink: 0; margin-top: 1px; }
-  .day-order-note-title {
-    font-weight: 700;
-    font-size: 14px;
-    margin-bottom: 5px;
-    color: var(--gold-light);
-  }
-  .day-order-note p { font-size: 13px; line-height: 1.55; }
-
   /* FOOTER */
   footer {
     text-align: center;
@@ -568,19 +506,6 @@
 
 <div class="container">
 
-  <!-- BOOKINGS SECURED -->
-  <div class="alert" style="border-color:#2f7a4f; background:#e8f4ec; color:#1f4a30;">
-    <div class="alert-icon" style="color:#2f7a4f;">✓</div>
-    <div>
-      <div class="alert-title" style="color:#2f7a4f;">Major Time-Sensitive Reservations Secured</div>
-      <p style="color:#1f4a30; opacity:1;"><strong>Monday, June 22 is the Midtown/FAO Schwarz day.</strong> Tuesday, June 23 is the SoHo day.</p>
-      <ul style="margin:8px 0 0 18px; padding:0; color:#1f4a30; font-size:13.5px; line-height:1.5;">
-        <li><strong>Breakfast at Tiffany's — Blue Box Café</strong> · June 22, 10:00 AM · 727 5th Ave, 5th Floor</li>
-        <li><strong>Jellycat Diner Experience at FAO Schwarz</strong> · June 22, 11:50 AM – 12:00 PM · 30 Rockefeller Plaza · Booking #351207910</li>
-      </ul>
-    </div>
-  </div>
-
   <!-- PRE-TRIP CHECKLIST -->
   <div class="section">
     <div class="section-label">Before You Leave Fort Wayne</div>
@@ -598,59 +523,31 @@
           <div style="font-size:13px; color:var(--ink); padding:8px 0; border-bottom:1px solid var(--border);">
             <strong>NexPass</strong> — <span style="color:var(--muted);">nexusparkingsystems.com. Register the car's license plate before arrival so parking payment is fully automatic. No ticket to deal with.</span>
           </div>
-          <div style="font-size:13px; color:var(--ink); padding:8px 0; border-bottom:1px solid var(--border);">
+          <div style="font-size:13px; color:var(--ink); padding:8px 0;">
             <strong>Uber</strong> — <span style="color:var(--muted);">Both phones should have Uber installed and a payment method saved. Primary transport within NYC beyond walking. Also use for trip-sharing so Jon can track rides.</span>
-          </div>
-          <div style="font-size:13px; color:var(--ink); padding:8px 0; border-bottom:1px solid var(--border);">
-            <strong>Find My (iOS)</strong> — <span style="color:var(--muted);">Enable location sharing with Jon on both phones before leaving. Stays on the whole trip. This is the single most important safety step.</span>
-          </div>
-          <div style="font-size:13px; color:var(--ink); padding:8px 0; border-bottom:1px solid var(--border);">
-            <strong>Resy</strong> — <span style="color:var(--muted);">resy.com or app. Already used for Blue Box Café booking. Also use to book Serendipity 3 for Monday, June 22 (~4 PM slot) once the date opens.</span>
-          </div>
-          <div style="font-size:13px; color:var(--ink); padding:8px 0; border-bottom:1px solid var(--border);">
-            <strong>TodayTix</strong> — <span style="color:var(--muted);">Optional. If doing Broadway, this app finds same-week discount tickets. Free to download. Good backup to Broadway.com.</span>
           </div>
         </div>
       </div>
 
-      <!-- RESERVATIONS -->
-      <div style="background:var(--card); border:2px solid var(--rust); border-radius:8px; padding:20px 22px;">
-        <div style="font-size:11px; font-weight:700; letter-spacing:3px; text-transform:uppercase; color:var(--rust); margin-bottom:12px;">🗓️ Reservations Required</div>
+      <!-- RESERVATIONS & TICKETS -->
+      <div style="background:var(--card); border:2px solid var(--rust); border-radius:8px; padding:20px 22px; grid-column: 1 / -1;">
+        <div style="font-size:11px; font-weight:700; letter-spacing:3px; text-transform:uppercase; color:var(--rust); margin-bottom:12px;">🗓️ Reservations &amp; Tickets</div>
         <div style="display:flex; flex-direction:column; gap:0;">
-          <div style="font-size:13px; padding:10px 0; border-bottom:1px solid var(--border);">
-            <div style="font-weight:700; color:var(--ink);">Jellycat Diner <span style="font-size:10px; background:#e8f4ec; color:#2f7a4f; padding:2px 7px; border-radius:3px; font-weight:700; letter-spacing:1px; text-transform:uppercase; margin-left:6px;">✓ Booked</span></div>
-            <div style="color:var(--muted); margin-top:3px;">Monday, June 22 at 11:50 AM – 12:00 PM · 30 Rockefeller Plaza · Booking #351207910.</div>
-          </div>
           <div style="font-size:13px; padding:10px 0; border-bottom:1px solid var(--border);">
             <div style="font-weight:700; color:var(--ink);">Blue Box Café at Tiffany's <span style="font-size:10px; background:#e8f4ec; color:#2f7a4f; padding:2px 7px; border-radius:3px; font-weight:700; letter-spacing:1px; text-transform:uppercase; margin-left:6px;">✓ Booked</span></div>
             <div style="color:var(--muted); margin-top:3px;">Monday, June 22 at 10:00 AM · 727 5th Ave, 5th Floor · Breakfast for 2.</div>
           </div>
           <div style="font-size:13px; padding:10px 0; border-bottom:1px solid var(--border);">
-            <div style="font-weight:700; color:var(--ink);">Serendipity 3</div>
-            <div style="color:var(--muted); margin-top:3px;">resy.com · Original location, 225 E. 60th St · <strong>Book for Monday, June 22 at ~4 PM.</strong> Reserve as soon as 30–60 days out opens on Resy.</div>
+            <div style="font-weight:700; color:var(--ink);">Jellycat Diner at FAO Schwarz <span style="font-size:10px; background:#e8f4ec; color:#2f7a4f; padding:2px 7px; border-radius:3px; font-weight:700; letter-spacing:1px; text-transform:uppercase; margin-left:6px;">✓ Booked</span></div>
+            <div style="color:var(--muted); margin-top:3px;">Monday, June 22 at 11:50 AM – 12:00 PM · 30 Rockefeller Plaza · Booking #351207910.</div>
           </div>
           <div style="font-size:13px; padding:10px 0; border-bottom:1px solid var(--border);">
-            <div style="font-weight:700; color:var(--ink);">Museum of Ice Cream <span style="font-size:10px; background:#edf2f7; color:#4a6080; padding:2px 7px; border-radius:3px; font-weight:700; letter-spacing:1px; text-transform:uppercase; margin-left:6px;">Required</span></div>
-            <div style="color:var(--muted); margin-top:3px;">museumoficecream.com · 558 Broadway, SoHo · ~$38–42/person. Advance tickets required — sells out, especially in summer. Buy before the trip. <strong>Book for Tuesday, June 23.</strong></div>
+            <div style="font-weight:700; color:var(--ink);">TAO Uptown <span style="font-size:10px; background:#fde8e3; color:var(--rust); padding:2px 7px; border-radius:3px; font-weight:700; letter-spacing:1px; text-transform:uppercase; margin-left:6px;">Reserve</span></div>
+            <div style="color:var(--muted); margin-top:3px;">OpenTable · 42 E 58th St · <strong>Book for Monday, June 22 at 6:30 PM.</strong> Fills up weeks out in June.</div>
           </div>
-          <div style="font-size:13px; padding:10px 0;">
-            <div style="font-weight:700; color:var(--ink);">Central Park Carriage <span style="font-size:10px; background:#e8f0ea; color:var(--sage); padding:2px 7px; border-radius:3px; font-weight:700; letter-spacing:1px; text-transform:uppercase; margin-left:6px;">Optional</span></div>
-            <div style="color:var(--muted); margin-top:3px;">nycroyalcarriage.com · Monday, June 22 afternoon · ~$150/carriage for 45 min. Pre-book — don't rely on walk-up in June. Check weather forecast; horses don't operate above 89°F.</div>
-          </div>
-        </div>
-      </div>
-
-      <!-- TICKETS -->
-      <div style="background:var(--card); border:1px solid var(--border); border-radius:8px; padding:20px 22px;">
-        <div style="font-size:11px; font-weight:700; letter-spacing:3px; text-transform:uppercase; color:var(--gold); margin-bottom:12px;">🎭 Tickets to Buy in Advance</div>
-        <div style="display:flex; flex-direction:column; gap:0;">
           <div style="font-size:13px; padding:10px 0; border-bottom:1px solid var(--border);">
             <div style="font-weight:700; color:var(--ink);">Museum of Ice Cream <span style="font-size:10px; background:#fde8e3; color:var(--rust); padding:2px 7px; border-radius:3px; font-weight:700; letter-spacing:1px; text-transform:uppercase; margin-left:6px;">Required</span></div>
-            <div style="color:var(--muted); margin-top:3px;">museumoficecream.com · 558 Broadway, SoHo · ~$38–42/person. Sells out in summer — buy before the trip. <strong>Book for Tuesday, June 23.</strong></div>
-          </div>
-          <div style="font-size:13px; padding:10px 0; border-bottom:1px solid var(--border);">
-            <div style="font-weight:700; color:var(--ink);">Broadway Show <span style="font-size:10px; background:#e8f0ea; color:var(--sage); padding:2px 7px; border-radius:3px; font-weight:700; letter-spacing:1px; text-transform:uppercase; margin-left:6px;">Optional</span></div>
-            <div style="color:var(--muted); margin-top:3px;">broadway.com or TodayTix · Recommended for June 22 evening. Best teen picks: <em>&amp; Juliet</em> or <em>SIX</em>. $80–200+/person. TKTS booth in Times Square sells day-of discounts at noon if you decide last minute.</div>
+            <div style="color:var(--muted); margin-top:3px;">museumoficecream.com · 558 Broadway, SoHo · ~$38–42/person. Advance tickets required — sells out, especially in summer. Buy before the trip. <strong>Book for Tuesday, June 23.</strong></div>
           </div>
           <div style="font-size:13px; padding:10px 0;">
             <div style="font-weight:700; color:var(--ink);">NJ Transit Train Tickets</div>
@@ -668,7 +565,7 @@
         <div style="font-size:13px; color:var(--ink); padding:6px 0; border-bottom:1px solid var(--border);"><strong>Portable battery pack</strong> — <span style="color:var(--muted);">Full days in NYC drain phones fast. Essential.</span></div>
         <div style="font-size:13px; color:var(--ink); padding:6px 0; border-bottom:1px solid var(--border);"><strong>Comfortable walking shoes</strong> — <span style="color:var(--muted);">Both. Plan 5–8 miles of walking per day.</span></div>
         <div style="font-size:13px; color:var(--ink); padding:6px 0; border-bottom:1px solid var(--border);"><strong>Screenshot offline saves</strong> — <span style="color:var(--muted);">Hotel address, Metropark station address, reservation confirmations. Saved to camera roll.</span></div>
-        <div style="font-size:13px; color:var(--ink); padding:6px 0;"><strong>Cash</strong> — <span style="color:var(--muted);">$50–100 in small bills. Carriage ride tip, food carts, incidentals.</span></div>
+        <div style="font-size:13px; color:var(--ink); padding:6px 0;"><strong>Cash</strong> — <span style="color:var(--muted);">$50–100 in small bills. Food carts, tips, incidentals.</span></div>
         <div style="font-size:13px; color:var(--ink); padding:6px 0;"><strong>Light day bag</strong> — <span style="color:var(--muted);">Small backpack or crossbody for carrying water, battery, purchases.</span></div>
         <div style="font-size:13px; color:var(--ink); padding:6px 0;"><strong>Weather check</strong> — <span style="color:var(--muted);">June in NYC: avg high 80–85°F, humid. Light layers for evening A/C indoors.</span></div>
       </div>
@@ -759,15 +656,6 @@
     <div class="section-label">Day by Day</div>
     <div class="section-title">Full Itinerary</div>
 
-    <!-- DAY ORDER LOCKED -->
-    <div class="day-order-note" style="border-color:#2f7a4f;">
-      <div class="day-order-note-icon">✓</div>
-      <div>
-        <div class="day-order-note-title">Day Order — Locked In</div>
-        <p><strong>Day 2 (Monday, June 22):</strong> Tiffany's breakfast → Jellycat → Central Park → TAO Uptown. <strong>Day 3 (Tuesday, June 23):</strong> SoHo, Canal St, Museum of Ice Cream, Ellen's Stardust.</p>
-      </div>
-    </div>
-
     <!-- DAY 1 -->
     <div class="day-card">
       <div class="day-header">
@@ -804,11 +692,19 @@
             </div>
           </li>
           <li class="tl-item">
+            <div class="tl-time">6:30 PM</div>
+            <div class="tl-dot"></div>
+            <div class="tl-content">
+              <div class="tl-title">🍕 Dinner — Joe's Pizza</div>
+              <div class="tl-desc">1435 Broadway at Times Square (closest of several locations). Original NYC slice joint — thin crust, perfectly executed, ~$3–5/slice. No reservations, no wait, grab-and-go or eat at the counter. Perfect low-effort first night in the city.</div>
+            </div>
+          </li>
+          <li class="tl-item">
             <div class="tl-time">7–8 PM</div>
             <div class="tl-dot"></div>
             <div class="tl-content">
               <div class="tl-title">Times Square First Look</div>
-              <div class="tl-desc">Walk to Times Square — 5 min from the hotel. Best experienced at night when the lights are full. No need to rush anything tonight.</div>
+              <div class="tl-desc">Walk Times Square after dinner — best experienced at night when the lights are full. No need to rush anything tonight; call it an early night.</div>
             </div>
           </li>
         </ul>
@@ -863,42 +759,40 @@
             <div class="tl-time">12:15–1:00</div>
             <div class="tl-dot"></div>
             <div class="tl-content">
-              <div class="tl-title">Grand Central Terminal <span class="badge badge-free">Free</span></div>
+              <div class="tl-title">Grand Central Terminal</div>
               <div class="tl-desc">15-min walk SE from Rockefeller (or short Uber). Main Concourse celestial ceiling, the Whispering Gallery (find two opposite corners near the Oyster Bar and whisper — you'll hear each other), Grand Central Market gourmet food hall. 45 min is plenty.</div>
             </div>
           </li>
           <li class="tl-item">
             <div class="tl-time">1:15–2:15</div>
-            <div class="tl-dot"></div>
+            <div class="tl-dot optional"></div>
             <div class="tl-content">
-              <div class="tl-title">🍝 Lunch — Via Quadronno</div>
-              <div class="tl-desc">25 E 73rd St · Uber north from Grand Central (~15 min, ~$12–15). Italian café steps from the east side of Central Park — house-made pastas, panini, gelato. The Infatuation's top pick for this part of the city. Been there since 1999. Casual, no rush. ~$20–30/person.</div>
+              <div class="tl-title">OPTIONAL: 🍝 Lunch — Via Quadronno</div>
+              <div class="tl-desc">25 E 73rd St · Uber north from Grand Central (~15 min, ~$12–15). Italian café steps from the east side of Central Park — house-made pastas, panini, gelato. The Infatuation's top pick for this part of the city. Been there since 1999. Casual, no rush. ~$20–30/person. Skip if Tiffany's breakfast is still keeping you full.</div>
             </div>
           </li>
           <li class="tl-item">
             <div class="tl-time">2:30–3:45</div>
             <div class="tl-dot"></div>
             <div class="tl-content">
-              <div class="tl-title">🌿 Central Park <span class="badge badge-free">Free</span></div>
-              <div class="tl-desc">Via Quadronno is steps from the 72nd St east entrance — walk straight into the park. Route: Strawberry Fields (72nd &amp; West Drive) → Bow Bridge → Bethesda Fountain → The Mall. Walk south toward 59th St. June is beautiful — green, full. Plan 1–1.5 hrs at a relaxed pace.<br><br>
-              <em>Optional add-on:</em> <strong>Central Park Carriage Ride</strong> <span class="badge badge-book">Pre-Book</span><br>
-              NYC Royal Carriage, nycroyalcarriage.com. Meet at 59th &amp; 5th at the south end of the park — you'll naturally end up near here after the walk. 45-min tour $150/carriage (not per person). Note: horses don't operate above 89°F — check the forecast.</div>
+              <div class="tl-title">🌿 Central Park</div>
+              <div class="tl-desc">Enter at the 72nd St east entrance (just west of Via Quadronno, or short Uber from Grand Central if skipping lunch). Route: Strawberry Fields (72nd &amp; West Drive) → Bow Bridge → Bethesda Fountain → The Mall. Walk south toward 59th St. June is beautiful — green, full. Plan 1–1.5 hrs at a relaxed pace.</div>
             </div>
           </li>
           <li class="tl-item">
             <div class="tl-time">4:00–5:00</div>
-            <div class="tl-dot"></div>
+            <div class="tl-dot optional"></div>
             <div class="tl-content">
-              <div class="tl-title">🍨 Serendipity 3 — Afternoon Treat <span class="badge badge-book">Reserve on Resy</span></div>
-              <div class="tl-desc">225 E 60th St · 15-min walk east from Central Park's south end, or short Uber. Dessert experience, not a meal — the Frrrozen Hot Chocolate is the reason to go. Reserve on Resy for a 4 PM slot so there's no summer wait. ~$20–30/person for drinks and dessert. Original location is the one to go to.</div>
+              <div class="tl-title">Herald Square &amp; Macy's</div>
+              <div class="tl-desc">Uber south to 34th St from Central Park's south end (~15 min, ~$12–18). The original Macy's flagship (11 floors, world's largest department store), budget shopping on 34th St nearby. Skip this if they're ready to head back and freshen up — it's a full day by this point.</div>
             </div>
           </li>
           <li class="tl-item">
-            <div class="tl-time">5:15–6:00</div>
-            <div class="tl-dot optional"></div>
+            <div class="tl-time">5:00–6:00</div>
+            <div class="tl-dot"></div>
             <div class="tl-content">
-              <div class="tl-title">Herald Square &amp; Macy's <span class="badge badge-opt">Optional</span> <span class="badge badge-free">Free</span></div>
-              <div class="tl-desc">Uber south from Serendipity to 34th St (~15 min, ~$12–18). The original Macy's flagship (11 floors, world's largest department store), budget shopping on 34th St nearby. Skip this if they're ready to head back and freshen up — it's a full day by this point.</div>
+              <div class="tl-title">Back to Hotel · Freshen Up</div>
+              <div class="tl-desc">Uber back to The Jewel (~15 min, ~$15–20). Change clothes for dinner — TAO Uptown is the "dress up" night.</div>
             </div>
           </li>
           <li class="tl-item">
@@ -906,7 +800,7 @@
             <div class="tl-dot"></div>
             <div class="tl-content">
               <div class="tl-title">🥢 Dinner — TAO Uptown <span class="badge badge-book">Reserve on OpenTable</span></div>
-              <div class="tl-desc">42 E 58th St · Short Uber from wherever they are — Serendipity, Macy's, or back at the hotel. Dramatic pan-Asian restaurant — towering Buddha, reflective pool, genuinely great food. One of the coolest dining rooms in Midtown. This is the "nice dinner" — they can dress up. Reserve well in advance on OpenTable. ~$40–60/person.</div>
+              <div class="tl-desc">42 E 58th St · Short Uber from wherever they are — Herald Square, Macy's, or back at the hotel. Dramatic pan-Asian restaurant — towering Buddha, reflective pool, genuinely great food. One of the coolest dining rooms in Midtown. This is the "nice dinner" — they can dress up. Reserve well in advance on OpenTable. ~$40–60/person.</div>
             </div>
           </li>
         </ul>
@@ -918,14 +812,10 @@
               <div style="color:var(--muted); margin-top:3px;">727 5th Ave, 5th Floor · Reservation confirmed for 10:00 AM.</div>
             </div>
             <div style="font-size:13px;">
-              <div style="font-weight:700; color:var(--ink);">🍝 Lunch — Via Quadronno</div>
-              <div style="color:var(--muted); margin-top:3px;">25 E 73rd St · Italian café at the east edge of Central Park. ~$20–30/person.</div>
+              <div style="font-weight:700; color:var(--ink);">OPTIONAL: 🍝 Lunch — Via Quadronno</div>
+              <div style="color:var(--muted); margin-top:3px;">25 E 73rd St · Italian café at the east edge of Central Park. ~$20–30/person. Skip if Tiffany's breakfast holds them over.</div>
             </div>
             <div style="font-size:13px;">
-              <div style="font-weight:700; color:var(--ink);">🍨 Treat — Serendipity 3</div>
-              <div style="color:var(--muted); margin-top:3px;">Frrrozen Hot Chocolate (dessert only). ~4 PM slot. ~$20–30/person.</div>
-            </div>
-            <div style="font-size:13px; grid-column: 1 / -1; border-top: 1px solid var(--border); padding-top: 8px; margin-top: 4px;">
               <div style="font-weight:700; color:var(--ink);">🥢 Dinner — TAO Uptown</div>
               <div style="color:var(--muted); margin-top:3px;">42 E 58th St · The nice dinner — dress up. Reserve on OpenTable. ~$40–60/person.</div>
             </div>
@@ -957,7 +847,7 @@
             <div class="tl-time">10 AM–12 PM</div>
             <div class="tl-dot"></div>
             <div class="tl-content">
-              <div class="tl-title">SoHo Shopping <span class="badge badge-free">Free</span></div>
+              <div class="tl-title">SoHo Shopping</div>
               <div class="tl-desc">Explore Broadway, Spring St, Prince St. Teen-friendly stores: Aritzia, Free People, Brandy Melville, Anthropologie, plus boutiques and local shops. Cobblestone streets, great energy. This is real NYC shopping — not a tourist trap.</div>
             </div>
           </li>
@@ -997,16 +887,16 @@
             <div class="tl-time">5:30–7 PM</div>
             <div class="tl-dot"></div>
             <div class="tl-content">
-              <div class="tl-title">5th Avenue &amp; Madison Avenue — Evening Walk <span class="badge badge-free">Free</span></div>
+              <div class="tl-title">5th Avenue &amp; Madison Avenue — Evening Walk</div>
               <div class="tl-desc">4-min walk from hotel. Tiffany's (727 5th Ave), Bergdorf Goodman, Saks Fifth Avenue. Window shopping — iconic storefronts at dusk. Madison Ave runs parallel one block east — same vibe, slightly less crowded. Blue Box Café is at 727 5th Ave if they want to peek at the building; even without a reservation, the exterior and Tiffany's store itself is worth the stop.</div>
             </div>
           </li>
           <li class="tl-item">
-            <div class="tl-time">7:30 PM</div>
-            <div class="tl-dot"></div>
+            <div class="tl-time">7–8 PM</div>
+            <div class="tl-dot optional"></div>
             <div class="tl-content">
-              <div class="tl-title">🎤 Dinner — Ellen's Stardust Diner</div>
-              <div class="tl-desc">1650 Broadway at 51st St · Times Square. Singing waitstaff — aspiring Broadway performers who belt show tunes while serving your food. Perfect energy after a full downtown day. No reservations; arrive by 6:30–7 PM to avoid a long wait. Diner food — burgers, milkshakes, classic American. ~$20–30/person.</div>
+              <div class="tl-title">🍴 Dinner — Pick a Spot Near the Hotel</div>
+              <div class="tl-desc">Open call. After a full downtown day, walk to whatever looks good in the 5th Ave / Rockefeller corridor — plenty of options within 5 minutes of The Jewel. Decide day-of based on energy and appetite.</div>
             </div>
           </li>
         </ul>
@@ -1026,8 +916,8 @@
               <div style="color:var(--muted); margin-top:3px;">558 Broadway · Not a food stop — it's the experience. Advance tickets required.</div>
             </div>
             <div style="font-size:13px; grid-column: 1 / -1; border-top: 1px solid var(--border); padding-top: 8px; margin-top: 4px;">
-              <div style="font-weight:700; color:var(--ink);">🎤 Dinner — Ellen's Stardust Diner</div>
-              <div style="color:var(--muted); margin-top:3px;">1650 Broadway at 51st St · Singing waitstaff, Broadway performers, diner food. No reservations. ~$20–30/person.</div>
+              <div style="font-weight:700; color:var(--ink);">🍴 Dinner — Pick a Spot Near the Hotel</div>
+              <div style="color:var(--muted); margin-top:3px;">Open call. Decide day-of based on appetite and what they're passing by in the 5th Ave / Rockefeller corridor.</div>
             </div>
           </div>
         </div>
@@ -1074,38 +964,6 @@
     </div>
   </div>
 
-  <!-- BROADWAY -->
-  <div class="section">
-    <div class="section-label">Optional Add-On</div>
-    <div class="section-title">Broadway Show Recommendations</div>
-    <p style="font-size:13.5px; color:var(--muted); margin-bottom:20px;">Best fit is <strong>Monday June 22 evening</strong> — you'll already be near the Theater District from the day's activities. If doing a show, plan dinner before 6 PM so you're seated by curtain (~7 PM). Book on broadway.com or TodayTix (last-minute discount app).</p>
-    <div class="show-grid">
-      <div class="show-card recommended">
-        <div class="show-name">&amp; Juliet</div>
-        <div class="show-meta">🌟 Top Pick for a 16-Year-Old</div>
-        <div class="show-why">Max Martin pop jukebox musical — Britney Spears, Katy Perry, Backstreet Boys hits reimagined. Written by the Schitt's Creek writer. Empowering story, LGBTQ+ inclusive, funny, energetic. Perfect for a teenage girl. Confirm it's still running June 2026.</div>
-      </div>
-      <div class="show-card recommended">
-        <div class="show-name">SIX</div>
-        <div class="show-meta">🌟 Strong Teens/Women Pick</div>
-        <div class="show-why">Henry VIII's six wives retold as a pop concert. Catchy, feminist, fast-paced. Long-running proven hit. Specifically praised for tweens and teens. 80 min, no intermission — great for first-time Broadway goers.</div>
-      </div>
-      <div class="show-card">
-        <div class="show-name">Cats: The Jellicle Ball</div>
-        <div class="show-meta">Bold &amp; Unique · New in 2026</div>
-        <div class="show-why">Drag and ball culture reimagining of Cats. Bold, fresh take. If the daughter is into that world, this would be memorable and distinctly NYC. More avant-garde than the others.</div>
-      </div>
-      <div class="show-card">
-        <div class="show-name">Harry Potter &amp; the Cursed Child</div>
-        <div class="show-meta">Safe Family Choice</div>
-        <div class="show-why">If she's a Harry Potter fan, the stagecraft is genuinely stunning. Longer show (~2.5 hrs with intermission). Well-reviewed for older kids and teens. Safe, known quantity.</div>
-      </div>
-    </div>
-    <p style="font-size:12.5px; color:var(--muted); margin-top:14px; padding:12px 16px; background:var(--section-bg); border-radius:6px;">
-      💡 <strong>Cost:</strong> Broadway tickets range $80–200+ per person depending on show and seat. TodayTix app often has same-week deals. TKTS booth in Times Square sells day-of discount tickets starting at noon.
-    </p>
-  </div>
-
   <!-- SAFETY -->
   <div class="section">
     <div class="section-label">Peace of Mind</div>
@@ -1125,7 +983,7 @@
       </div>
       <div class="safety-card">
         <div class="safety-title">📱 Stay Connected</div>
-        <div class="safety-body">Both should have Find My (iOS) location sharing active with Jon. Keep phones charged — bring a portable battery. Screenshot hotel address and Metropark station address offline in case of connectivity issues.</div>
+        <div class="safety-body">Keep phones charged — bring a portable battery. Screenshot hotel address and Metropark station address offline in case of connectivity issues.</div>
       </div>
     </div>
   </div>
@@ -1162,11 +1020,6 @@
         <div class="check-label"><strong>Now</strong> — TAO Uptown dinner reservation <span class="check-urgency">Reserve ASAP</span><br><span style="font-size:12.5px; color:rgba(255,255,255,0.5);">OpenTable · 42 E 58th St · <strong>Book for Monday, June 22 at 6:30 PM.</strong> Fills up weeks out in June.</span></div>
       </div>
 
-      <div class="check-item" data-check-id="serendipity">
-        <div class="check-box"></div>
-        <div class="check-label"><strong>Now</strong> — Serendipity 3 reservation on Resy<br><span style="font-size:12.5px; color:rgba(255,255,255,0.5);">resy.com · 225 E 60th St · <strong>Book for Monday, June 22 at ~4 PM.</strong> Book as soon as 30–60 days out opens on the platform.</span></div>
-      </div>
-
       <div class="check-item" data-check-id="nexpass">
         <div class="check-box"></div>
         <div class="check-label"><strong>Before June 21</strong> — NexPass app (nexusparkingsystems.com)<br><span style="font-size:12.5px; color:rgba(255,255,255,0.5);">Register license plate for Metropark parking. 5 min setup.</span></div>
@@ -1175,16 +1028,6 @@
       <div class="check-item" data-check-id="nj-transit">
         <div class="check-box"></div>
         <div class="check-label"><strong>Before leaving</strong> — NJ Transit app<br><span style="font-size:12.5px; color:rgba(255,255,255,0.5);">Free, iOS. Create account. Use MyTix for Northeast Corridor tickets. Also download DepartureVision for live train departures.</span></div>
-      </div>
-
-      <div class="check-item" data-check-id="broadway-show">
-        <div class="check-box"></div>
-        <div class="check-label"><strong>Optional</strong> — Broadway Show<br><span style="font-size:12.5px; color:rgba(255,255,255,0.5);">&amp; Juliet or SIX recommended. Broadway.com or TodayTix app. Best for whichever evening works. TKTS booth in Times Square sells day-of discounts at noon if deciding last minute.</span></div>
-      </div>
-
-      <div class="check-item" data-check-id="carriage-ride">
-        <div class="check-box"></div>
-        <div class="check-label"><strong>Optional</strong> — Central Park Carriage Ride<br><span style="font-size:12.5px; color:rgba(255,255,255,0.5);">nycroyalcarriage.com · 45-min tour ~$150/carriage · <strong>Book for Monday, June 22 afternoon.</strong> Doesn't run above 89°F.</span></div>
       </div>
 
       <div class="sync-status" id="syncStatus" hidden></div>

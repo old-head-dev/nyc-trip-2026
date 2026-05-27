@@ -11,11 +11,26 @@ struct DeepLinkerTests {
         #expect(url?.absoluteString == "https://www.google.com/maps/dir/?api=1&destination=Joe's%20Pizza,%201435%20Broadway,%20NY")
     }
 
-    @Test("Google Maps with nil destination opens the app generically")
+    @Test("Google Maps with nil destination uses universal Maps URL (browser fallback when app missing)")
     func googleMapsNoDestination() {
         let cta = CTA.openInGoogleMaps(destination: nil, label: "Open Google Maps")
         let url = DeepLinker.url(for: cta)
-        #expect(url?.absoluteString == "comgooglemaps://")
+        #expect(url?.absoluteString == "https://www.google.com/maps/@?api=1&map_action=map")
+    }
+
+    @Test("Google Maps with empty-string destination matches nil-destination behavior")
+    func googleMapsEmptyDestination() {
+        let cta = CTA.openInGoogleMaps(destination: "", label: "Open Google Maps")
+        let url = DeepLinker.url(for: cta)
+        #expect(url?.absoluteString == "https://www.google.com/maps/@?api=1&map_action=map")
+    }
+
+    @Test("openURL case returns the provided URL untouched")
+    func openURLPassthrough() {
+        let raw = URL(string: "https://example.com/foo?bar=baz")!
+        let cta = CTA.openURL(raw, label: "Open Example")
+        let url = DeepLinker.url(for: cta)
+        #expect(url == raw)
     }
 
     @Test("Uber builds universal link with dropoff address")

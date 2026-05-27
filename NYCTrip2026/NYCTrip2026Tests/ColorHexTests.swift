@@ -9,9 +9,9 @@ struct ColorHexTests {
         let color = Color(hex: "#fbe9dc")
         let components = color.cgColor?.components
         #expect(components != nil)
-        #expect(abs((components?[0] ?? 0) - 0xfb / 255.0) < 0.01)
-        #expect(abs((components?[1] ?? 0) - 0xe9 / 255.0) < 0.01)
-        #expect(abs((components?[2] ?? 0) - 0xdc / 255.0) < 0.01)
+        #expect(abs((components?[0] ?? 0) - 0xfb / 255.0) < 0.002)
+        #expect(abs((components?[1] ?? 0) - 0xe9 / 255.0) < 0.002)
+        #expect(abs((components?[2] ?? 0) - 0xdc / 255.0) < 0.002)
     }
 
     @Test("parses 6-char hex without hash")
@@ -19,8 +19,8 @@ struct ColorHexTests {
         let color = Color(hex: "2a2622")
         let components = color.cgColor?.components
         #expect(components != nil)
-        #expect(abs((components?[0] ?? 0) - 0x2a / 255.0) < 0.01)
-        #expect(abs((components?[1] ?? 0) - 0x26 / 255.0) < 0.01)
-        #expect(abs((components?[2] ?? 0) - 0x22 / 255.0) < 0.01)
+        #expect(abs((components?[0] ?? 0) - 0x2a / 255.0) < 0.002)
+        #expect(abs((components?[1] ?? 0) - 0x26 / 255.0) < 0.002)
+        #expect(abs((components?[2] ?? 0) - 0x22 / 255.0) < 0.002)
     }
 }

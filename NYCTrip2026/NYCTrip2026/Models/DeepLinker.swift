@@ -8,7 +8,9 @@ enum DeepLinker {
         switch cta {
         case let .openInGoogleMaps(destination, _):
             guard let destination, !destination.isEmpty else {
-                return URL(string: "comgooglemaps://")
+                // Universal Maps link: opens Google Maps app if installed, otherwise Safari to maps.google.com.
+                // Bare comgooglemaps:// silently no-ops when the app isn't installed.
+                return URL(string: "https://www.google.com/maps/@?api=1&map_action=map")
             }
             var components = URLComponents(string: "https://www.google.com/maps/dir/")!
             components.queryItems = [

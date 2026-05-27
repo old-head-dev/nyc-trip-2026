@@ -77,4 +77,31 @@ struct TripContentTests {
             }
         }
     }
+
+    @Test("Day-step day labels match their actual position and per-day count")
+    func dayLabelsMatchPosition() {
+        let trip = Trip.allSteps.filter { (1...4).contains($0.day) }
+        let byDay = Dictionary(grouping: trip, by: \.day)
+        for (day, steps) in byDay {
+            let totalForDay = steps.count
+            for (index, step) in steps.enumerated() {
+                let expected = "Day \(day) · \(index + 1) of \(totalForDay)"
+                #expect(step.dayLabel == expected,
+                        "Step id \(step.id) has dayLabel '\(step.dayLabel)' — expected '\(expected)' (position drifted)")
+            }
+        }
+    }
+
+    @Test("Placeholder reservation strings flagged for pre-install fill-in")
+    func placeholderReservationsVisible() {
+        // Codex Checkpoint 1 flagged these as render-on-device risk. We keep them per Jon's choice,
+        // but assert the count so any silent disappearance (or new placeholders added) is noticed.
+        let placeholderCount = Trip.allSteps.reduce(0) { acc, step in
+            guard let res = step.reservation else { return acc }
+            let fields = [res.time, res.confirmation, res.extra].compactMap { $0 }
+            return acc + fields.filter { $0.contains("Jon to fill in") || $0.contains("time set by ticket purchase") }.count
+        }
+        #expect(placeholderCount == 5,
+                "Expected 5 'Jon to fill in' / 'time set by ticket purchase' placeholders across reservations; found \(placeholderCount). Update count when Jon fills these in.")
+    }
 }

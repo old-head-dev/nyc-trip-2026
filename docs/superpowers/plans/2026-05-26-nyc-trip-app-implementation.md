@@ -1177,7 +1177,7 @@ git commit -m "Add Trip content integrity tests (ids, days, CTAs, bookends, hero
 
 ---
 
-## 🛡 CHECKPOINT 1: Codex Adversarial Review
+## ✅ CHECKPOINT 1: Codex Adversarial Review (passed 2026-05-27)
 
 **Stop here. Before building any views, run an adversarial review of the data + content + URL construction + asset wiring.**
 

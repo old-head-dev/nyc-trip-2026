@@ -1,14 +1,5 @@
-//
-//  FontLoadingTests.swift
-//  NYCTrip2026Tests
-//
-//  Verifies the bundled DM Sans fonts are registered via UIAppFonts and
-//  load successfully via UIFont(name:size:) at runtime.
-//
-
 import Testing
 import UIKit
-@testable import NYCTrip2026
 
 @Suite("DM Sans font loading")
 struct FontLoadingTests {

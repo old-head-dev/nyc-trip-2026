@@ -57,7 +57,9 @@ private func relativeLuminance(of color: Color) -> Double {
 
 private func linearize(_ srgb: CGFloat) -> Double {
     let v = Double(srgb)
-    return v <= 0.03928 ? v / 12.92 : pow((v + 0.055) / 1.055, 2.4)
+    // WCAG 2.1 cutoff (0.04045). WCAG 2.0 used 0.03928; gap is benign for 8-bit hex
+    // colors (no channel lands in that range) but the 2.1 value is the current spec.
+    return v <= 0.04045 ? v / 12.92 : pow((v + 0.055) / 1.055, 2.4)
 }
 
 private func contrastRatio(_ l1: Double, _ l2: Double) -> Double {

@@ -1947,7 +1947,7 @@ git commit -m "Wire TripView into app entry point; remove placeholder ContentVie
 
 ---
 
-## 🛡 CHECKPOINT 2: Codex Adversarial Review
+## ✅ CHECKPOINT 2: Codex Adversarial Review (passed 2026-05-27)
 
 **Stop. Full UI + navigation is now in place. Adversarial-review before polish.**
 

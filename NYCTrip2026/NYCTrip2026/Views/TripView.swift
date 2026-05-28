@@ -2,10 +2,19 @@ import SwiftUI
 
 struct TripView: View {
     @AppStorage("lastStepIndex") private var lastStepIndex: Int = 0
-    @State private var currentIndex: Int = 0
+    @State private var currentIndex: Int
 
     private let steps = Trip.allSteps
     private var totalCount: Int { steps.count }
+
+    init() {
+        // Initialize the page selection from UserDefaults synchronously so the first
+        // TabView render lands on the restored page. Setting it in .onAppear left a
+        // one-frame flash of Welcome before snapping to the persisted step.
+        let saved = UserDefaults.standard.integer(forKey: "lastStepIndex")
+        let clamped = max(0, min(saved, Trip.allSteps.count - 1))
+        _currentIndex = State(initialValue: clamped)
+    }
 
     var body: some View {
         TabView(selection: $currentIndex) {
@@ -15,9 +24,6 @@ struct TripView: View {
             }
         }
         .tabViewStyle(.page(indexDisplayMode: .never))
-        .onAppear {
-            currentIndex = clampedRestoreIndex()
-        }
         .onChange(of: currentIndex) { _, newValue in
             lastStepIndex = newValue
         }
@@ -55,9 +61,6 @@ struct TripView: View {
         }
     }
 
-    private func clampedRestoreIndex() -> Int {
-        max(0, min(lastStepIndex, totalCount - 1))
-    }
 }
 
 #Preview {

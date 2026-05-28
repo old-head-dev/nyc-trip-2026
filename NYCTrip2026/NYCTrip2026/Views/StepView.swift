@@ -20,25 +20,13 @@ struct StepView: View {
         dayPeers.firstIndex(where: { $0.id == step.id }) ?? 0
     }
 
-    private var accessibilityText: String {
-        var parts: [String] = []
-        parts.append("Step \(currentIndex + 1) of \(totalCount)")
-        parts.append(step.title.replacingOccurrences(of: "\n", with: " "))
-        if let subtitle = step.subtitle { parts.append(subtitle.replacingOccurrences(of: "\n", with: " ")) }
-        if let res = step.reservation {
-            parts.append("Reservation: \(res.time) at \(res.address)")
-            if let extra = res.extra { parts.append(extra) }
-        }
-        return parts.joined(separator: ". ")
-    }
-
     var body: some View {
         ZStack {
             step.background.ignoresSafeArea()
 
             VStack(spacing: 0) {
                 Text(step.dayLabel)
-                    .font(.dmSans(.semibold, size: min(eyebrowSize, 16)))
+                    .font(.dmSans(.semibold, fixedSize: min(eyebrowSize, 16)))
                     .tracking(1.5)
                     .textCase(.uppercase)
                     .foregroundStyle(step.accent)
@@ -57,16 +45,17 @@ struct StepView: View {
                         .accessibilityHidden(true)
 
                     Text(step.title)
-                        .font(.dmSans(.semibold, size: min(titleSize, 30)))
+                        .font(.dmSans(.semibold, fixedSize: min(titleSize, 30)))
                         .tracking(-0.3)
                         .multilineTextAlignment(.center)
                         .foregroundStyle(Color.tripTextPrimary)
                         .lineLimit(4)
                         .minimumScaleFactor(0.7)
+                        .accessibilityAddTraits(.isHeader)
 
                     if let subtitle = step.subtitle {
                         Text(subtitle)
-                            .font(.dmSans(.regular, size: min(subtitleSize, 19)))
+                            .font(.dmSans(.regular, fixedSize: min(subtitleSize, 19)))
                             .multilineTextAlignment(.center)
                             .foregroundStyle(Color.tripTextSecondary)
                             .lineSpacing(2)
@@ -103,10 +92,6 @@ struct StepView: View {
             .padding(.horizontal, 22)
             .padding(.vertical, 28)
         }
-        // Use .contain (not .combine) so child Buttons remain individually
-        // focusable for VoiceOver while the parent advertises the summary label.
-        .accessibilityElement(children: .contain)
-        .accessibilityLabel(accessibilityText)
     }
 }
 

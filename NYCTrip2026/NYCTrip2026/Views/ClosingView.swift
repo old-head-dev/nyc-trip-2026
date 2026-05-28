@@ -11,20 +11,13 @@ struct ClosingView: View {
     @ScaledMetric private var backLinkSize: CGFloat = 13
     @ScaledMetric private var backLinkSymbolSize: CGFloat = 13
 
-    private var accessibilityText: String {
-        var parts: [String] = []
-        parts.append(step.title.replacingOccurrences(of: "\n", with: " "))
-        if let subtitle = step.subtitle { parts.append(subtitle.replacingOccurrences(of: "\n", with: " ")) }
-        return parts.joined(separator: ". ")
-    }
-
     var body: some View {
         ZStack {
             step.background.ignoresSafeArea()
 
             VStack(spacing: 0) {
                 Text(step.dayLabel)
-                    .font(.dmSans(.semibold, size: min(eyebrowSize, 16)))
+                    .font(.dmSans(.semibold, fixedSize: min(eyebrowSize, 16)))
                     .tracking(1.5)
                     .textCase(.uppercase)
                     .foregroundStyle(step.accent)
@@ -43,15 +36,16 @@ struct ClosingView: View {
                         .accessibilityHidden(true)
 
                     Text(step.title)
-                        .font(.dmSans(.semibold, size: min(titleSize, 32)))
+                        .font(.dmSans(.semibold, fixedSize: min(titleSize, 32)))
                         .multilineTextAlignment(.center)
                         .foregroundStyle(Color.tripTextPrimary)
                         .minimumScaleFactor(0.7)
                         .lineLimit(3)
+                        .accessibilityAddTraits(.isHeader)
 
                     if let subtitle = step.subtitle {
                         Text(subtitle)
-                            .font(.dmSans(.regular, size: min(subtitleSize, 22)))
+                            .font(.dmSans(.regular, fixedSize: min(subtitleSize, 22)))
                             .multilineTextAlignment(.center)
                             .foregroundStyle(Color.tripTextSecondary)
                             .lineSpacing(4)
@@ -67,7 +61,7 @@ struct ClosingView: View {
                         Image(systemName: "chevron.left")
                             .font(.system(size: backLinkSymbolSize, weight: .semibold))
                         Text("Back through the trip")
-                            .font(.dmSans(.medium, size: backLinkSize))
+                            .font(.dmSans(.medium, fixedSize: backLinkSize))
                     }
                     .foregroundStyle(step.accent)
                 }
@@ -76,9 +70,6 @@ struct ClosingView: View {
             .padding(.horizontal, 22)
             .padding(.vertical, 28)
         }
-        // .contain preserves the "Back through the trip" button as its own focus.
-        .accessibilityElement(children: .contain)
-        .accessibilityLabel(accessibilityText)
     }
 }
 

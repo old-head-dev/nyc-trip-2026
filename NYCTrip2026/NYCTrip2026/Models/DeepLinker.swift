@@ -39,12 +39,21 @@ enum DeepLinker {
         }
     }
 
-    /// Opens the URL via UIApplication. No-op if the URL is nil or cannot be opened.
+    /// Opens the URL via UIApplication. If the primary URL can't be opened (e.g. the
+    /// target app isn't installed and the custom scheme is allow-listed but unhandled),
+    /// fall back per CTA — currently only MyTix has a meaningful App Store fallback so
+    /// Katy never sees a tap do nothing.
     @MainActor
     static func open(_ cta: CTA) {
         #if canImport(UIKit)
-        guard let url = url(for: cta), UIApplication.shared.canOpenURL(url) else { return }
-        UIApplication.shared.open(url)
+        let app = UIApplication.shared
+        if let url = url(for: cta), app.canOpenURL(url) {
+            app.open(url)
+            return
+        }
+        if case .openMyTix = cta, let fallback = URL(string: "https://apps.apple.com/us/app/nj-transit-mobile-app/id964927905") {
+            app.open(fallback)
+        }
         #endif
     }
 }

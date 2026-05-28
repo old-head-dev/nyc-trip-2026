@@ -11,20 +11,13 @@ struct WelcomeView: View {
     @ScaledMetric private var eyebrowSize: CGFloat = 11
     @ScaledMetric private var beginSize: CGFloat = 16
 
-    private var accessibilityText: String {
-        var parts: [String] = []
-        parts.append(step.title.replacingOccurrences(of: "\n", with: " "))
-        if let subtitle = step.subtitle { parts.append(subtitle.replacingOccurrences(of: "\n", with: " ")) }
-        return parts.joined(separator: ". ")
-    }
-
     var body: some View {
         ZStack {
             step.background.ignoresSafeArea()
 
             VStack(spacing: 0) {
                 Text(step.dayLabel)
-                    .font(.dmSans(.semibold, size: min(eyebrowSize, 16)))
+                    .font(.dmSans(.semibold, fixedSize: min(eyebrowSize, 16)))
                     .tracking(1.5)
                     .textCase(.uppercase)
                     .foregroundStyle(step.accent)
@@ -43,15 +36,16 @@ struct WelcomeView: View {
                         .accessibilityHidden(true)
 
                     Text(step.title)
-                        .font(.dmSans(.semibold, size: min(titleSize, 32)))
+                        .font(.dmSans(.semibold, fixedSize: min(titleSize, 32)))
                         .multilineTextAlignment(.center)
                         .foregroundStyle(Color.tripTextPrimary)
                         .minimumScaleFactor(0.7)
                         .lineLimit(3)
+                        .accessibilityAddTraits(.isHeader)
 
                     if let subtitle = step.subtitle {
                         Text(subtitle)
-                            .font(.dmSans(.regular, size: min(subtitleSize, 22)))
+                            .font(.dmSans(.regular, fixedSize: min(subtitleSize, 22)))
                             .multilineTextAlignment(.center)
                             .foregroundStyle(Color.tripTextSecondary)
                             .lineSpacing(4)
@@ -64,7 +58,7 @@ struct WelcomeView: View {
 
                 Button(action: onBegin) {
                     Text("Begin")
-                        .font(.dmSans(.semibold, size: beginSize))
+                        .font(.dmSans(.semibold, fixedSize: beginSize))
                         .tracking(0.5)
                         .foregroundStyle(.white)
                         .frame(maxWidth: .infinity)
@@ -79,9 +73,6 @@ struct WelcomeView: View {
             .padding(.horizontal, 22)
             .padding(.vertical, 28)
         }
-        // .contain preserves the Begin button as its own VoiceOver focus.
-        .accessibilityElement(children: .contain)
-        .accessibilityLabel(accessibilityText)
     }
 }
 

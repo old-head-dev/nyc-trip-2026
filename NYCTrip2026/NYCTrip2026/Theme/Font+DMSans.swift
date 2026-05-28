@@ -15,8 +15,16 @@ enum DMSansWeight {
 
 extension Font {
     /// Convenience for our bundled DM Sans family.
-    /// Falls back to SF Pro automatically if the custom font fails to load.
+    /// `size:` returns a font that scales with Dynamic Type relative to .body (use this
+    /// for plain literal sizes — Font.custom handles the scaling).
+    /// `fixedSize:` returns a font that does NOT auto-scale (use this when the caller
+    /// already produced a Dynamic-Type-scaled value via @ScaledMetric — passing it to
+    /// `size:` would double-scale).
     static func dmSans(_ weight: DMSansWeight, size: CGFloat) -> Font {
         .custom(weight.fontName, size: size)
+    }
+
+    static func dmSans(_ weight: DMSansWeight, fixedSize: CGFloat) -> Font {
+        .custom(weight.fontName, fixedSize: fixedSize)
     }
 }

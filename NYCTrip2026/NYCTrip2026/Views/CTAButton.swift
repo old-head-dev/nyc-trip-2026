@@ -23,6 +23,8 @@ struct CTAButton: View {
                     .fill(accent)
             )
         }
+        .accessibilityLabel(cta.label)
+        .accessibilityHint("Opens \(appName)")
     }
 
     private var symbolName: String {
@@ -32,6 +34,16 @@ struct CTAButton: View {
         case .openMyTix:        return "train.side.front.car"
         case .callPhone:        return "phone.fill"
         case .openURL:          return "arrow.up.right.square"
+        }
+    }
+
+    private var appName: String {
+        switch cta {
+        case .openInGoogleMaps: return "Google Maps"
+        case .openInUber:       return "Uber"
+        case .openMyTix:        return "NJ Transit Mobile"
+        case .callPhone:        return "Phone"
+        case .openURL:          return "the link"
         }
     }
 }

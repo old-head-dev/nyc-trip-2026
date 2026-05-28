@@ -24,6 +24,7 @@ struct NavBar: View {
             }
             .opacity(isFirst ? 0 : 1)
             .disabled(isFirst)
+            .accessibilityLabel("Back")
 
             Spacer()
 
@@ -36,6 +37,7 @@ struct NavBar: View {
                         .frame(width: i == activeDot ? 18 : 5, height: 5)
                 }
             }
+            .accessibilityHidden(true)
 
             Spacer()
 
@@ -50,6 +52,7 @@ struct NavBar: View {
             }
             .opacity(isLast ? 0 : 1)
             .disabled(isLast)
+            .accessibilityLabel("Next")
         }
     }
 }

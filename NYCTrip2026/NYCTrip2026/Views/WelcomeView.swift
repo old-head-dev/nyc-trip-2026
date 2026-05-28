@@ -11,6 +11,13 @@ struct WelcomeView: View {
     @ScaledMetric private var eyebrowSize: CGFloat = 11
     @ScaledMetric private var beginSize: CGFloat = 16
 
+    private var accessibilityText: String {
+        var parts: [String] = []
+        parts.append(step.title.replacingOccurrences(of: "\n", with: " "))
+        if let subtitle = step.subtitle { parts.append(subtitle.replacingOccurrences(of: "\n", with: " ")) }
+        return parts.joined(separator: ". ")
+    }
+
     var body: some View {
         ZStack {
             step.background.ignoresSafeArea()
@@ -72,6 +79,9 @@ struct WelcomeView: View {
             .padding(.horizontal, 22)
             .padding(.vertical, 28)
         }
+        // .contain preserves the Begin button as its own VoiceOver focus.
+        .accessibilityElement(children: .contain)
+        .accessibilityLabel(accessibilityText)
     }
 }
 

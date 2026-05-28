@@ -11,6 +11,13 @@ struct ClosingView: View {
     @ScaledMetric private var backLinkSize: CGFloat = 13
     @ScaledMetric private var backLinkSymbolSize: CGFloat = 13
 
+    private var accessibilityText: String {
+        var parts: [String] = []
+        parts.append(step.title.replacingOccurrences(of: "\n", with: " "))
+        if let subtitle = step.subtitle { parts.append(subtitle.replacingOccurrences(of: "\n", with: " ")) }
+        return parts.joined(separator: ". ")
+    }
+
     var body: some View {
         ZStack {
             step.background.ignoresSafeArea()
@@ -69,6 +76,9 @@ struct ClosingView: View {
             .padding(.horizontal, 22)
             .padding(.vertical, 28)
         }
+        // .contain preserves the "Back through the trip" button as its own focus.
+        .accessibilityElement(children: .contain)
+        .accessibilityLabel(accessibilityText)
     }
 }
 

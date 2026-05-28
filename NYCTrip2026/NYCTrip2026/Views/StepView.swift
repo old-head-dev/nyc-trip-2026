@@ -20,6 +20,18 @@ struct StepView: View {
         dayPeers.firstIndex(where: { $0.id == step.id }) ?? 0
     }
 
+    private var accessibilityText: String {
+        var parts: [String] = []
+        parts.append("Step \(currentIndex + 1) of \(totalCount)")
+        parts.append(step.title.replacingOccurrences(of: "\n", with: " "))
+        if let subtitle = step.subtitle { parts.append(subtitle.replacingOccurrences(of: "\n", with: " ")) }
+        if let res = step.reservation {
+            parts.append("Reservation: \(res.time) at \(res.address)")
+            if let extra = res.extra { parts.append(extra) }
+        }
+        return parts.joined(separator: ". ")
+    }
+
     var body: some View {
         ZStack {
             step.background.ignoresSafeArea()
@@ -91,6 +103,10 @@ struct StepView: View {
             .padding(.horizontal, 22)
             .padding(.vertical, 28)
         }
+        // Use .contain (not .combine) so child Buttons remain individually
+        // focusable for VoiceOver while the parent advertises the summary label.
+        .accessibilityElement(children: .contain)
+        .accessibilityLabel(accessibilityText)
     }
 }
 

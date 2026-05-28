@@ -5,7 +5,11 @@ struct WelcomeView: View {
     let totalCount: Int
     let onBegin: () -> Void
 
-    private let heroSize: CGFloat = 200
+    @ScaledMetric private var heroSize: CGFloat = 200
+    @ScaledMetric private var titleSize: CGFloat = 24
+    @ScaledMetric private var subtitleSize: CGFloat = 15
+    @ScaledMetric private var eyebrowSize: CGFloat = 11
+    @ScaledMetric private var beginSize: CGFloat = 16
 
     var body: some View {
         ZStack {
@@ -13,10 +17,12 @@ struct WelcomeView: View {
 
             VStack(spacing: 0) {
                 Text(step.dayLabel)
-                    .font(.dmSans(.semibold, size: 11))
+                    .font(.dmSans(.semibold, size: min(eyebrowSize, 16)))
                     .tracking(1.5)
                     .textCase(.uppercase)
                     .foregroundStyle(step.accent)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.7)
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .padding(.top, 8)
 
@@ -26,20 +32,24 @@ struct WelcomeView: View {
                     Image(step.hero)
                         .resizable()
                         .scaledToFit()
-                        .frame(height: heroSize)
+                        .frame(height: min(heroSize, 240))
                         .accessibilityHidden(true)
 
                     Text(step.title)
-                        .font(.dmSans(.semibold, size: 24))
+                        .font(.dmSans(.semibold, size: min(titleSize, 32)))
                         .multilineTextAlignment(.center)
                         .foregroundStyle(Color.tripTextPrimary)
+                        .minimumScaleFactor(0.7)
+                        .lineLimit(3)
 
                     if let subtitle = step.subtitle {
                         Text(subtitle)
-                            .font(.dmSans(.regular, size: 15))
+                            .font(.dmSans(.regular, size: min(subtitleSize, 22)))
                             .multilineTextAlignment(.center)
                             .foregroundStyle(Color.tripTextSecondary)
                             .lineSpacing(4)
+                            .minimumScaleFactor(0.7)
+                            .lineLimit(4)
                     }
                 }
 
@@ -47,7 +57,7 @@ struct WelcomeView: View {
 
                 Button(action: onBegin) {
                     Text("Begin")
-                        .font(.dmSans(.semibold, size: 16))
+                        .font(.dmSans(.semibold, size: beginSize))
                         .tracking(0.5)
                         .foregroundStyle(.white)
                         .frame(maxWidth: .infinity)

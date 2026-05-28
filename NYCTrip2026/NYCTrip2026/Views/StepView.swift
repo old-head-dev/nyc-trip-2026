@@ -7,7 +7,10 @@ struct StepView: View {
     let onBack: () -> Void
     let onNext: () -> Void
 
-    private let heroSize: CGFloat = 180
+    @ScaledMetric private var heroSize: CGFloat = 180
+    @ScaledMetric private var titleSize: CGFloat = 22
+    @ScaledMetric private var subtitleSize: CGFloat = 13
+    @ScaledMetric private var eyebrowSize: CGFloat = 11
 
     private var dayPeers: [Step] {
         Trip.allSteps.filter { $0.day == step.day }
@@ -23,10 +26,12 @@ struct StepView: View {
 
             VStack(spacing: 0) {
                 Text(step.dayLabel)
-                    .font(.dmSans(.semibold, size: 11))
+                    .font(.dmSans(.semibold, size: min(eyebrowSize, 16)))
                     .tracking(1.5)
                     .textCase(.uppercase)
                     .foregroundStyle(step.accent)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.7)
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .padding(.top, 8)
 
@@ -36,22 +41,25 @@ struct StepView: View {
                     Image(step.hero)
                         .resizable()
                         .scaledToFit()
-                        .frame(height: heroSize)
+                        .frame(height: min(heroSize, 220))
                         .accessibilityHidden(true)
 
                     Text(step.title)
-                        .font(.dmSans(.semibold, size: 22))
+                        .font(.dmSans(.semibold, size: min(titleSize, 30)))
                         .tracking(-0.3)
                         .multilineTextAlignment(.center)
                         .foregroundStyle(Color.tripTextPrimary)
-                        .lineLimit(3)
+                        .lineLimit(4)
+                        .minimumScaleFactor(0.7)
 
                     if let subtitle = step.subtitle {
                         Text(subtitle)
-                            .font(.dmSans(.regular, size: 13))
+                            .font(.dmSans(.regular, size: min(subtitleSize, 19)))
                             .multilineTextAlignment(.center)
                             .foregroundStyle(Color.tripTextSecondary)
                             .lineSpacing(2)
+                            .minimumScaleFactor(0.7)
+                            .lineLimit(5)
                     }
 
                     if let reservation = step.reservation {

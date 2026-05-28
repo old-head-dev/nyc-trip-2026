@@ -59,7 +59,6 @@ None blocking. Three small things noted in code comments:
 
 1. **NJ Transit `njtransit://` scheme is unverified** — Codex flagged it as undocumented. We have an App Store fallback if the scheme fails, so worst case Katy gets routed to install NJ Transit Mobile from the App Store instead of opening it. Verify on her actual device during Task 23.
 2. **`@ScaledMetric` filtering in StepView** computes `dayPeers` on every body render (O(31) filter). Trivially fast at this scale, no concern.
-3. **xcuserstate file noise in `git status`** — Xcode's personal state file, never tracked-but-modified. Add `xcuserdata/` to `.gitignore` if you want a clean `git status` long-term.
 
 ## Decisions Locked In
 

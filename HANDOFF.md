@@ -1,9 +1,5 @@
 # Session Handoff — 2026-05-27
 
-## ⚠️ Uncommitted Changes
-
-`NYCTrip2026/NYCTrip2026.xcodeproj/project.xcworkspace/xcuserdata/jkher.xcuserdatad/UserInterfaceState.xcuserstate` is modified. It's Xcode's per-user state file (window layout, breakpoints, last-opened tab) — pure noise, safe to discard. Worth adding `xcuserdata/` to `.gitignore` at some point.
-
 ## What Was Done
 
 Built the entire NYC Trip 2026 companion iOS app autonomously from the implementation plan, with three Codex adversarial review checkpoints. 23 commits since the empty Xcode scaffold; build green; 44 tests passing; pushed to `origin/main`.

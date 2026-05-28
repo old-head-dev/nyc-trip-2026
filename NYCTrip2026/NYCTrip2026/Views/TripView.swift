@@ -17,13 +17,17 @@ struct TripView: View {
     }
 
     var body: some View {
-        TabView(selection: $currentIndex) {
-            ForEach(Array(steps.enumerated()), id: \.element.id) { index, step in
-                page(for: step, index: index)
-                    .tag(index)
+        ZStack {
+            steps[currentIndex].background.ignoresSafeArea()
+
+            TabView(selection: $currentIndex) {
+                ForEach(Array(steps.enumerated()), id: \.element.id) { index, step in
+                    page(for: step, index: index)
+                        .tag(index)
+                }
             }
+            .tabViewStyle(.page(indexDisplayMode: .never))
         }
-        .tabViewStyle(.page(indexDisplayMode: .never))
         .onChange(of: currentIndex) { _, newValue in
             lastStepIndex = newValue
         }

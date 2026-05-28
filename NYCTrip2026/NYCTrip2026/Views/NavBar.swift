@@ -1,14 +1,15 @@
 import SwiftUI
 
 struct NavBar: View {
-    let currentIndex: Int
-    let totalCount: Int
+    let isFirst: Bool
+    let isLast: Bool
+    let dotPosition: Int      // 0-based position of the active dot within the current day
+    let dotCount: Int         // number of dots to render (= steps in the current day)
     let onBack: () -> Void
     let onNext: () -> Void
     let accent: Color
 
-    var isFirst: Bool { currentIndex == 0 }
-    var isLast: Bool { currentIndex == totalCount - 1 }
+    private let maxDots = 8
 
     var body: some View {
         HStack {
@@ -27,10 +28,12 @@ struct NavBar: View {
             Spacer()
 
             HStack(spacing: 5) {
-                ForEach(0..<min(totalCount, 8), id: \.self) { i in
+                let renderedCount = min(dotCount, maxDots)
+                let activeDot = min(dotPosition, renderedCount - 1)
+                ForEach(0..<renderedCount, id: \.self) { i in
                     Capsule()
-                        .fill(i == min(currentIndex, 7) ? accent : Color.tripTextPrimary.opacity(0.18))
-                        .frame(width: i == min(currentIndex, 7) ? 18 : 5, height: 5)
+                        .fill(i == activeDot ? accent : Color.tripTextPrimary.opacity(0.18))
+                        .frame(width: i == activeDot ? 18 : 5, height: 5)
                 }
             }
 
@@ -53,8 +56,10 @@ struct NavBar: View {
 
 #Preview {
     NavBar(
-        currentIndex: 2,
-        totalCount: 8,
+        isFirst: false,
+        isLast: false,
+        dotPosition: 2,
+        dotCount: 8,
         onBack: {},
         onNext: {},
         accent: Color(hex: "#4d6a82")

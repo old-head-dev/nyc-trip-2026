@@ -5,11 +5,11 @@ enum Trip {
     // MARK: Color palette (warm-family + 2 dusty-cool accents)
 
     private static let peach        = (bg: "#fbe9dc", accent: "#b85c38")
-    private static let blush        = (bg: "#f6e2d8", accent: "#b56b58")
+    private static let blush        = (bg: "#f6e2d8", accent: "#a45a48")
     private static let dustyRose    = (bg: "#f0d3d8", accent: "#9c4a64")
     private static let clay         = (bg: "#ecd9c8", accent: "#a05b2e")
     private static let cream        = (bg: "#f8eedd", accent: "#8a6f3a")
-    private static let butterCream  = (bg: "#f4e9cf", accent: "#9a7a2c")
+    private static let butterCream  = (bg: "#f4e9cf", accent: "#86691d")
     private static let sageCream    = (bg: "#e0e3d4", accent: "#5e6c4a")
     private static let mistBlue     = (bg: "#d8dfe5", accent: "#4d6a82")
     private static let wisteria     = (bg: "#dcd5dd", accent: "#6b5e75")

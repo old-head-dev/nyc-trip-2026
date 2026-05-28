@@ -9,6 +9,14 @@ struct StepView: View {
 
     private let heroSize: CGFloat = 180
 
+    private var dayPeers: [Step] {
+        Trip.allSteps.filter { $0.day == step.day }
+    }
+
+    private var dayPosition: Int {
+        dayPeers.firstIndex(where: { $0.id == step.id }) ?? 0
+    }
+
     var body: some View {
         ZStack {
             step.background.ignoresSafeArea()
@@ -62,8 +70,10 @@ struct StepView: View {
                 Spacer()
 
                 NavBar(
-                    currentIndex: currentIndex,
-                    totalCount: totalCount,
+                    isFirst: currentIndex == 0,
+                    isLast: currentIndex == totalCount - 1,
+                    dotPosition: dayPosition,
+                    dotCount: dayPeers.count,
                     onBack: onBack,
                     onNext: onNext,
                     accent: step.accent

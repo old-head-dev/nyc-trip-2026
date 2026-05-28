@@ -15,7 +15,6 @@ struct TripView: View {
             }
         }
         .tabViewStyle(.page(indexDisplayMode: .never))
-        .ignoresSafeArea()
         .onAppear {
             currentIndex = clampedRestoreIndex()
         }

@@ -5,11 +5,11 @@ struct WelcomeView: View {
     let totalCount: Int
     let onBegin: () -> Void
 
-    @ScaledMetric private var heroSize: CGFloat = 200
-    @ScaledMetric private var titleSize: CGFloat = 24
-    @ScaledMetric private var subtitleSize: CGFloat = 15
-    @ScaledMetric private var eyebrowSize: CGFloat = 11
-    @ScaledMetric private var beginSize: CGFloat = 16
+    @ScaledMetric private var heroSize: CGFloat = 400
+    @ScaledMetric private var titleSize: CGFloat = 32
+    @ScaledMetric private var subtitleSize: CGFloat = 24
+    @ScaledMetric private var eyebrowSize: CGFloat = 24
+    @ScaledMetric private var beginSize: CGFloat = 24
 
     var body: some View {
         ZStack {
@@ -32,7 +32,7 @@ struct WelcomeView: View {
                     Image(step.hero)
                         .resizable()
                         .scaledToFit()
-                        .frame(height: min(heroSize, 240))
+                        .frame(height: min(heroSize, 300))
                         .accessibilityHidden(true)
 
                     Text(step.title)
@@ -53,6 +53,7 @@ struct WelcomeView: View {
                             .lineLimit(4)
                     }
                 }
+                .offset(y: -36)
 
                 Spacer()
 
@@ -61,7 +62,7 @@ struct WelcomeView: View {
                         .font(.dmSans(.semibold, fixedSize: beginSize))
                         .tracking(0.5)
                         .foregroundStyle(.white)
-                        .frame(maxWidth: .infinity)
+                        .frame(maxWidth: 260)
                         .padding(.vertical, 16)
                         .background(
                             RoundedRectangle(cornerRadius: 14, style: .continuous)

@@ -4,9 +4,9 @@ struct ClosingView: View {
     let step: Step
     let onBack: () -> Void
 
-    @ScaledMetric private var heroSize: CGFloat = 200
-    @ScaledMetric private var titleSize: CGFloat = 24
-    @ScaledMetric private var subtitleSize: CGFloat = 15
+    @ScaledMetric private var heroSize: CGFloat = 400
+    @ScaledMetric private var titleSize: CGFloat = 32
+    @ScaledMetric private var subtitleSize: CGFloat = 24
     @ScaledMetric private var eyebrowSize: CGFloat = 11
     @ScaledMetric private var backLinkSize: CGFloat = 13
     @ScaledMetric private var backLinkSymbolSize: CGFloat = 13
@@ -32,7 +32,7 @@ struct ClosingView: View {
                     Image(step.hero)
                         .resizable()
                         .scaledToFit()
-                        .frame(height: min(heroSize, 240))
+                        .frame(height: min(heroSize, 300))
                         .accessibilityHidden(true)
 
                     Text(step.title)

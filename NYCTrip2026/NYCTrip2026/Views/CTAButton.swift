@@ -10,14 +10,14 @@ struct CTAButton: View {
         } label: {
             HStack(spacing: 8) {
                 Image(systemName: symbolName)
-                    .font(.system(size: 14, weight: .semibold))
+                    .font(.system(size: 16, weight: .semibold))
                 Text(cta.label)
-                    .font(.dmSans(.semibold, size: 14))
+                    .font(.dmSans(.semibold, size: 16))
             }
             .foregroundStyle(.white)
             .padding(.horizontal, 18)
             .padding(.vertical, 14)
-            .frame(maxWidth: .infinity)
+            .frame(maxWidth: 260)
             .background(
                 RoundedRectangle(cornerRadius: 14, style: .continuous)
                     .fill(accent)
@@ -31,7 +31,7 @@ struct CTAButton: View {
         switch cta {
         case .openInGoogleMaps: return "mappin.and.ellipse"
         case .openInUber:       return "car.fill"
-        case .openMyTix:        return "train.side.front.car"
+        case .openNJTransit:    return "train.side.front.car"
         case .callPhone:        return "phone.fill"
         case .openURL:          return "arrow.up.right.square"
         }
@@ -41,7 +41,7 @@ struct CTAButton: View {
         switch cta {
         case .openInGoogleMaps: return "Google Maps"
         case .openInUber:       return "Uber"
-        case .openMyTix:        return "NJ Transit Mobile"
+        case .openNJTransit:    return "NJ TRANSIT"
         case .callPhone:        return "Phone"
         case .openURL:          return "the link"
         }
@@ -55,7 +55,12 @@ struct CTAButton: View {
             accent: Color(hex: "#b85c38")
         )
         CTAButton(
-            cta: .openInUber(destination: "Penn Station", label: "Open in Uber · Drive"),
+            cta: .openInUber(
+                destination: "Penn Station",
+                latitude: 40.750568,
+                longitude: -73.994235,
+                label: "Open in Uber · Drive"
+            ),
             accent: Color(hex: "#4d6a82")
         )
     }

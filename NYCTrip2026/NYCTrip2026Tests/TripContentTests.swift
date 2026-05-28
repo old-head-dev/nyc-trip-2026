@@ -43,6 +43,35 @@ struct TripContentTests {
         }
     }
 
+    @Test("Uber CTAs use the expected coordinate policy for their destination strings")
+    func uberCoordinatesMatchDestinations() {
+        let expected: [String: (latitude: Double, longitude: Double)] = [
+            "The Jewel Hotel, 11 W 51st St, New York, NY": (40.7597381, -73.9777528),
+            "Via Quadronno, 25 E 73rd St, New York, NY": (40.7727446, -73.9651572),
+            "Bethesda Fountain, Central Park, New York, NY": (40.774122, -73.971136),
+            "Macy's Herald Square, 151 W 34th St, New York, NY": (40.750797, -73.989578),
+            "Sunday Morning Bakehouse, 11 W 25th St, New York, NY 10010": (40.74339, -73.98971),
+            "SoHo, Broadway & Spring St, New York, NY": (40.72350, -73.99830),
+            "Penn Station, 31st St & 8th Ave, New York, NY": (40.750568, -73.994235)
+        ]
+
+        var seenDestinations = Set<String>()
+        for step in Trip.allSteps {
+            for cta in step.ctas {
+                guard case let .openInUber(destination, latitude, longitude, _) = cta else { continue }
+                guard let coordinates = expected[destination] else {
+                    Issue.record("Unexpected Uber destination on step id \(step.id): \(destination)")
+                    continue
+                }
+                seenDestinations.insert(destination)
+                #expect(latitude == coordinates.latitude, "Step id \(step.id) has stale Uber latitude for \(destination)")
+                #expect(longitude == coordinates.longitude, "Step id \(step.id) has stale Uber longitude for \(destination)")
+            }
+        }
+
+        #expect(seenDestinations == Set(expected.keys), "Uber destination set changed; verify coordinate policy before shipping")
+    }
+
     @Test("No step has more than two CTAs")
     func atMostTwoCTAs() {
         for step in Trip.allSteps {
@@ -101,7 +130,7 @@ struct TripContentTests {
             let fields = [res.time, res.confirmation, res.extra].compactMap { $0 }
             return acc + fields.filter { $0.contains("Jon to fill in") || $0.contains("time set by ticket purchase") }.count
         }
-        #expect(placeholderCount == 5,
-                "Expected 5 'Jon to fill in' / 'time set by ticket purchase' placeholders across reservations; found \(placeholderCount). Update count when Jon fills these in.")
+        #expect(placeholderCount == 0,
+                "Expected no 'Jon to fill in' / 'time set by ticket purchase' placeholders across reservations; found \(placeholderCount).")
     }
 }

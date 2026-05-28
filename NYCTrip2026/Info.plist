@@ -22,9 +22,19 @@
 	<array>
 		<string>comgooglemaps</string>
 		<string>njtransit</string>
+		<string>uber</string>
 	</array>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>Uber</key>
+	<dict>
+		<key>ClientID</key>
+		<string>0JGHGDTE2QMSbScJgeezveZDsQsovwHr</string>
+		<key>DisplayName</key>
+		<string>NYC Trip 2026</string>
+		<key>RedirectURI</key>
+		<string>nyctrip2026://oauth/consumer</string>
+	</dict>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>

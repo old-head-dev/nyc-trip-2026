@@ -7,10 +7,10 @@ struct StepView: View {
     let onBack: () -> Void
     let onNext: () -> Void
 
-    @ScaledMetric private var heroSize: CGFloat = 180
-    @ScaledMetric private var titleSize: CGFloat = 22
-    @ScaledMetric private var subtitleSize: CGFloat = 13
-    @ScaledMetric private var eyebrowSize: CGFloat = 11
+    @ScaledMetric private var heroSize: CGFloat = 300
+    @ScaledMetric private var titleSize: CGFloat = 32
+    @ScaledMetric private var subtitleSize: CGFloat = 24
+    @ScaledMetric private var eyebrowSize: CGFloat = 14
 
     private var dayPeers: [Step] {
         Trip.allSteps.filter { $0.day == step.day }
@@ -41,7 +41,9 @@ struct StepView: View {
                     Image(step.hero)
                         .resizable()
                         .scaledToFit()
-                        .frame(height: min(heroSize, 220))
+                        .frame(height: min(heroSize, 240))
+                        .scaleEffect(1.5)
+                        .padding(.bottom, 14)
                         .accessibilityHidden(true)
 
                     Text(step.title)

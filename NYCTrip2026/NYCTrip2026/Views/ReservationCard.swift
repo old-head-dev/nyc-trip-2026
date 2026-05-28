@@ -11,11 +11,11 @@ struct ReservationCard: View {
             HStack(spacing: 8) {
                 Circle().fill(accent).frame(width: 6, height: 6)
                 Text(detail.time)
-                    .font(.dmSans(.semibold, size: 13))
+                    .font(.dmSans(.semibold, size: 16))
                     .foregroundStyle(Color.tripTextPrimary)
             }
             Text(detail.address)
-                .font(.dmSans(.regular, size: 13))
+                .font(.dmSans(.regular, size: 16))
                 .foregroundStyle(Color.tripTextSecondary)
             if let conf = detail.confirmation {
                 Button {
@@ -29,14 +29,14 @@ struct ReservationCard: View {
                         Image(systemName: didCopy ? "checkmark" : "doc.on.doc")
                             .font(.system(size: 11, weight: .semibold))
                         Text(didCopy ? "Copied" : conf)
-                            .font(.dmSans(.medium, size: 12))
+                            .font(.dmSans(.medium, size: 14))
                     }
                     .foregroundStyle(accent)
                 }
             }
             if let extra = detail.extra {
                 Text(extra)
-                    .font(.dmSans(.regular, size: 12))
+                    .font(.dmSans(.regular, size: 16))
                     .foregroundStyle(Color.tripTextSecondary)
             }
         }

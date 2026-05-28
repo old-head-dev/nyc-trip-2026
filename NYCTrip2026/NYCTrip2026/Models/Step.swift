@@ -22,16 +22,16 @@ struct ReservationDetail {
 
 enum CTA {
     case openInGoogleMaps(destination: String?, label: String)  // nil = Maps with no preset
-    case openInUber(destination: String, label: String)
-    case openMyTix(label: String)
+    case openInUber(destination: String, latitude: Double, longitude: Double, label: String)
+    case openNJTransit(label: String)
     case callPhone(number: String, label: String)
     case openURL(URL, label: String)
 
     var label: String {
         switch self {
         case .openInGoogleMaps(_, let label),
-             .openInUber(_, let label),
-             .openMyTix(let label),
+             .openInUber(_, _, _, let label),
+             .openNJTransit(let label),
              .callPhone(_, let label),
              .openURL(_, let label):
             return label

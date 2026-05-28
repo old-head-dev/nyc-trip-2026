@@ -33,19 +33,52 @@ struct DeepLinkerTests {
         #expect(url == raw)
     }
 
-    @Test("Uber builds universal link with dropoff address")
+    @Test("Uber builds standard native deep link with dropoff address")
     func uberWithDestination() {
-        let cta = CTA.openInUber(destination: "11 W 51st St, New York, NY", label: "Open in Uber")
-        let url = DeepLinker.url(for: cta)
-        let expected = "https://m.uber.com/ul/?action=setPickup&pickup=my_location&dropoff%5Bformatted_address%5D=11%20W%2051st%20St,%20New%20York,%20NY"
+        let cta = CTA.openInUber(
+            destination: "11 W 51st St, New York, NY",
+            latitude: 40.7598080,
+            longitude: -73.9776070,
+            label: "Open in Uber"
+        )
+        let url = DeepLinker.url(for: cta, uberClientID: "real-client-id")
+        let expected = "uber://?client_id=real-client-id&action=setPickup&pickup=my_location&dropoff%5Blatitude%5D=40.759808&dropoff%5Blongitude%5D=-73.977607&dropoff%5Bnickname%5D=11%20W%2051st%20St,%20New%20York,%20NY&dropoff%5Bformatted_address%5D=11%20W%2051st%20St,%20New%20York,%20NY&user-agent=rides-ios-v0-nyc-trip-2026"
         #expect(url?.absoluteString == expected)
     }
 
-    @Test("MyTix uses njtransit scheme")
-    func myTixScheme() {
-        let cta = CTA.openMyTix(label: "Open MyTix")
+    @Test("Uber falls back to mobile web when Client ID is missing")
+    func uberMissingClientID() {
+        let cta = CTA.openInUber(
+            destination: "11 W 51st St, New York, NY",
+            latitude: 40.7598080,
+            longitude: -73.9776070,
+            label: "Open in Uber"
+        )
+
+        let url = DeepLinker.url(for: cta, uberClientID: "")
+        let expected = "https://m.uber.com/ul/?action=setPickup&pickup=my_location&dropoff%5Blatitude%5D=40.759808&dropoff%5Blongitude%5D=-73.977607&dropoff%5Bnickname%5D=11%20W%2051st%20St,%20New%20York,%20NY&dropoff%5Bformatted_address%5D=11%20W%2051st%20St,%20New%20York,%20NY&user-agent=rides-ios-v0-nyc-trip-2026"
+        #expect(url?.absoluteString == expected)
+    }
+
+    @Test("Uber fallback keeps mobile web dropoff coordinates when native app is missing")
+    func uberFallbackWithClientID() {
+        let cta = CTA.openInUber(
+            destination: "11 W 51st St, New York, NY",
+            latitude: 40.7598080,
+            longitude: -73.9776070,
+            label: "Open in Uber"
+        )
+
+        let url = DeepLinker.fallbackURL(for: cta, uberClientID: "real-client-id")
+        let expected = "https://m.uber.com/ul/?client_id=real-client-id&action=setPickup&pickup=my_location&dropoff%5Blatitude%5D=40.759808&dropoff%5Blongitude%5D=-73.977607&dropoff%5Bnickname%5D=11%20W%2051st%20St,%20New%20York,%20NY&dropoff%5Bformatted_address%5D=11%20W%2051st%20St,%20New%20York,%20NY&user-agent=rides-ios-v0-nyc-trip-2026"
+        #expect(url?.absoluteString == expected)
+    }
+
+    @Test("NJ Transit opens its App Store page because no reliable public deep link is available")
+    func njTransitAppStoreURL() {
+        let cta = CTA.openNJTransit(label: "Open NJ Transit app")
         let url = DeepLinker.url(for: cta)
-        #expect(url?.absoluteString == "njtransit://")
+        #expect(url?.absoluteString == "https://apps.apple.com/us/app/nj-transit-mobile-app/id589549928")
     }
 
     @Test("Phone uses tel scheme")

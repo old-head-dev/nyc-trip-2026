@@ -101,7 +101,7 @@ struct StepView: View {
     StepView(
         step: Trip.day2[0],
         currentIndex: 9,
-        totalCount: 31,
+        totalCount: 37,
         onBack: {},
         onNext: {}
     )
@@ -111,7 +111,7 @@ struct StepView: View {
     StepView(
         step: Trip.day2[4],
         currentIndex: 13,
-        totalCount: 31,
+        totalCount: 37,
         onBack: {},
         onNext: {}
     )
@@ -121,7 +121,7 @@ struct StepView: View {
     StepView(
         step: Trip.day1[0],
         currentIndex: 1,
-        totalCount: 31,
+        totalCount: 37,
         onBack: {},
         onNext: {}
     )

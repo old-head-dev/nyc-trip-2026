@@ -41,7 +41,7 @@ Each subway leg adds one dedicated `Step` placed adjacent to that leg's existing
 
 Routes below are **verified** (corroborated against MTA line data + an external review on 2026-06-15). The Broadway-line "spine" insight is narrower than first thought: for SoHo-bound legs the train is the **R or W local** (the N/Q run express and skip Prince St). Two service realities baked in below: the **Dec 8 2025 F/M tunnel swap** (5 Av/53 St is now **E/F**) and the **5 Av/53 St morning entrance closure**.
 
-### The six subway legs
+### The five subway legs (A–E)
 
 **A) Penn Station → The Jewel Hotel** — *Day 1, Sun*
 > Inside Penn, follow signs to the **8th Ave "A C E"** subway. Take the **uptown E train ONLY** (toward Queens/Jamaica — *not* the A or C) **4 stops to 5 Av/53 St** (42 St–Port Authority → 50 St → 7 Av → 5 Av/53 St). Exit toward 5th Ave, walk south to 51st St, turn right — the hotel is mid-block. ~15–20 min.

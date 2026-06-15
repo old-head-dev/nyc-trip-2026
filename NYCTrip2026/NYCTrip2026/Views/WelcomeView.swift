@@ -80,7 +80,7 @@ struct WelcomeView: View {
 #Preview {
     WelcomeView(
         step: Trip.welcomeStep,
-        totalCount: 31,
+        totalCount: 37,
         onBegin: {}
     )
 }

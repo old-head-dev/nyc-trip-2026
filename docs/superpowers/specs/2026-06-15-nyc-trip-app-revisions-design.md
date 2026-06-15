@@ -62,8 +62,8 @@ Routes below are **verified** (corroborated against MTA line data + an external 
 **E) The Jewel Hotel → Penn Station** — *Day 4, Wed (a MORNING trip)*
 > Walk to **5 Av/53 St** (E/F). Take the **downtown E train ONLY** (toward World Trade Center — *not* the F, which goes to Herald Sq, not Penn) **4 stops to 34 St–Penn Station** — drops you inside the Penn complex. ~15–20 min.
 > **Morning closure:** on weekdays **6:30–10:30am** the 5 Av/53 St entrance is **closed** (escalator work, exit-only — active through the trip dates). If leaving in that window, **enter at 7 Av Station (53rd St & 7th Ave)** instead and take the downtown E 3 stops to Penn.
-> CTAs (2): *After 10:30am → 5 Av/53 St Station (E/F), New York, NY* · *Before 10:30am → 7 Av Station (E), W 53rd St & 7th Ave, New York, NY*
-> *(Pending user decision: two-CTA version above vs. single entrance + note.)*
+> CTAs (2): *Before 10:30am → 7 Av Station (E), W 53rd St & 7th Ave, New York, NY* · *After 10:30am → 5 Av/53 St Station (E/F), New York, NY*
+> *(Decided: two-CTA version. "Before 10:30am" listed first since the train home is a morning trip.)*
 
 ## Full screen sequence
 

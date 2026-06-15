@@ -25,6 +25,7 @@ enum Trip {
         hero: String, title: String, subtitle: String? = nil,
         reservation: ReservationDetail? = nil,
         ctas: [CTA] = [],
+        hidesHero: Bool = false,
         palette: (bg: String, accent: String)
     ) -> Step {
         let (bg, accent) = colors(palette)
@@ -32,7 +33,8 @@ enum Trip {
             id: id, day: day, dayLabel: dayLabel,
             hero: hero, title: title, subtitle: subtitle,
             reservation: reservation, ctas: ctas,
-            background: bg, accent: accent
+            background: bg, accent: accent,
+            hidesHero: hidesHero
         )
     }
 
@@ -74,14 +76,15 @@ enum Trip {
 
         step(id: 4, day: 1, dayLabel: "Day 1 · 4 of 9",
              hero: "uber_car", title: "Hail a cab to\nThe Jewel Hotel",
-             subtitle: "~15 min ride to 11 W 51st St.\nGrab a yellow cab outside Penn — or use Uber as a backup.",
+             subtitle: "~15 min ride to 11 W 51st St.\nGrab a yellow cab outside Penn — or use Uber as a backup.\n\n(Or swipe forward for subway instructions.)",
              ctas: [.openInUber(destination: "The Jewel Hotel, 11 W 51st St, New York, NY", latitude: 40.7597381, longitude: -73.9777528, label: "Backup: open Uber")],
              palette: clay),
 
         step(id: 5, day: 1, dayLabel: "Day 1 · 5 of 9",
              hero: "subway_train", title: "Or take the subway\nto the hotel",
-             subtitle: "Inside Penn, follow signs to the 8th Ave A·C·E subway.\n\nTake the uptown E train only (toward Queens/Jamaica) — not the A or C — 4 stops to 5 Av/53 St.\n\nExit toward 5th Ave, walk south to 51st St, turn right.",
+             subtitle: "Inside Penn, follow signs to the 8th Ave A/C/E subway.\n\nTake the uptown E train only, toward Queens / Jamaica Center — do not take the A or C. Ride 4 stops to 5 Av/53 St.\n\nExit on the 5th Ave side, walk south to 51st St, turn right (west) — the hotel is at 11 W 51st St. Allow 20–25 min with luggage.",
              ctas: [.openInGoogleMaps(destination: "The Jewel Hotel, 11 W 51st St, New York, NY", label: "Open hotel in Google Maps")],
+             hidesHero: true,
              palette: mistBlue),
 
         step(id: 6, day: 1, dayLabel: "Day 1 · 6 of 9",
@@ -199,9 +202,9 @@ enum Trip {
     static let day3: [Step] = [
         step(id: 19, day: 3, dayLabel: "Day 3 · 1 of 11",
              hero: "breakfast", title: "Cinnamon rolls at\nSunday Morning",
-             subtitle: "11 W 25th St · about a 25-min walk, or take the subway (next screen).\n\nNot feeling the walk? Grab Starbucks near the hotel instead.",
+             subtitle: "11 W 25th St · about a 25-min walk, or swipe forward for subway instructions.\n\nNot feeling the walk? Grab Starbucks near the hotel instead.",
              ctas: [
-                .openInGoogleMaps(destination: "Sunday Morning Bakehouse, 11 W 25th St, New York, NY 10010", label: "Walk there (Google Maps)"),
+                .openInGoogleMaps(destination: "Sunday Morning Bakehouse, 11 W 25th St, New York, NY 10010", label: "Walk it (Google Maps)"),
                 .openInGoogleMaps(destination: "Starbucks, 1290 Sixth Avenue, New York, NY", label: "Starbucks instead")
              ],
              palette: butterCream),
@@ -210,11 +213,22 @@ enum Trip {
              hero: "subway_train", title: "Subway option:\nhotel → Sunday Morning",
              subtitle: "Walk to 47–50 Sts–Rockefeller Center (6th Ave).\n\nTake a downtown F or M train only — not B or D — 3 stops to 23 St.\n\nWalk north to 25th St, turn right — the bakery is mid-block. ~15 min.",
              ctas: [.openInGoogleMaps(destination: "47-50 Sts–Rockefeller Center Station, New York, NY", label: "Open station in Google Maps")],
+             hidesHero: true,
              palette: mistBlue),
 
         step(id: 21, day: 3, dayLabel: "Day 3 · 3 of 11",
+             hero: "subway_train", title: "Subway option:\nto the museum",
+             subtitle: "Take the downtown R or W train only to Prince St — NOT the N or Q (they skip Prince St). The museum is steps from the exit.\n\nFrom Sunday Morning, board at 23 St (R/W). From the hotel/Starbucks, board at 49 St (R/W).",
+             ctas: [
+                .openInGoogleMaps(destination: "23 St Station (R/W), Broadway & W 23rd St, New York, NY", label: "From breakfast: 23 St"),
+                .openInGoogleMaps(destination: "49 St Station (R/W), W 49th St & 7th Ave, New York, NY", label: "From the hotel: 49 St")
+             ],
+             hidesHero: true,
+             palette: wisteria),
+
+        step(id: 22, day: 3, dayLabel: "Day 3 · 4 of 11",
              hero: "ice_cream_cone", title: "Museum of\nIce Cream",
-             subtitle: "Hail a cab from breakfast — or take the subway (next screen).",
+             subtitle: "Hail a cab from breakfast — or take the subway (previous screen).",
              reservation: ReservationDetail(
                 time: "11:30am reservation",
                 address: "558 Broadway, at Prince St (SoHo)",
@@ -223,15 +237,6 @@ enum Trip {
              ),
              ctas: [.openInUber(destination: "Museum of Ice Cream, 558 Broadway, New York, NY", latitude: 40.7238545, longitude: -73.9979167, label: "Backup: open Uber")],
              palette: dustyRose),
-
-        step(id: 22, day: 3, dayLabel: "Day 3 · 4 of 11",
-             hero: "subway_train", title: "Subway option:\nto the museum",
-             subtitle: "Take the downtown R or W train only to Prince St — NOT the N or Q (they skip Prince St). The museum is steps from the exit.\n\nFrom Sunday Morning, board at 23 St (R/W). From the hotel/Starbucks, board at 49 St (R/W).",
-             ctas: [
-                .openInGoogleMaps(destination: "23 St Station (R/W), Broadway & W 23rd St, New York, NY", label: "From breakfast: 23 St"),
-                .openInGoogleMaps(destination: "49 St Station (R/W), W 49th St & 7th Ave, New York, NY", label: "From the hotel: 49 St")
-             ],
-             palette: mistBlue),
 
         step(id: 23, day: 3, dayLabel: "Day 3 · 5 of 11",
              hero: "lunch", title: "OPTIONAL: Lunch at\nJack's Wife Freda",
@@ -243,17 +248,19 @@ enum Trip {
              hero: "nyc_shopping", title: "SoHo shopping",
              subtitle: "Start around Prince & Mercer. Walk Prince → Greene → Spring → Wooster — the classic cobblestone boutique blocks — dipping over to Broadway for the bigger stores.\n\nWorth a look: Aritzia (560 Broadway), MoMA Design Store (81 Spring), Mure + Grand (155 Spring), Pearl River Mart (452 Broadway).",
              ctas: [.openInGoogleMaps(destination: "Prince St & Mercer St, New York, NY", label: "Open start point in Maps")],
+             hidesHero: true,
              palette: blush),
 
         step(id: 25, day: 3, dayLabel: "Day 3 · 7 of 11",
              hero: "nyc_shopping", title: "Canal Street",
              subtitle: "Start at Broadway & Canal, then walk east on Canal toward Lafayette/Centre.\n\nThe classic busy-Canal stretch — crowded sidewalks, souvenir shops, bargain finds. A fun browse more than serious shopping.",
              ctas: [.openInGoogleMaps(destination: "Canal St & Broadway, New York, NY", label: "Open start point in Maps")],
+             hidesHero: true,
              palette: clay),
 
         step(id: 26, day: 3, dayLabel: "Day 3 · 8 of 11",
              hero: "hotel_building", title: "Hail a cab\nback to the hotel",
-             subtitle: "Freshen up before evening.\nGrab a yellow cab — or use Uber as a backup.",
+             subtitle: "Freshen up before evening.\nGrab a yellow cab — or use Uber as a backup.\n\n(Or swipe forward for subway instructions.)",
              ctas: [.openInUber(destination: "The Jewel Hotel, 11 W 51st St, New York, NY", latitude: 40.7597381, longitude: -73.9777528, label: "Backup: open Uber")],
              palette: wisteria),
 
@@ -261,6 +268,7 @@ enum Trip {
              hero: "subway_train", title: "Subway option:\nCanal St → hotel",
              subtitle: "At Broadway & Canal, take an uptown N, R, or W train to 49 St — not the Q (it veers off toward the Upper East Side). The N runs local this far north, so it's fine here.\n\nExit at 7th Ave & 49th, walk north to 51st St, turn right.",
              ctas: [.openInGoogleMaps(destination: "Canal St Station, Broadway & Canal St, New York, NY", label: "Open station in Google Maps")],
+             hidesHero: true,
              palette: mistBlue),
 
         step(id: 28, day: 3, dayLabel: "Day 3 · 10 of 11",
@@ -290,7 +298,7 @@ enum Trip {
 
         step(id: 32, day: 4, dayLabel: "Day 4 · 3 of 6",
              hero: "uber_car", title: "Hail a cab to\nPenn Station",
-             subtitle: "Too far to walk with bags (~30 min).\nGrab a yellow cab — or use Uber as a backup.",
+             subtitle: "Too far to walk with bags (~30 min).\nGrab a yellow cab — or use Uber as a backup.\n\n(Or swipe forward for subway instructions.)",
              ctas: [.openInUber(destination: "Penn Station, 31st St & 8th Ave, New York, NY", latitude: 40.750568, longitude: -73.994235, label: "Backup: open Uber")],
              palette: clay),
 
@@ -301,6 +309,7 @@ enum Trip {
                 .openInGoogleMaps(destination: "7 Av Station, W 53rd St & 7th Ave, New York, NY", label: "Before 10:30am: 7 Av"),
                 .openInGoogleMaps(destination: "5 Av/53 St Station, New York, NY", label: "After 10:30am: 5 Av/53 St")
              ],
+             hidesHero: true,
              palette: mistBlue),
 
         step(id: 34, day: 4, dayLabel: "Day 4 · 5 of 6",

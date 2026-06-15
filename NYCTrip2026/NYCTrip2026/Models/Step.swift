@@ -11,6 +11,7 @@ struct Step: Identifiable {
     let ctas: [CTA]               // 0, 1, or 2 buttons
     let background: Color
     let accent: Color
+    var hidesHero: Bool = false   // true on text-dense screens (subway/route) so long copy isn't truncated
 }
 
 struct ReservationDetail {

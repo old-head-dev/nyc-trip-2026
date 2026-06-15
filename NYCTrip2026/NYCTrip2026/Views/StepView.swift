@@ -38,13 +38,15 @@ struct StepView: View {
                 Spacer()
 
                 VStack(spacing: 18) {
-                    Image(step.hero)
-                        .resizable()
-                        .scaledToFit()
-                        .frame(height: min(heroSize, 240))
-                        .scaleEffect(1.5)
-                        .padding(.bottom, 14)
-                        .accessibilityHidden(true)
+                    if !step.hidesHero {
+                        Image(step.hero)
+                            .resizable()
+                            .scaledToFit()
+                            .frame(height: min(heroSize, 240))
+                            .scaleEffect(1.5)
+                            .padding(.bottom, 14)
+                            .accessibilityHidden(true)
+                    }
 
                     Text(step.title)
                         .font(.dmSans(.semibold, fixedSize: min(titleSize, 30)))
@@ -61,8 +63,8 @@ struct StepView: View {
                             .multilineTextAlignment(.center)
                             .foregroundStyle(Color.tripTextSecondary)
                             .lineSpacing(2)
-                            .minimumScaleFactor(0.7)
-                            .lineLimit(5)
+                            .minimumScaleFactor(0.85)
+                            .lineLimit(11)
                     }
 
                     if let reservation = step.reservation {

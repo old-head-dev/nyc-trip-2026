@@ -37,14 +37,14 @@ Every screen that currently offers Uber changes so the **primary action is haili
 
 ## Cross-cutting pattern: subway screens
 
-Each subway leg adds one dedicated `Step` placed adjacent to that leg's existing screen. Plain-language, reassuring instructions in the subtitle; `subway_train` hero (reused); a Google Maps CTA to the relevant station. She swipes to it if taking the subway, past it otherwise.
+Each subway leg adds one dedicated `Step` placed adjacent to that leg's existing screen. Plain-language, reassuring instructions in the subtitle; a Google Maps CTA to the relevant station. She swipes to it if taking the subway, past it otherwise. **These instruction-dense screens hide the hero image** (`hidesHero: true` on `Step`) so the full multi-paragraph directions render at the standard subtitle size without truncation — verified screen-by-screen in the simulator (iPhone 17 Pro). The same applies to the detailed SoHo and Canal route screens. `StepView` renders the subtitle with `lineLimit(11)` / `minimumScaleFactor(0.85)`.
 
 Routes below are **verified** (corroborated against MTA line data + an external review on 2026-06-15). The Broadway-line "spine" insight is narrower than first thought: for SoHo-bound legs the train is the **R or W local** (the N/Q run express and skip Prince St). Two service realities baked in below: the **Dec 8 2025 F/M tunnel swap** (5 Av/53 St is now **E/F**) and the **5 Av/53 St morning entrance closure**.
 
 ### The five subway legs (A–E)
 
-**A) Penn Station → The Jewel Hotel** — *Day 1, Sun*
-> Inside Penn, follow signs to the **8th Ave "A C E"** subway. Take the **uptown E train ONLY** (toward Queens/Jamaica — *not* the A or C) **4 stops to 5 Av/53 St** (42 St–Port Authority → 50 St → 7 Av → 5 Av/53 St). Exit toward 5th Ave, walk south to 51st St, turn right — the hotel is mid-block. ~15–20 min.
+**A) Penn Station → The Jewel Hotel** — *Day 1, Sun (verified accurate for Sunday — the E is a 24/7 line and serves 5 Av/53 St every day; the weekday 5 Av/53 St morning closure does NOT apply Sunday. Residual risk: live MTA weekend advisories for 6/21, see top-of-doc action item.)*
+> Inside Penn, follow signs to the **8th Ave "A/C/E"** subway. Take the **uptown E train ONLY**, toward Queens / Jamaica Center — *do not take the A or C*. Ride **4 stops to 5 Av/53 St** (42 St–Port Authority → 50 St → 7 Av → 5 Av/53 St). Exit on the 5th Ave side, walk south to 51st St, turn right (west) — the hotel is at 11 W 51st St. Allow 20–25 min with luggage.
 > CTA: *Open in Google Maps → The Jewel Hotel, 11 W 51st St, New York, NY* (she's already inside Penn, so link the destination for the walk from the exit).
 
 **B) The Jewel Hotel → Sunday Morning Bakehouse** — *Day 3, Tue*
@@ -92,10 +92,10 @@ Legend: **[NEW]** added · **[CHG]** changed · **[OPT]** swipe-past optional ·
 9. Dinner at TAO Uptown (reservation) *(unch)*
 
 ### Day 3 — Tue Jun 23 (11 screens) — reordered around the 11:30 museum
-1. **[CHG]** Breakfast — **Sunday Morning** (cinnamon rolls). CTAs (2): *Walk there (Maps)* · *Starbucks instead (Maps)*. Subtitle: ~25-min walk or take the subway (next screen). *(No cab CTA here — walk/subway/Starbucks cover it within the 2-CTA cap.)*
+1. **[CHG]** Breakfast — **Sunday Morning** (cinnamon rolls). CTAs (2): *Walk it (Maps)* · *Starbucks instead (Maps)*. Subtitle: ~25-min walk or swipe forward for subway instructions. *(No cab CTA here — walk/subway/Starbucks cover it within the 2-CTA cap.)*
 2. **[NEW][OPT]** Subway: Hotel → Sunday Morning (Leg B)
-3. **[CHG][moved]** **Museum of Ice Cream — 11:30am** (reservation, time updated). Subtitle: hail a cab (or subway, next screen). CTA: *Backup: open Uber*. *(Reservation + 1 CTA = within layout rules.)*
-4. **[NEW][OPT]** Subway → Museum of Ice Cream (Leg C, two boarding points)
+3. **[NEW][OPT]** Subway → Museum of Ice Cream (Leg C, two boarding points) *(placed before the museum so the travel instructions precede arrival, per user; palette wisteria to avoid an identical-blue adjacency with screen 2)*
+4. **[CHG][moved]** **Museum of Ice Cream — 11:30am** (reservation, time updated). Subtitle: hail a cab — or take the subway (previous screen). CTA: *Backup: open Uber*. *(Reservation + 1 CTA = within layout rules.)*
 5. **[CHG][moved]** (optional) Lunch — Jack's Wife Freda, 226 Lafayette (steps from the museum). CTA: *Open in Google Maps*
 6. **[CHG][detailed]** **SoHo shopping** — see route below. CTA: *Open in Google Maps* → start point
 7. **[CHG][detailed]** **Canal Street** — see route below. CTA: *Open in Google Maps* → Canal & Broadway (start corner)

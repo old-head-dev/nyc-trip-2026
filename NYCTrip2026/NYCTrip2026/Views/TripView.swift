@@ -12,7 +12,14 @@ struct TripView: View {
         // TabView render lands on the restored page. Setting it in .onAppear left a
         // one-frame flash of Welcome before snapping to the persisted step.
         let saved = UserDefaults.standard.integer(forKey: "lastStepIndex")
-        let clamped = max(0, min(saved, Trip.allSteps.count - 1))
+        var clamped = max(0, min(saved, Trip.allSteps.count - 1))
+        #if DEBUG
+        // Debug-only: jump straight to a screen for layout verification in the simulator
+        // (e.g. SIMCTL_CHILD_START_INDEX=24 xcrun simctl launch …). Never compiled into release.
+        if let raw = ProcessInfo.processInfo.environment["START_INDEX"], let i = Int(raw) {
+            clamped = max(0, min(i, Trip.allSteps.count - 1))
+        }
+        #endif
         _currentIndex = State(initialValue: clamped)
     }
 

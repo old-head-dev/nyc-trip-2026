@@ -112,21 +112,23 @@ Legend: **[NEW]** added · **[CHG]** changed · **[OPT]** swipe-past optional ·
 
 ## Shopping-route screen content (drafts)
 
-**SoHo screen** (condensed from research; verified addresses):
-> Start around **Prince & Mercer**, walk Prince → Greene → Spring → Wooster, dipping to Broadway for the big stores.
-> Priority stops: **Aritzia** (560 Broadway — *relocated, use 560 not 524*), **MoMA Design Store** (81 Spring St), **Mure + Grand** (155 Spring St), **Pearl River Mart** (452 Broadway). **Supreme** now at 190 Bowery if it matters.
-> Maps CTA → start point near Prince & Mercer (or Aritzia, 560 Broadway).
+Both screens are **route-guidance first** (which blocks to walk), not shopping checklists. Named stores appear only as light "worth a look" flavor on SoHo; Canal is pure navigation.
 
-**Canal Street screen:**
-> Start at **Broadway & Canal**, hit **Pearl River Mart** (452 Broadway — a few blocks north of Canal; the old Canal storefront is gone, this is the only location), then walk **east on Canal toward Lafayette/Centre** for the classic busy-Canal browse (souvenirs, accessories — fun to walk more than serious shopping).
-> Maps CTA → Pearl River Mart, 452 Broadway (or Canal & Broadway).
+**SoHo screen** (route-forward):
+> Start around **Prince & Mercer**, walk **Prince → Greene → Spring → Wooster** — the classic cobblestone boutique blocks — dipping over to **Broadway** for the bigger stores. Drift east toward **Lafayette/Bowery** if you want to keep going.
+> *Worth a look along the way:* Aritzia (560 Broadway), MoMA Design Store (81 Spring St), Mure + Grand (155 Spring St), Pearl River Mart (452 Broadway).
+> Maps CTA → start point: **Prince St & Mercer St, New York, NY**.
 
-## Open decisions for the user (surfaced by research)
+**Canal Street screen** (route only, no named destinations):
+> Start at **Broadway & Canal**, then walk **east on Canal toward Lafayette/Centre** — the classic busy-Canal stretch: crowded sidewalks, souvenir shops, bargain accessories. Treat it as a fun browse more than serious shopping.
+> Maps CTA → start corner: **Canal St & Broadway, New York, NY**.
 
-1. **Which Starbucks?** Closest is **30 Rockefeller Plaza** (across 51st St, but it's a below-ground concourse store) vs. street-level **1290 Sixth Ave** (~3 blocks, easier to spot). Recommend **1290 Sixth Ave** for findability by someone new to the area. *Your call.*
-2. **Kith** — the SoHo flagship reopened **men's-only**. For a mother/daughter afternoon, recommend **dropping it** from the SoHo list. *Your call.*
-3. **Mure + Grand** confirmed real (boutique). Including the SoHo location (155 Spring St). OK?
-4. **Pearl River Mart on the Canal leg** — there is no separate Canal storefront anymore; only 452 Broadway. Spec routes the Canal screen there. OK?
+## Resolved decisions (user, 2026-06-15)
+
+1. **Starbucks → 1290 Sixth Ave** (street-level, ~3 blocks, easy to find). Day 3 breakfast "Starbucks instead" CTA points here: `Starbucks, 1290 Sixth Avenue, New York, NY`.
+2. **Kith dropped** from the SoHo screen (men's-only). User's intent: SoHo/Canal screens guide a *general walking route*, not specific stores.
+3. **Mure + Grand kept** as light flavor on the SoHo screen (155 Spring St).
+4. **Canal screen routes to no named store** — Pearl River Mart removed from Canal; the screen gives block-by-block navigation only (Canal & Broadway → east toward Lafayette/Centre).
 
 ## Testing impact
 

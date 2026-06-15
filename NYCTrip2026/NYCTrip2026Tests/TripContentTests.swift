@@ -50,8 +50,7 @@ struct TripContentTests {
             "Via Quadronno, 25 E 73rd St, New York, NY": (40.7727446, -73.9651572),
             "Bethesda Fountain, Central Park, New York, NY": (40.774122, -73.971136),
             "Macy's Herald Square, 151 W 34th St, New York, NY": (40.750797, -73.989578),
-            "Sunday Morning Bakehouse, 11 W 25th St, New York, NY 10010": (40.74339, -73.98971),
-            "SoHo, Broadway & Spring St, New York, NY": (40.72350, -73.99830),
+            "Museum of Ice Cream, 558 Broadway, New York, NY": (40.7238545, -73.9979167),
             "Penn Station, 31st St & 8th Ave, New York, NY": (40.750568, -73.994235)
         ]
 
@@ -79,9 +78,9 @@ struct TripContentTests {
         }
     }
 
-    @Test("Total step count is 31 (welcome + 29 + closing)")
+    @Test("Total step count is 37 (welcome + 35 + closing)")
     func totalCount() {
-        #expect(Trip.allSteps.count == 31)
+        #expect(Trip.allSteps.count == 37)
     }
 
     @Test("Every step's hero name is non-empty")

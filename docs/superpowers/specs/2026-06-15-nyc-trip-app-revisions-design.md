@@ -94,8 +94,8 @@ Legend: **[NEW]** added · **[CHG]** changed · **[OPT]** swipe-past optional ·
 ### Day 3 — Tue Jun 23 (11 screens) — reordered around the 11:30 museum
 1. **[CHG]** Breakfast — **Sunday Morning** (cinnamon rolls). CTAs (2): *Walk it (Maps)* · *Starbucks instead (Maps)*. Subtitle: ~25-min walk or swipe forward for subway instructions. *(No cab CTA here — walk/subway/Starbucks cover it within the 2-CTA cap.)*
 2. **[NEW][OPT]** Subway: Hotel → Sunday Morning (Leg B)
-3. **[NEW][OPT]** Subway → Museum of Ice Cream (Leg C, two boarding points) *(placed before the museum so the travel instructions precede arrival, per user; palette wisteria to avoid an identical-blue adjacency with screen 2)*
-4. **[CHG][moved]** **Museum of Ice Cream — 11:30am** (reservation, time updated). Subtitle: hail a cab — or take the subway (previous screen). CTA: *Backup: open Uber*. *(Reservation + 1 CTA = within layout rules.)*
+3. **[CHG][moved]** **Museum of Ice Cream — 11:30am** (reservation, time updated). Subtitle: hail a cab — or swipe forward for subway instructions. CTA: *Backup: open Uber*. *(Reservation + 1 CTA = within layout rules.)*
+4. **[NEW][OPT]** Subway → Museum of Ice Cream (Leg C, two boarding points)
 5. **[CHG][moved]** (optional) Lunch — Jack's Wife Freda, 226 Lafayette (steps from the museum). CTA: *Open in Google Maps*
 6. **[CHG][detailed]** **SoHo shopping** — see route below. CTA: *Open in Google Maps* → start point
 7. **[CHG][detailed]** **Canal Street** — see route below. CTA: *Open in Google Maps* → Canal & Broadway (start corner)

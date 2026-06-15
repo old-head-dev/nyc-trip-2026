@@ -217,18 +217,8 @@ enum Trip {
              palette: mistBlue),
 
         step(id: 21, day: 3, dayLabel: "Day 3 · 3 of 11",
-             hero: "subway_train", title: "Subway option:\nto the museum",
-             subtitle: "Take the downtown R or W train only to Prince St — NOT the N or Q (they skip Prince St). The museum is steps from the exit.\n\nFrom Sunday Morning, board at 23 St (R/W). From the hotel/Starbucks, board at 49 St (R/W).",
-             ctas: [
-                .openInGoogleMaps(destination: "23 St Station (R/W), Broadway & W 23rd St, New York, NY", label: "From breakfast: 23 St"),
-                .openInGoogleMaps(destination: "49 St Station (R/W), W 49th St & 7th Ave, New York, NY", label: "From the hotel: 49 St")
-             ],
-             hidesHero: true,
-             palette: wisteria),
-
-        step(id: 22, day: 3, dayLabel: "Day 3 · 4 of 11",
              hero: "ice_cream_cone", title: "Museum of\nIce Cream",
-             subtitle: "Hail a cab from breakfast — or take the subway (previous screen).",
+             subtitle: "Hail a cab from breakfast — or swipe forward for subway instructions.",
              reservation: ReservationDetail(
                 time: "11:30am reservation",
                 address: "558 Broadway, at Prince St (SoHo)",
@@ -237,6 +227,16 @@ enum Trip {
              ),
              ctas: [.openInUber(destination: "Museum of Ice Cream, 558 Broadway, New York, NY", latitude: 40.7238545, longitude: -73.9979167, label: "Backup: open Uber")],
              palette: dustyRose),
+
+        step(id: 22, day: 3, dayLabel: "Day 3 · 4 of 11",
+             hero: "subway_train", title: "Subway option:\nto the museum",
+             subtitle: "Take the downtown R or W train only to Prince St — NOT the N or Q (they skip Prince St). The museum is steps from the exit.\n\nFrom Sunday Morning, board at 23 St (R/W). From the hotel/Starbucks, board at 49 St (R/W).",
+             ctas: [
+                .openInGoogleMaps(destination: "23 St Station (R/W), Broadway & W 23rd St, New York, NY", label: "From breakfast: 23 St"),
+                .openInGoogleMaps(destination: "49 St Station (R/W), W 49th St & 7th Ave, New York, NY", label: "From the hotel: 49 St")
+             ],
+             hidesHero: true,
+             palette: mistBlue),
 
         step(id: 23, day: 3, dayLabel: "Day 3 · 5 of 11",
              hero: "lunch", title: "OPTIONAL: Lunch at\nJack's Wife Freda",

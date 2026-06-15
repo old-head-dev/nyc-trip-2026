@@ -45,6 +45,15 @@ Non-obvious bugs, gotchas, and wrong assumptions discovered while building the N
 - **Correct solution**: Scope `.ignoresSafeArea()` to the per-view background only (`step.background.ignoresSafeArea()` inside each ZStack). Do not apply it on the wrapping TabView. The background still extends to screen edges; the content padding now measures from the safe-area boundary.
 - **Affected files**: `Views/TripView.swift`
 
+### `minimumScaleFactor` + a low `lineLimit` silently shrinks long text, so screens sharing one `Text` modifier render at *different* sizes
+
+- **Date**: 2026-06-15
+- **Root cause**: `StepView` renders every screen's subtitle through one identical `Text(...).font(fixedSize: 19).minimumScaleFactor(0.7).lineLimit(5)`. Short subtitles fit 5 lines at 19pt; long ones (multi-paragraph subway/route directions) can't, so SwiftUI scales them down toward 0.7 (~13pt) to fit. The newer content-heavy screens therefore rendered visibly smaller than the existing ones — the user reported it as "the new screens have a smaller font." Same modifier, content-dependent rendered size.
+- **Wrong assumptions**: That a shared `Text` font modifier guarantees a uniform on-screen size. `minimumScaleFactor` makes rendered size depend on content length and available space.
+- **Tried and failed**: Raising `lineLimit` (5→11) and lifting the floor (0.7→0.85) helped mid-length screens, but the longest (SoHo, Canal, the subway legs) still overflowed vertically because the hero image ate ~240pt. `lineLimit` alone cannot fix truncation when a hero is competing for height.
+- **Correct solution**: For instruction-dense screens, hide the hero entirely (`Step.hidesHero` flag → `if !step.hidesHero { Image(...) }`) to free the vertical budget so full text renders at the base 19pt. Verify each long screen in the simulator (don't trust the build). Keep `lineLimit` high with `minimumScaleFactor` as a gentle last-resort safety net only.
+- **Affected files**: `Models/Step.swift`, `Views/StepView.swift`, `Content/Trip.swift`
+
 ## xcode
 
 ### `INFOPLIST_KEY_UIAppFonts` build setting is silently ignored by Xcode 26.5
@@ -79,6 +88,25 @@ Non-obvious bugs, gotchas, and wrong assumptions discovered while building the N
 - **Wrong assumptions**: That setting "iOS 17.0" in the General → Minimum Deployments dropdown applies it everywhere.
 - **Correct solution**: After project creation, grep the pbxproj and `sed -i.bak -E 's/IPHONEOS_DEPLOYMENT_TARGET = (26\.5|17\.6);/IPHONEOS_DEPLOYMENT_TARGET = 17.0;/g'` to normalize all 6 entries to a single value. Verify with another grep.
 - **Affected files**: `NYCTrip2026/NYCTrip2026.xcodeproj/project.pbxproj`
+
+## simulator
+
+### `simctl spawn booted defaults write <bundleid>` does NOT seed an app's sandboxed `UserDefaults` — use a `SIMCTL_CHILD_` env override
+
+- **Date**: 2026-06-15
+- **Root cause**: To screenshot a specific in-app screen for layout verification, I tried seeding the persisted page index (`@AppStorage("lastStepIndex")`) via `xcrun simctl spawn booted defaults write com.…NYCTrip2026 lastStepIndex 5`. `defaults read` echoed `5`, but the app still launched on screen 0. A simulator app's standard `UserDefaults` lives in its sandboxed container (`…/Data/Application/<uuid>/Library/Preferences/<bid>.plist`) managed by `cfprefsd`; `simctl spawn defaults` writes a different domain. Writing the container plist directly is also unreliable because `cfprefsd` caches it.
+- **Wrong assumptions**: That `simctl spawn defaults write <bid>` targets the app's own `UserDefaults`. It doesn't reach the sandboxed container the app actually reads.
+- **Correct solution**: Add a DEBUG-gated env override read at launch: `#if DEBUG / if let v = ProcessInfo.processInfo.environment["START_INDEX"], let i = Int(v) { … } / #endif`, then launch with `SIMCTL_CHILD_START_INDEX=N xcrun simctl launch booted <bid>` — `simctl` forwards `SIMCTL_CHILD_`-prefixed vars to the spawned app's environment. Deterministic, bypasses `cfprefsd`, never ships. (Bonus in this app: `Trip.allSteps` index == step id for ids 0–35, so `START_INDEX=<id>`.)
+- **Affected files**: `Views/TripView.swift`
+
+### Simulator-screenshot gotchas: the Apple-Account-Verification modal, and `launch -w`
+
+- **Date**: 2026-06-15
+- **Root cause / fixes**:
+  - A SpringBoard **"Apple Account Verification"** modal overlays app screenshots on any sim with a (stale) signed-in Apple ID. With no `idb` / `cliclick` / Python-Quartz available to tap it away, the clean fix is `xcrun simctl erase "<device>"` — a freshly-erased sim has no account, so the dialog never appears. Reinstall the app after erasing.
+  - `xcrun simctl launch -w` is **`--wait-for-debugger`** (blocks waiting for a debugger to attach — looks like a hang, exits 117 on misuse), NOT "wait until launched." Just `simctl launch`, then pause briefly before screenshot.
+  - The harness blocks foreground `sleep`; use `perl -e 'select(undef,undef,undef,2)'` for a ~2s render wait before `xcrun simctl io booted screenshot`.
+- **Affected files**: n/a (toolchain behavior)
 
 ## process
 

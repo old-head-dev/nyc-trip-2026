@@ -1,86 +1,51 @@
-# Session Handoff - 2026-05-28
+# Session Handoff — 2026-06-15 (v2 revisions + layout pass)
 
 ## Final Status
 
-The NYC Trip 2026 iOS app is considered content-complete and ready for final device install.
+The NYC Trip 2026 app's **v2 revisions are complete, verified, and pushed**. `main` is in sync with `origin/main` (`59bb163`). Working tree clean except Xcode's `UserInterfaceState.xcuserstate` (untracked noise — ignore).
 
-Current branch: `main`
+Build green, full `xcodebuild test` suite passing on the **iPhone 17 Pro** simulator (the old `iPhone 15` sim referenced in v1 docs no longer exists — use iPhone 17 Pro).
 
-Primary changes completed since the original build handoff:
+**Remaining work is on-device only**: Jon is testing v2 on Katy's iPhone and will open a fresh session if more fixes are needed.
 
-- Finalized trip copy, reservations, CTA labels, font sizing, hero sizing, button width, and warm gray primary text color.
-- Filled all previously pending reservation placeholders:
-  - The Jewel Hotel Expedia itinerary and room details
-  - TAO Uptown OpenTable confirmation
-  - Museum of Ice Cream ticket time and booking details
-- Replaced the unreliable MyTix/NJ Transit custom-scheme CTA with the NJ Transit App Store URL because no reliable public direct app deep link was confirmed.
-- Reworked Uber CTAs to use native `uber://` deep links when an Uber Client ID exists, with mobile web fallback when the Uber app is missing or no Client ID is configured.
-- Added Uber app scheme support in `Info.plist`.
-- Added precise Uber dropoff coordinates for every Uber destination currently in the Swift app content.
-- Added tests that lock Uber destination strings to their expected coordinates so stale coordinates are caught before shipping.
+## What changed this session
 
-## Final Uber Coordinates
+Two phases, both on `main`:
 
-These are the coordinates currently wired in `NYCTrip2026/NYCTrip2026/Content/Trip.swift` and protected by `TripContentTests`:
+**1. Content revisions** (per `docs/superpowers/plans/2026-06-15-nyc-trip-app-revisions.md`, spec at `docs/superpowers/specs/2026-06-15-nyc-trip-app-revisions-design.md`):
+- 5 swipe-past **subway-option screens** (Penn→hotel, hotel→Sunday Morning, →Museum, Canal→hotel, hotel→Penn) with verified routes (E/F tunnel swap, R/W-only to Prince St, 5 Av/53 St morning closure).
+- **Taxi-first** ride model ("Hail a cab" primary, Uber = "Backup: open Uber" / "Cab or Uber").
+- Day 3 breakfast: **walk + Starbucks** options; **Museum → 11:30am**; **detailed SoHo/Canal** route screens; **Brandy Melville** added to Day 2.
+- Screen count **31 → 37**. Two Codex `codex exec` adversarial rounds (7 findings, all resolved + confirmed). Reviews saved in `docs/superpowers/reviews/`.
 
-- The Jewel Hotel, 11 W 51st St: `40.7597381, -73.9777528`
-- Via Quadronno, 25 E 73rd St: `40.7727446, -73.9651572`
-- Bethesda Fountain, Central Park: `40.774122, -73.971136`
-- Macy's Herald Square, 151 W 34th St: `40.750797, -73.989578`
-- Sunday Morning Bakehouse, 11 W 25th St: `40.74339, -73.98971`
-- SoHo, Broadway & Spring St: `40.72350, -73.99830`
-- Penn Station, 31st St & 8th Ave: `40.750568, -73.994235`
+**2. Layout pass** (from Katy's walkthrough — all verified screen-by-screen in the simulator):
+- **Truncation fix**: long subtitles were shrinking because `StepView`'s shared `Text` uses `minimumScaleFactor` + a low `lineLimit`. Raised `lineLimit` 5→11 / floor 0.7→0.85, and added a **`Step.hidesHero`** flag that removes the hero image on the 5 subway screens + SoHo + Canal so full text renders at the base 19pt.
+- Adopted a **Sunday-verified Penn→hotel** subway copy (E to 5 Av/53 St, toward Queens/Jamaica Center, 20–25 min with luggage). The E is 24/7 so Sunday is fine; weekday 5 Av/53 St closure doesn't apply Sunday.
+- Fixed a truncated CTA label: "Walk there (Google Maps)" → "Walk it (Google Maps)".
+- Day 3 order: **Museum is 3 of 11, its subway screen is 4 of 11** (a swap was tried then reverted at Jon's request). Every leg now reads "swipe forward for subway instructions."
+- Added a **DEBUG-only `START_INDEX` env override** in `TripView` for simulator layout verification: `SIMCTL_CHILD_START_INDEX=N xcrun simctl launch booted com.jonathanhering.NYCTrip2026` jumps straight to a screen (`#if DEBUG`, never ships). In this app `Trip.allSteps` index == step id for ids 0–35.
 
-## Verification
+## Pending (Jon's actions)
 
-Final automated verification run during closeout:
+1. **On-device test** v2 on Katy's iPhone: Xcode → her phone → ⌘R. Swipe all 37 screens; confirm footers count …of 9/9/11/6, subway screens read fully (no truncation), Museum shows 11:30am at 3 of 11, Day-4 Penn subway shows both entrance buttons.
+2. **Pre-trip**: install Google Maps / Uber / NJ Transit Mobile on Katy's phone; buy round-trip Metropark↔NY Penn MyTix tickets in advance.
+3. **Check mta.info weekend advisories for Sun 6/21** — the only residual subway risk (Day 1 E leg is on a weekend; the E sometimes gets rerouted for planned weekend work).
 
-```bash
-xcodebuild test -project NYCTrip2026/NYCTrip2026.xcodeproj -scheme NYCTrip2026 -destination 'platform=iOS Simulator,id=5A84E526-621A-4926-9300-05328D576F7E'
-```
+## Key references
 
-Result: passed on retry with `** TEST SUCCEEDED **`.
+- `docs/LEARNINGS.md` — SwiftUI / Xcode / **simulator** gotchas (the `minimumScaleFactor` shrink, the `SIMCTL_CHILD_` deterministic-launch technique, the screenshot-dialog `simctl erase` fix).
+- Content lives entirely in `NYCTrip2026/NYCTrip2026/Content/Trip.swift`; layout in `Views/StepView.swift`; model flag in `Models/Step.swift`.
 
-Note: the first full-suite attempt failed only while launching the UI test runner due to a transient Simulator `Busy` / preflight-check error. The immediate retry completed successfully.
-
-## Remaining Manual Step
-
-Install on Katy's iPhone 15:
-
-1. Plug the phone into the Mac.
-2. Trust the Mac on the phone if prompted.
-3. Open `NYCTrip2026.xcodeproj` in Xcode.
-4. Select Katy's iPhone 15 as the run destination.
-5. Press Cmd+R.
-6. On the phone, spot-check the welcome screen, several itinerary screens, and CTAs.
-
-Manual CTA checks still worth doing on the physical phone:
-
-- Uber opens to the intended destination for The Jewel, Sunday Morning, SoHo, and Penn Station.
-- NJ Transit CTA opens the App Store page for the NJ Transit app.
-- Google Maps CTAs open Google Maps or browser fallback.
-- Confirmation-copy cards still show the copied state.
-
-## Notes
-
-- The Uber Application ID / Client ID is present in `Info.plist`; no Uber client secret is committed.
-- The repo already ignores the Xcode `UserInterfaceState.xcuserstate` path, but the file is still tracked from earlier commits. It may continue to appear as modified after using Xcode unless it is removed from tracking in a future cleanup.
-- Target trip dates remain June 21-24, 2026.
-
-## Starter Prompt
+## Starter prompt
 
 ```text
-NYC Trip 2026 companion iOS app - final state after 2026-05-28 closeout.
+NYC Trip 2026 companion iOS app — v2 revisions + layout pass complete and pushed (main @ 59bb163), 2026-06-15.
 
-Read first:
-- HANDOFF.md
+Read first: HANDOFF.md
 
-Status:
-- Branch: main
-- App content is complete.
-- Final full xcodebuild test passed on retry.
-- Remaining work is physical-device install and manual CTA spot-checking on Katy's iPhone 15.
+Status: 37 screens, tests green on iPhone 17 Pro sim, all subway/route screens verified untruncated in the simulator. Remaining work is on-device testing on Katy's iPhone.
 
-Useful next task:
-Install the app on Katy's iPhone 15 from Xcode and verify the key CTAs on-device.
+If Jon reports an on-device display issue: reproduce it in the simulator first via
+  SIMCTL_CHILD_START_INDEX=<id> xcrun simctl launch booted com.jonathanhering.NYCTrip2026
+(allSteps index == step id), screenshot with `xcrun simctl io booted screenshot`, then fix in Trip.swift / StepView.swift.
 ```

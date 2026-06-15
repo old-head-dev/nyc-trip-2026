@@ -39,29 +39,31 @@ Every screen that currently offers Uber changes so the **primary action is haili
 
 Each subway leg adds one dedicated `Step` placed adjacent to that leg's existing screen. Plain-language, reassuring instructions in the subtitle; `subway_train` hero (reused); a Google Maps CTA to the relevant station. She swipes to it if taking the subway, past it otherwise.
 
-All routes below are **drafts pending user verification** (subway accuracy is the highest-stakes content in the app).
+Routes below are **verified** (corroborated against MTA line data + an external review on 2026-06-15). The Broadway-line "spine" insight is narrower than first thought: for SoHo-bound legs the train is the **R or W local** (the N/Q run express and skip Prince St). Two service realities baked in below: the **Dec 8 2025 F/M tunnel swap** (5 Av/53 St is now **E/F**) and the **5 Av/53 St morning entrance closure**.
 
 ### The six subway legs
 
 **A) Penn Station → The Jewel Hotel** — *Day 1, Sun*
-> Inside Penn, follow signs to the **8th Ave "A C E"** subway. Take the **uptown E train** (toward Queens) **3 stops to 5 Av/53 St.** Exit and walk south on 5th Ave to 51st St, turn right — the hotel is mid-block. ~15–20 min.
-> CTA: *Open in Google Maps → The Jewel Hotel, 11 W 51st St, New York, NY* (for the short walk from the exit; she's already inside Penn so the boarding station needs no link).
+> Inside Penn, follow signs to the **8th Ave "A C E"** subway. Take the **uptown E train ONLY** (toward Queens/Jamaica — *not* the A or C) **4 stops to 5 Av/53 St** (42 St–Port Authority → 50 St → 7 Av → 5 Av/53 St). Exit toward 5th Ave, walk south to 51st St, turn right — the hotel is mid-block. ~15–20 min.
+> CTA: *Open in Google Maps → The Jewel Hotel, 11 W 51st St, New York, NY* (she's already inside Penn, so link the destination for the walk from the exit).
 
 **B) The Jewel Hotel → Sunday Morning Bakehouse** — *Day 3, Tue*
-> Walk to **47–50 Sts–Rockefeller Center** (6th Ave). Take a **downtown F or M train 3 stops to 23 St.** Exit at 23rd & 6th, walk north to 25th St, turn right — bakery is mid-block. ~15 min.
-> CTA: *Open in Google Maps → 47-50 Sts–Rockefeller Center (B/D/F/M), New York, NY*
+> Walk to **47–50 Sts–Rockefeller Center** (6th Ave). Take a **downtown F or M train ONLY** (*not* B or D — they skip 23 St) **3 stops to 23 St.** Walk north to 25th St, turn right — bakery is mid-block. ~15 min.
+> CTA: *Open in Google Maps → 47-50 Sts–Rockefeller Center Station, New York, NY*
 
 **C) → Museum of Ice Cream** (serves both breakfast paths) — *Day 3, Tue*
-> Take the **downtown N or R (yellow) train on Broadway to Prince St** — the museum is steps from the exit. **From Sunday Morning, board at 28 St. From the hotel/Starbucks, board at 49 St.** Same line, same direction. ~15–20 min.
-> CTAs (2): *From breakfast → 28 St Station (R/W), Broadway, NY* · *From the hotel → 49 St Station (N/R/W), New York, NY*
+> Take the **downtown R or W train ONLY to Prince St** — **NOT the N or Q** (they run express and skip Prince St). The museum is steps from the exit. **From Sunday Morning, board at 23 St (R/W). From the hotel/Starbucks, board at 49 St (R/W).** ~15–20 min.
+> CTAs (2): *From breakfast → 23 St Station (R/W), Broadway & W 23rd St, NY* · *From the hotel → 49 St Station (R/W), W 49th St & 7th Ave, NY*
 
 **D) Canal St → The Jewel Hotel** — *Day 3, Tue*
-> At Broadway & Canal, take the **uptown N or R train to 49 St** (~6 stops). Exit at 7th Ave & 49th, walk north to 51st, turn right. ~22–25 min. *(Use N or R specifically — not the Q.)*
-> CTA: *Open in Google Maps → Canal St Station (N/R), Broadway, New York, NY*
+> At Broadway & Canal, take an **uptown N, R, or W train to 49 St** (*not* the Q — it veers off to the Upper East Side). Here N is fine: 49 St is north of the express zone, so the N runs local and stops there. Exit at 7th Ave & 49th, walk north to 51st, turn right. ~22–25 min.
+> CTA: *Open in Google Maps → Canal St Station, Broadway & Canal St, New York, NY*
 
-**E) The Jewel Hotel → Penn Station** — *Day 4, Wed*
-> Walk to **5 Av/53 St** (E/M). Take a **downtown E train 3 stops to 34 St–Penn Station** — it drops you right inside the Penn complex. ~15–20 min.
-> CTA: *Open in Google Maps → 5 Av/53 St Station (E/M), New York, NY*
+**E) The Jewel Hotel → Penn Station** — *Day 4, Wed (a MORNING trip)*
+> Walk to **5 Av/53 St** (E/F). Take the **downtown E train ONLY** (toward World Trade Center — *not* the F, which goes to Herald Sq, not Penn) **4 stops to 34 St–Penn Station** — drops you inside the Penn complex. ~15–20 min.
+> **Morning closure:** on weekdays **6:30–10:30am** the 5 Av/53 St entrance is **closed** (escalator work, exit-only — active through the trip dates). If leaving in that window, **enter at 7 Av Station (53rd St & 7th Ave)** instead and take the downtown E 3 stops to Penn.
+> CTAs (2): *After 10:30am → 5 Av/53 St Station (E/F), New York, NY* · *Before 10:30am → 7 Av Station (E), W 53rd St & 7th Ave, New York, NY*
+> *(Pending user decision: two-CTA version above vs. single entrance + note.)*
 
 ## Full screen sequence
 

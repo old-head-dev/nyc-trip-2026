@@ -1,0 +1,2187 @@
+OpenAI Codex v0.139.0
+--------
+workdir: /Users/jkher/Documents/Claude/NYC Trip 2026
+model: gpt-5.5
+provider: openai
+approval: on-request
+sandbox: read-only
+reasoning effort: xhigh
+reasoning summaries: none
+session id: 019ecca6-1b25-7991-86f3-bf5900a06d72
+--------
+user
+You are doing an ADVERSARIAL code review of revisions to a SwiftUI iOS app that is a personal NYC trip guide (a gift). The change adds subway options, a taxi-first ride model, reorders Day 3 around an 11:30am museum reservation, and adds detailed SoHo/Canal and Brandy Melville screens.
+
+Read the diff at /tmp/nyc-revisions-review.diff and the design spec at docs/superpowers/specs/2026-06-15-nyc-trip-app-revisions-design.md. The Swift content lives in NYCTrip2026/NYCTrip2026/Content/Trip.swift; the content tests in NYCTrip2026/NYCTrip2026Tests/TripContentTests.swift.
+
+Review for, in priority order:
+1. SUBWAY ACCURACY: does each subway screen's instruction match the verified routes in the spec exactly (train letters, direction, stop counts, boarding stations, the R/W-only-to-Prince-St rule, the E/F Day-4 detail, the morning-closure note)? Flag ANY discrepancy between Trip.swift and the spec.
+2. CONTENT INTEGRITY: unique ids 1-35, dayLabels matching per-day counts (9/9/11/6), no step with >2 CTAs, no reservation step with >1 CTA, every Uber destination present in the test's expected dict and vice-versa (the set must match exactly).
+3. CORRECTNESS: typos, wrong addresses vs the spec, broken \n line breaks, a CTA pointing at the wrong place, palette assignments that put identical backgrounds on adjacent screens.
+4. ANYTHING that would confuse or mislead Katy (a mother + daughter new to NYC) while navigating.
+
+Do NOT rewrite code. Output a numbered list of findings, each with: file:line, severity (blocker/should-fix/nit), what's wrong, and the suggested fix. If you find nothing in a category, say so explicitly.
+
+Before finishing, double-check the subway facts against the spec one more time and list anything you might have skimmed.
+
+codex
+I'm using `superpowers:using-superpowers` first because the session instructions require it before starting task work; then I’ll stay read-only and inspect the requested diff/spec/files.
+hook: PreToolUse
+hook: PreToolUse Completed
+exec
+/bin/zsh -lc "sed -n '1,240p' /Users/jkher/.codex/plugins/cache/claude-plugins-official/superpowers/5.1.0/skills/using-superpowers/SKILL.md" in /Users/jkher/Documents/Claude/NYC Trip 2026
+ succeeded in 0ms:
+---
+name: using-superpowers
+description: Use when starting any conversation - establishes how to find and use skills, requiring Skill tool invocation before ANY response including clarifying questions
+---
+
+<SUBAGENT-STOP>
+If you were dispatched as a subagent to execute a specific task, skip this skill.
+</SUBAGENT-STOP>
+
+<EXTREMELY-IMPORTANT>
+If you think there is even a 1% chance a skill might apply to what you are doing, you ABSOLUTELY MUST invoke the skill.
+
+IF A SKILL APPLIES TO YOUR TASK, YOU DO NOT HAVE A CHOICE. YOU MUST USE IT.
+
+This is not negotiable. This is not optional. You cannot rationalize your way out of this.
+</EXTREMELY-IMPORTANT>
+
+## Instruction Priority
+
+Superpowers skills override default system prompt behavior, but **user instructions always take precedence**:
+
+1. **User's explicit instructions** (CLAUDE.md, GEMINI.md, AGENTS.md, direct requests) — highest priority
+2. **Superpowers skills** — override default system behavior where they conflict
+3. **Default system prompt** — lowest priority
+
+If CLAUDE.md, GEMINI.md, or AGENTS.md says "don't use TDD" and a skill says "always use TDD," follow the user's instructions. The user is in control.
+
+## How to Access Skills
+
+**In Claude Code:** Use the `Skill` tool. When you invoke a skill, its content is loaded and presented to you—follow it directly. Never use the Read tool on skill files.
+
+**In Copilot CLI:** Use the `skill` tool. Skills are auto-discovered from installed plugins. The `skill` tool works the same as Claude Code's `Skill` tool.
+
+**In Gemini CLI:** Skills activate via the `activate_skill` tool. Gemini loads skill metadata at session start and activates the full content on demand.
+
+**In other environments:** Check your platform's documentation for how skills are loaded.
+
+## Platform Adaptation
+
+Skills use Claude Code tool names. Non-CC platforms: see `references/copilot-tools.md` (Copilot CLI), `references/codex-tools.md` (Codex) for tool equivalents. Gemini CLI users get the tool mapping loaded automatically via GEMINI.md.
+
+# Using Skills
+
+## The Rule
+
+**Invoke relevant or requested skills BEFORE any response or action.** Even a 1% chance a skill might apply means that you should invoke the skill to check. If an invoked skill turns out to be wrong for the situation, you don't need to use it.
+
+```dot
+digraph skill_flow {
+    "User message received" [shape=doublecircle];
+    "About to EnterPlanMode?" [shape=doublecircle];
+    "Already brainstormed?" [shape=diamond];
+    "Invoke brainstorming skill" [shape=box];
+    "Might any skill apply?" [shape=diamond];
+    "Invoke Skill tool" [shape=box];
+    "Announce: 'Using [skill] to [purpose]'" [shape=box];
+    "Has checklist?" [shape=diamond];
+    "Create TodoWrite todo per item" [shape=box];
+    "Follow skill exactly" [shape=box];
+    "Respond (including clarifications)" [shape=doublecircle];
+
+    "About to EnterPlanMode?" -> "Already brainstormed?";
+    "Already brainstormed?" -> "Invoke brainstorming skill" [label="no"];
+    "Already brainstormed?" -> "Might any skill apply?" [label="yes"];
+    "Invoke brainstorming skill" -> "Might any skill apply?";
+
+    "User message received" -> "Might any skill apply?";
+    "Might any skill apply?" -> "Invoke Skill tool" [label="yes, even 1%"];
+    "Might any skill apply?" -> "Respond (including clarifications)" [label="definitely not"];
+    "Invoke Skill tool" -> "Announce: 'Using [skill] to [purpose]'";
+    "Announce: 'Using [skill] to [purpose]'" -> "Has checklist?";
+    "Has checklist?" -> "Create TodoWrite todo per item" [label="yes"];
+    "Has checklist?" -> "Follow skill exactly" [label="no"];
+    "Create TodoWrite todo per item" -> "Follow skill exactly";
+}
+```
+
+## Red Flags
+
+These thoughts mean STOP—you're rationalizing:
+
+| Thought | Reality |
+|---------|---------|
+| "This is just a simple question" | Questions are tasks. Check for skills. |
+| "I need more context first" | Skill check comes BEFORE clarifying questions. |
+| "Let me explore the codebase first" | Skills tell you HOW to explore. Check first. |
+| "I can check git/files quickly" | Files lack conversation context. Check for skills. |
+| "Let me gather information first" | Skills tell you HOW to gather information. |
+| "This doesn't need a formal skill" | If a skill exists, use it. |
+| "I remember this skill" | Skills evolve. Read current version. |
+| "This doesn't count as a task" | Action = task. Check for skills. |
+| "The skill is overkill" | Simple things become complex. Use it. |
+| "I'll just do this one thing first" | Check BEFORE doing anything. |
+| "This feels productive" | Undisciplined action wastes time. Skills prevent this. |
+| "I know what that means" | Knowing the concept ≠ using the skill. Invoke it. |
+
+## Skill Priority
+
+When multiple skills could apply, use this order:
+
+1. **Process skills first** (brainstorming, debugging) - these determine HOW to approach the task
+2. **Implementation skills second** (frontend-design, mcp-builder) - these guide execution
+
+"Let's build X" → brainstorming first, then implementation skills.
+"Fix this bug" → debugging first, then domain-specific skills.
+
+## Skill Types
+
+**Rigid** (TDD, debugging): Follow exactly. Don't adapt away discipline.
+
+**Flexible** (patterns): Adapt principles to context.
+
+The skill itself tells you which.
+
+## User Instructions
+
+Instructions say WHAT, not HOW. "Add X" or "Fix Y" doesn't mean skip workflows.
+
+codex
+No clarifying questions are needed: the files, priority order, and output format are explicit. I’m also using `swiftui-pro` because this is a SwiftUI app review.
+hook: PreToolUse
+hook: PreToolUse Completed
+exec
+/bin/zsh -lc "sed -n '1,260p' /Users/jkher/.codex/skills/swiftui-pro/skills/swiftui-pro/SKILL.md" in /Users/jkher/Documents/Claude/NYC Trip 2026
+ exited 1 in 0ms:
+sed: /Users/jkher/.codex/skills/swiftui-pro/skills/swiftui-pro/SKILL.md: No such file or directory
+
+codex
+The first listed duplicate path for `swiftui-pro` was not present, so I’m opening the available copy under `.agents` and will follow that.
+hook: PreToolUse
+hook: PreToolUse Completed
+exec
+/bin/zsh -lc "sed -n '1,260p' /Users/jkher/.agents/skills/swiftui-pro/SKILL.md" in /Users/jkher/Documents/Claude/NYC Trip 2026
+ succeeded in 0ms:
+---
+name: swiftui-pro
+description: Comprehensively reviews SwiftUI code for best practices on modern APIs, maintainability, and performance. Use when reading, writing, or reviewing SwiftUI projects.
+license: MIT
+metadata:
+  author: Paul Hudson
+  version: "1.1"
+---
+
+Review Swift and SwiftUI code for correctness, modern API usage, and adherence to project conventions. Report only genuine problems - do not nitpick or invent issues.
+
+Review process:
+
+1. Check for deprecated API using `references/api.md`.
+1. Check that views, modifiers, and animations have been written optimally using `references/views.md`.
+1. Validate that data flow is configured correctly using `references/data.md`.
+1. Ensure navigation is updated and performant using `references/navigation.md`.
+1. Ensure the code uses designs that are accessible and compliant with Apple’s Human Interface Guidelines using `references/design.md`.
+1. Validate accessibility compliance including Dynamic Type, VoiceOver, and Reduce Motion using `references/accessibility.md`.
+1. Ensure the code is able to run efficiently using `references/performance.md`.
+1. Quick validation of Swift code using `references/swift.md`.
+1. Final code hygiene check using `references/hygiene.md`.
+
+If doing a partial review, load only the relevant reference files.
+
+
+## Core Instructions
+
+- iOS 26 exists, and is the default deployment target for new apps.
+- Target Swift 6.2 or later, using modern Swift concurrency.
+- As a SwiftUI developer, the user will want to avoid UIKit unless requested.
+- Do not introduce third-party frameworks without asking first.
+- Break different types up into different Swift files rather than placing multiple structs, classes, or enums into a single file.
+- Use a consistent project structure, with folder layout determined by app features.
+
+
+## Output Format
+
+Organize findings by file. For each issue:
+
+1. State the file and relevant line(s).
+2. Name the rule being violated (e.g., "Use `foregroundStyle()` instead of `foregroundColor()`").
+3. Show a brief before/after code fix.
+
+Skip files with no issues. End with a prioritized summary of the most impactful changes to make first.
+
+Example output:
+
+### ContentView.swift
+
+**Line 12: Use `foregroundStyle()` instead of `foregroundColor()`.**
+
+```swift
+// Before
+Text("Hello").foregroundColor(.red)
+
+// After
+Text("Hello").foregroundStyle(.red)
+```
+
+**Line 24: Icon-only button is bad for VoiceOver - add a text label.**
+
+```swift
+// Before
+Button(action: addUser) {
+    Image(systemName: "plus")
+}
+
+// After
+Button("Add User", systemImage: "plus", action: addUser)
+```
+
+**Line 31: Avoid `Binding(get:set:)` in view body - use `@State` with `onChange()` instead.**
+
+```swift
+// Before
+TextField("Username", text: Binding(
+    get: { model.username },
+    set: { model.username = $0; model.save() }
+))
+
+// After
+TextField("Username", text: $model.username)
+    .onChange(of: model.username) {
+        model.save()
+    }
+```
+
+### Summary
+
+1. **Accessibility (high):** The add button on line 24 is invisible to VoiceOver.
+2. **Deprecated API (medium):** `foregroundColor()` on line 12 should be `foregroundStyle()`.
+3. **Data flow (medium):** The manual binding on line 31 is fragile and harder to maintain.
+
+End of example.
+
+
+## References
+
+- `references/accessibility.md` - Dynamic Type, VoiceOver, Reduce Motion, and other accessibility requirements.
+- `references/api.md` - updating code for modern API, and the deprecated code it replaces.
+- `references/design.md` - guidance for building accessible apps that meet Apple’s Human Interface Guidelines.
+- `references/hygiene.md` - making code compile cleanly and be maintainable in the long term.
+- `references/navigation.md` - navigation using `NavigationStack`/`NavigationSplitView`, plus alerts, confirmation dialogs, and sheets.
+- `references/performance.md` - optimizing SwiftUI code for maximum performance.
+- `references/data.md` - data flow, shared state, and property wrappers.
+- `references/swift.md` - tips on writing modern Swift code, including using Swift Concurrency effectively.
+- `references/views.md` - view structure, composition, and animation.
+
+codex
+I’m doing a quick memory pass because this repo has prior review history; I’ll only use it to avoid re-reporting stale context, and I’ll verify the current diff/spec directly.
+hook: PreToolUse
+hook: PreToolUse
+hook: PreToolUse Completed
+hook: PreToolUse Completed
+exec
+/bin/zsh -lc pwd in /Users/jkher/Documents/Claude/NYC Trip 2026
+ succeeded in 0ms:
+/Users/jkher/Documents/Claude/NYC Trip 2026
+
+exec
+/bin/zsh -lc 'rg -n "NYC Trip 2026|TripContentTests|subway|Day 3|Brandy|Canal|SoHo" /Users/jkher/.codex/memories/MEMORY.md' in /Users/jkher/Documents/Claude/NYC Trip 2026
+ succeeded in 0ms:
+505:# Task Group: NYC Trip 2026 SwiftUI final-gate and fix-verification reviews
+507:scope: Use when reviewing the NYC Trip 2026 iOS app before device install or when the user wants a strict evidence-only re-review of a fix commit without code changes.
+508:applies_to: cwd=/Users/jkher/Documents/Claude/NYC Trip 2026; reuse_rule=reuse for this repo's SwiftUI/accessibility/deep-link/state-restore review workflow, but re-check the current commit, file tree, and requested diff before carrying findings forward
+514:- rollout_summaries/2026-05-28T00-49-29-SuQS-nyc_trip_2026_final_gate_code_review.md (cwd=/Users/jkher/Documents/Claude/NYC Trip 2026, rollout_path=/Users/jkher/.codex/sessions/2026/05/27/rollout-2026-05-27T20-49-29-019e6c0e-c9c0-7261-aa11-132ba65a5b56.jsonl, updated_at=2026-05-28T00:54:34+00:00, thread_id=019e6c0e-c9c0-7261-aa11-132ba65a5b56, final verdict was "Fix 3 items first")
+518:- NYC Trip 2026, final gate review, SwiftUI, accessibility, Dynamic Type, VoiceOver, @ScaledMetric, Font.custom, DeepLinker, URLComponents, URLQueryItem, TripView, AppStorage, Info.plist, LSApplicationQueriesSchemes, DM Sans, asset catalog, iPhone install
+524:- rollout_summaries/2026-05-28T01-01-00-LE2q-fe50e5f_review_nyc_trip_ios_fixes.md (cwd=/Users/jkher/Documents/Claude/NYC Trip 2026, rollout_path=/Users/jkher/.codex/sessions/2026/05/27/rollout-2026-05-27T21-01-00-019e6c19-55e0-7bf0-80e2-a97d0d01d59e.jsonl, updated_at=2026-05-28T01:02:53+00:00, thread_id=019e6c19-55e0-7bf0-80e2-a97d0d01d59e, re-review confirmed the targeted fixes with repo-visible evidence)
+554:# Task Group: NYC Trip 2026 adversarial phase and delta reviews
+556:scope: Use when the user wants adversarial, evidence-only review of NYC Trip 2026 implementation phases or commit deltas before later checkpoints.
+557:applies_to: cwd=/Users/jkher/Documents/Claude/NYC Trip 2026; reuse_rule=reuse for this repo's phased SwiftUI review workflow and diff-scoped verification, but only after matching the requested commit range and review scope
+563:- rollout_summaries/2026-05-27T23-36-08-5UJZ-nyc_trip_2026_adversarial_review_phases_0_3.md (cwd=/Users/jkher/Documents/Claude/NYC Trip 2026, rollout_path=/Users/jkher/.codex/sessions/2026/05/27/rollout-2026-05-27T19-36-08-019e6bcb-a291-77a2-8f9d-20024e78406b.jsonl, updated_at=2026-05-27T23:41:49+00:00, thread_id=019e6bcb-a291-77a2-8f9d-20024e78406b, found a real device-breaker and placeholder debt)
+573:- rollout_summaries/2026-05-27T23-48-20-ijBB-nyc_trip_2026_codex_checkpoint_1_re_review.md (cwd=/Users/jkher/Documents/Claude/NYC Trip 2026, rollout_path=/Users/jkher/.codex/sessions/2026/05/27/rollout-2026-05-27T19-48-20-019e6bd6-d0b8-7cb1-9905-d18230b36747.jsonl, updated_at=2026-05-27T23:50:09+00:00, thread_id=019e6bd6-d0b8-7cb1-9905-d18230b36747, confirmed targeted deep-link and deployment-target fixes)
+583:- rollout_summaries/2026-05-28T00-04-22-S6x2-nyc_trip_swiftui_adversarial_review.md (cwd=/Users/jkher/Documents/Claude/NYC Trip 2026, rollout_path=/Users/jkher/.codex/sessions/2026/05/27/rollout-2026-05-27T20-04-22-019e6be5-7eb8-7a23-b72a-3fdae5c2b2a8.jsonl, updated_at=2026-05-28T00:09:51+00:00, thread_id=019e6be5-7eb8-7a23-b72a-3fdae5c2b2a8, strict four-section adversarial review contract)
+593:- rollout_summaries/2026-05-28T00-23-24-7Kaj-nyc_trip_b9cad85_adversarial_delta_review.md (cwd=/Users/jkher/Documents/Claude/NYC Trip 2026, rollout_path=/Users/jkher/.codex/sessions/2026/05/27/rollout-2026-05-27T20-23-24-019e6bf6-ea3b-7c12-baf7-9892abda9e2f.jsonl, updated_at=2026-05-28T00:26:11+00:00, thread_id=019e6bf6-ea3b-7c12-baf7-9892abda9e2f, verified safe-area, NavBar, palette, and WCAG delta behavior)
+613:- `placeholderReservationsVisible` in `TripContentTests.swift` is intentionally count-based placeholder debt tracking, not a mistaken self-fulfilling test; update the expected count when placeholders are replaced [Task 2]
+
+codex
+The relevant memory only points to prior review style and one test-note; I’m treating it as background and checking the current diff/spec from scratch.
+hook: PreToolUse
+hook: PreToolUse Completed
+exec
+/bin/zsh -lc "sed -n '554,614p' /Users/jkher/.codex/memories/MEMORY.md" in /Users/jkher/Documents/Claude/NYC Trip 2026
+ succeeded in 0ms:
+# Task Group: NYC Trip 2026 adversarial phase and delta reviews
+
+scope: Use when the user wants adversarial, evidence-only review of NYC Trip 2026 implementation phases or commit deltas before later checkpoints.
+applies_to: cwd=/Users/jkher/Documents/Claude/NYC Trip 2026; reuse_rule=reuse for this repo's phased SwiftUI review workflow and diff-scoped verification, but only after matching the requested commit range and review scope
+
+## Task 1: Adversarial review of Phases 0-3, partial
+
+### rollout_summary_files
+
+- rollout_summaries/2026-05-27T23-36-08-5UJZ-nyc_trip_2026_adversarial_review_phases_0_3.md (cwd=/Users/jkher/Documents/Claude/NYC Trip 2026, rollout_path=/Users/jkher/.codex/sessions/2026/05/27/rollout-2026-05-27T19-36-08-019e6bcb-a291-77a2-8f9d-20024e78406b.jsonl, updated_at=2026-05-27T23:41:49+00:00, thread_id=019e6bcb-a291-77a2-8f9d-20024e78406b, found a real device-breaker and placeholder debt)
+
+### keywords
+
+- b0ae7ae..4a96f84, SwiftUI, Swift Testing, adversarial review, DeepLinker, Info.plist, LSApplicationQueriesSchemes, URLQueryItem, Google Maps, Uber, NJ Transit, Trip.swift, hero assets, placeholder strings, project.pbxproj, deployment target
+
+## Task 2: Re-review commit 6774fb7 delta, success
+
+### rollout_summary_files
+
+- rollout_summaries/2026-05-27T23-48-20-ijBB-nyc_trip_2026_codex_checkpoint_1_re_review.md (cwd=/Users/jkher/Documents/Claude/NYC Trip 2026, rollout_path=/Users/jkher/.codex/sessions/2026/05/27/rollout-2026-05-27T19-48-20-019e6bd6-d0b8-7cb1-9905-d18230b36747.jsonl, updated_at=2026-05-27T23:50:09+00:00, thread_id=019e6bd6-d0b8-7cb1-9905-d18230b36747, confirmed targeted deep-link and deployment-target fixes)
+
+### keywords
+
+- 6774fb7, git diff, git show, IPHONEOS_DEPLOYMENT_TARGET, LSApplicationQueriesSchemes, Google Maps URLs API, canOpenURL, DeepLinker, xcodeproj, testing
+
+## Task 3: Adversarial review of Phase 4 Views and Phase 5 Navigation, success
+
+### rollout_summary_files
+
+- rollout_summaries/2026-05-28T00-04-22-S6x2-nyc_trip_swiftui_adversarial_review.md (cwd=/Users/jkher/Documents/Claude/NYC Trip 2026, rollout_path=/Users/jkher/.codex/sessions/2026/05/27/rollout-2026-05-27T20-04-22-019e6be5-7eb8-7a23-b72a-3fdae5c2b2a8.jsonl, updated_at=2026-05-28T00:09:51+00:00, thread_id=019e6be5-7eb8-7a23-b72a-3fdae5c2b2a8, strict four-section adversarial review contract)
+
+### keywords
+
+- 7c3fe2e..86a441d, SwiftUI, adversarial review, TabView, AppStorage, safe area, page dots, accessibility, SF Symbols, contrast, grep, rg missing
+
+## Task 4: Focused adversarial re-review of b9cad85 delta, success
+
+### rollout_summary_files
+
+- rollout_summaries/2026-05-28T00-23-24-7Kaj-nyc_trip_b9cad85_adversarial_delta_review.md (cwd=/Users/jkher/Documents/Claude/NYC Trip 2026, rollout_path=/Users/jkher/.codex/sessions/2026/05/27/rollout-2026-05-27T20-23-24-019e6bf6-ea3b-7c12-baf7-9892abda9e2f.jsonl, updated_at=2026-05-28T00:26:11+00:00, thread_id=019e6bf6-ea3b-7c12-baf7-9892abda9e2f, verified safe-area, NavBar, palette, and WCAG delta behavior)
+
+### keywords
+
+- b9cad85, delta review, safe area, TabView, NavBar, StepView, WCAG, Swift Testing, contrast ratio, hue analysis, Dynamic Type, NJ Transit
+
+## User preferences
+
+- when the user says "Do not skip any file" and "Do not take prior summaries at face value inspect the actual code" -> default to reading the source and not relying on summaries [Task 1]
+- when the user requires a specific findings format such as severity buckets plus `File / Issue / Fix / Evidence` or fixed question sections -> preserve that exact structure instead of smoothing it into a generic review memo [Task 1][Task 2][Task 3][Task 4]
+- when the user says "Re-review only the 6 files changed in commit 6774fb7. Do not audit unrelated code." or "only inspect what changed in b9cad85" -> keep review scope tightly bound to the requested diff [Task 2][Task 4]
+- when the user says "Every finding must cite the actual code" or "No unsupported assertions" -> ground every claim in repo evidence, and verify iOS availability/API behavior directly instead of guessing [Task 2][Task 3][Task 4]
+- when the user says "production-quality adversarial review" and "genuine bugs and UX defects, not style nits" -> prioritize correctness and user-facing defects over style commentary [Task 3]
+- when the user adds a verification pass for hero names, schemes, placeholders, or step counts -> run a second-pass reconciliation before finalizing [Task 1]
+
+## Reusable knowledge
+
+- `Trip.allSteps` is exactly 31 steps, and the hero asset list matches the `hero` strings in `Trip.swift`; those checks were worth preserving because the user repeatedly asked for content-parity validation [Task 1]
+- The Phase 0-3 review isolated a real device-breaker: `canOpenURL`-style checks need `LSApplicationQueriesSchemes`, and `Info.plist` initially had fonts but no allow-list entries [Task 1]
+- The 6774fb7 re-review established the durable deep-link rule: `LSApplicationQueriesSchemes` entries must be bare scheme strings like `comgooglemaps` and `njtransit`, while empty Google Maps fallback should be the universal URL `https://www.google.com/maps/@?api=1&map_action=map` [Task 2]
+- `placeholderReservationsVisible` in `TripContentTests.swift` is intentionally count-based placeholder debt tracking, not a mistaken self-fulfilling test; update the expected count when placeholders are replaced [Task 2]
+- Phase 4/5 review established the core navigation model: `TripView` uses `TabView(selection: $currentIndex)` with integer `.tag(index)` values and `.tabViewStyle(.page(indexDisplayMode: .never))`, while `Step.day` drives welcome/step/closing renderer selection [Task 3]
+
+codex
+Next I’m reading the supplied diff and spec alongside the live Swift/test files with line numbers, so each finding can tie back to current source instead of the patch alone.
+hook: PreToolUse
+hook: PreToolUse
+hook: PreToolUse
+hook: PreToolUse
+hook: PreToolUse Completed
+hook: PreToolUse Completed
+hook: PreToolUse Completed
+hook: PreToolUse Completed
+exec
+/bin/zsh -lc 'wc -l docs/superpowers/specs/2026-06-15-nyc-trip-app-revisions-design.md' in /Users/jkher/Documents/Claude/NYC Trip 2026
+exec
+/bin/zsh -lc 'wc -l NYCTrip2026/NYCTrip2026/Content/Trip.swift' in /Users/jkher/Documents/Claude/NYC Trip 2026
+exec
+/bin/zsh -lc 'wc -l /tmp/nyc-revisions-review.diff' in /Users/jkher/Documents/Claude/NYC Trip 2026
+ succeeded in 0ms:
+     147 docs/superpowers/specs/2026-06-15-nyc-trip-app-revisions-design.md
+
+ succeeded in 0ms:
+     324 NYCTrip2026/NYCTrip2026/Content/Trip.swift
+
+ succeeded in 0ms:
+     343 /tmp/nyc-revisions-review.diff
+
+exec
+/bin/zsh -lc 'wc -l NYCTrip2026/NYCTrip2026Tests/TripContentTests.swift' in /Users/jkher/Documents/Claude/NYC Trip 2026
+ succeeded in 0ms:
+     135 NYCTrip2026/NYCTrip2026Tests/TripContentTests.swift
+
+codex
+The review surface is small enough to read completely: 343-line diff, 147-line spec, 324-line content file, and 135-line test file.
+hook: PreToolUse
+hook: PreToolUse
+hook: PreToolUse
+hook: PreToolUse
+hook: PreToolUse Completed
+hook: PreToolUse Completed
+hook: PreToolUse Completed
+hook: PreToolUse Completed
+exec
+/bin/zsh -lc 'nl -ba NYCTrip2026/NYCTrip2026/Content/Trip.swift' in /Users/jkher/Documents/Claude/NYC Trip 2026
+exec
+/bin/zsh -lc 'nl -ba /tmp/nyc-revisions-review.diff' in /Users/jkher/Documents/Claude/NYC Trip 2026
+exec
+/bin/zsh -lc 'nl -ba NYCTrip2026/NYCTrip2026Tests/TripContentTests.swift' in /Users/jkher/Documents/Claude/NYC Trip 2026
+ succeeded in 0ms:
+     1	import Testing
+     2	import UIKit
+     3	@testable import NYCTrip2026
+     4	
+     5	@Suite("Trip content integrity")
+     6	struct TripContentTests {
+     7	    @Test("Step ids are unique")
+     8	    func uniqueIds() {
+     9	        let ids = Trip.allSteps.map(\.id)
+    10	        #expect(ids.count == Set(ids).count, "Duplicate step IDs found")
+    11	    }
+    12	
+    13	    @Test("Day values are in valid range 0...5")
+    14	    func dayValuesInRange() {
+    15	        for step in Trip.allSteps {
+    16	            #expect((0...5).contains(step.day), "Step id \(step.id) has invalid day \(step.day)")
+    17	        }
+    18	    }
+    19	
+    20	    @Test("Welcome is first and closing is last")
+    21	    func bookends() {
+    22	        #expect(Trip.allSteps.first?.day == 0)
+    23	        #expect(Trip.allSteps.last?.day == 5)
+    24	        #expect(Trip.allSteps.first?.hero == "icon")
+    25	        #expect(Trip.allSteps.last?.hero == "icon")
+    26	    }
+    27	
+    28	    @Test("Days flow forward: 0, 1...1, 2...2, 3...3, 4...4, 5")
+    29	    func daysAscend() {
+    30	        var prev = -1
+    31	        for step in Trip.allSteps {
+    32	            #expect(step.day >= prev, "Step id \(step.id) day \(step.day) went backwards from \(prev)")
+    33	            prev = step.day
+    34	        }
+    35	    }
+    36	
+    37	    @Test("Every CTA has a non-empty label")
+    38	    func ctaLabelsNonEmpty() {
+    39	        for step in Trip.allSteps {
+    40	            for cta in step.ctas {
+    41	                #expect(!cta.label.isEmpty, "Empty CTA label on step id \(step.id)")
+    42	            }
+    43	        }
+    44	    }
+    45	
+    46	    @Test("Uber CTAs use the expected coordinate policy for their destination strings")
+    47	    func uberCoordinatesMatchDestinations() {
+    48	        let expected: [String: (latitude: Double, longitude: Double)] = [
+    49	            "The Jewel Hotel, 11 W 51st St, New York, NY": (40.7597381, -73.9777528),
+    50	            "Via Quadronno, 25 E 73rd St, New York, NY": (40.7727446, -73.9651572),
+    51	            "Bethesda Fountain, Central Park, New York, NY": (40.774122, -73.971136),
+    52	            "Macy's Herald Square, 151 W 34th St, New York, NY": (40.750797, -73.989578),
+    53	            "Museum of Ice Cream, 558 Broadway, New York, NY": (40.7238545, -73.9979167),
+    54	            "Penn Station, 31st St & 8th Ave, New York, NY": (40.750568, -73.994235)
+    55	        ]
+    56	
+    57	        var seenDestinations = Set<String>()
+    58	        for step in Trip.allSteps {
+    59	            for cta in step.ctas {
+    60	                guard case let .openInUber(destination, latitude, longitude, _) = cta else { continue }
+    61	                guard let coordinates = expected[destination] else {
+    62	                    Issue.record("Unexpected Uber destination on step id \(step.id): \(destination)")
+    63	                    continue
+    64	                }
+    65	                seenDestinations.insert(destination)
+    66	                #expect(latitude == coordinates.latitude, "Step id \(step.id) has stale Uber latitude for \(destination)")
+    67	                #expect(longitude == coordinates.longitude, "Step id \(step.id) has stale Uber longitude for \(destination)")
+    68	            }
+    69	        }
+    70	
+    71	        #expect(seenDestinations == Set(expected.keys), "Uber destination set changed; verify coordinate policy before shipping")
+    72	    }
+    73	
+    74	    @Test("No step has more than two CTAs")
+    75	    func atMostTwoCTAs() {
+    76	        for step in Trip.allSteps {
+    77	            #expect(step.ctas.count <= 2, "Step id \(step.id) has \(step.ctas.count) CTAs (max 2)")
+    78	        }
+    79	    }
+    80	
+    81	    @Test("Total step count is 37 (welcome + 35 + closing)")
+    82	    func totalCount() {
+    83	        #expect(Trip.allSteps.count == 37)
+    84	    }
+    85	
+    86	    @Test("Every step's hero name is non-empty")
+    87	    func heroNamesNonEmpty() {
+    88	        for step in Trip.allSteps {
+    89	            #expect(!step.hero.isEmpty, "Step id \(step.id) has empty hero name")
+    90	        }
+    91	    }
+    92	
+    93	    @Test("Every referenced hero name resolves to a bundled image asset")
+    94	    func heroAssetsExist() {
+    95	        for name in Trip.referencedHeroNames {
+    96	            #expect(UIImage(named: name) != nil, "Asset catalog has no image named '\(name)'")
+    97	        }
+    98	    }
+    99	
+   100	    @Test("Reservation + 2 CTAs never coincide (layout space invariant)")
+   101	    func reservationAndTwoCTAsExclusive() {
+   102	        for step in Trip.allSteps {
+   103	            if step.reservation != nil {
+   104	                #expect(step.ctas.count <= 1, "Step id \(step.id) has both a reservation card and >1 CTA — layout will overflow")
+   105	            }
+   106	        }
+   107	    }
+   108	
+   109	    @Test("Day-step day labels match their actual position and per-day count")
+   110	    func dayLabelsMatchPosition() {
+   111	        let trip = Trip.allSteps.filter { (1...4).contains($0.day) }
+   112	        let byDay = Dictionary(grouping: trip, by: \.day)
+   113	        for (day, steps) in byDay {
+   114	            let totalForDay = steps.count
+   115	            for (index, step) in steps.enumerated() {
+   116	                let expected = "Day \(day) · \(index + 1) of \(totalForDay)"
+   117	                #expect(step.dayLabel == expected,
+   118	                        "Step id \(step.id) has dayLabel '\(step.dayLabel)' — expected '\(expected)' (position drifted)")
+   119	            }
+   120	        }
+   121	    }
+   122	
+   123	    @Test("Placeholder reservation strings flagged for pre-install fill-in")
+   124	    func placeholderReservationsVisible() {
+   125	        // Codex Checkpoint 1 flagged these as render-on-device risk. We keep them per Jon's choice,
+   126	        // but assert the count so any silent disappearance (or new placeholders added) is noticed.
+   127	        let placeholderCount = Trip.allSteps.reduce(0) { acc, step in
+   128	            guard let res = step.reservation else { return acc }
+   129	            let fields = [res.time, res.confirmation, res.extra].compactMap { $0 }
+   130	            return acc + fields.filter { $0.contains("Jon to fill in") || $0.contains("time set by ticket purchase") }.count
+   131	        }
+   132	        #expect(placeholderCount == 0,
+   133	                "Expected no 'Jon to fill in' / 'time set by ticket purchase' placeholders across reservations; found \(placeholderCount).")
+   134	    }
+   135	}
+
+ succeeded in 0ms:
+     1	import SwiftUI
+     2	
+     3	enum Trip {
+     4	
+     5	    // MARK: Color palette (warm-family + 2 dusty-cool accents)
+     6	
+     7	    private static let peach        = (bg: "#fbe9dc", accent: "#b85c38")
+     8	    private static let blush        = (bg: "#f6e2d8", accent: "#a45a48")
+     9	    private static let dustyRose    = (bg: "#f0d3d8", accent: "#9c4a64")
+    10	    private static let clay         = (bg: "#ecd9c8", accent: "#a05b2e")
+    11	    private static let cream        = (bg: "#f8eedd", accent: "#8a6f3a")
+    12	    private static let butterCream  = (bg: "#f4e9cf", accent: "#86691d")
+    13	    private static let sageCream    = (bg: "#e0e3d4", accent: "#5e6c4a")
+    14	    private static let mistBlue     = (bg: "#d8dfe5", accent: "#4d6a82")
+    15	    private static let wisteria     = (bg: "#dcd5dd", accent: "#6b5e75")
+    16	
+    17	    private static func colors(_ p: (bg: String, accent: String)) -> (Color, Color) {
+    18	        (Color(hex: p.bg), Color(hex: p.accent))
+    19	    }
+    20	
+    21	    // MARK: Step factory
+    22	
+    23	    private static func step(
+    24	        id: Int, day: Int, dayLabel: String,
+    25	        hero: String, title: String, subtitle: String? = nil,
+    26	        reservation: ReservationDetail? = nil,
+    27	        ctas: [CTA] = [],
+    28	        palette: (bg: String, accent: String)
+    29	    ) -> Step {
+    30	        let (bg, accent) = colors(palette)
+    31	        return Step(
+    32	            id: id, day: day, dayLabel: dayLabel,
+    33	            hero: hero, title: title, subtitle: subtitle,
+    34	            reservation: reservation, ctas: ctas,
+    35	            background: bg, accent: accent
+    36	        )
+    37	    }
+    38	
+    39	    // MARK: The trip
+    40	
+    41	    static let welcomeStep = step(
+    42	        id: 0, day: 0, dayLabel: "",
+    43	        hero: "icon",
+    44	        title: "Welcome to your\nNYC trip!",
+    45	        subtitle: "June 21-24, 2026",
+    46	        palette: peach
+    47	    )
+    48	
+    49	    static let closingStep = step(
+    50	        id: 999, day: 5, dayLabel: "",
+    51	        hero: "icon",
+    52	        title: "Welcome home!",
+    53	        subtitle: "Hope you loved every minute.",
+    54	        palette: peach
+    55	    )
+    56	
+    57	    static let day1: [Step] = [
+    58	        step(id: 1, day: 1, dayLabel: "Day 1 · 1 of 9",
+    59	             hero: "sedan_car", title: "Drive to\nMetropark Station",
+    60	             subtitle: "~10 hr drive to Iselin, NJ",
+    61	             ctas: [.openInGoogleMaps(destination: "Metropark Station, Iselin, NJ", label: "Open in Google Maps")],
+    62	             palette: mistBlue),
+    63	
+    64	        step(id: 2, day: 1, dayLabel: "Day 1 · 2 of 9",
+    65	             hero: "sedan_car", title: "Park in the Metropark parking garage",
+    66	             subtitle: "No ticket required. Just drive in.",
+    67	             palette: butterCream),
+    68	
+    69	        step(id: 3, day: 1, dayLabel: "Day 1 · 3 of 9",
+    70	             hero: "subway_train", title: "Train to Penn Station",
+    71	             subtitle: "Northeast Corridor line ~35-50 min\n\nActivate your tickets at the platform.",
+    72	             ctas: [.openNJTransit(label: "Open NJ Transit app")],
+    73	             palette: sageCream),
+    74	
+    75	        step(id: 4, day: 1, dayLabel: "Day 1 · 4 of 9",
+    76	             hero: "uber_car", title: "Hail a cab to\nThe Jewel Hotel",
+    77	             subtitle: "~15 min ride to 11 W 51st St.\nGrab a yellow cab outside Penn — or use Uber as a backup.",
+    78	             ctas: [.openInUber(destination: "The Jewel Hotel, 11 W 51st St, New York, NY", latitude: 40.7597381, longitude: -73.9777528, label: "Backup: open Uber")],
+    79	             palette: clay),
+    80	
+    81	        step(id: 5, day: 1, dayLabel: "Day 1 · 5 of 9",
+    82	             hero: "subway_train", title: "Or take the subway\nto the hotel",
+    83	             subtitle: "Inside Penn, follow signs to the 8th Ave A·C·E subway.\n\nTake the uptown E train only (toward Queens) — not the A or C — 4 stops to 5 Av/53 St.\n\nExit toward 5th Ave, walk south to 51st St, turn right.",
+    84	             ctas: [.openInGoogleMaps(destination: "The Jewel Hotel, 11 W 51st St, New York, NY", label: "Open hotel in Google Maps")],
+    85	             palette: mistBlue),
+    86	
+    87	        step(id: 6, day: 1, dayLabel: "Day 1 · 6 of 9",
+    88	             hero: "hotel_building", title: "Check in at\nThe Jewel Hotel",
+    89	             reservation: ReservationDetail(
+    90	                time: "Check-in after 3pm",
+    91	                address: "11 W 51st St, across from Rockefeller Center",
+    92	                confirmation: "Expedia itinerary #73447998588498",
+    93	                extra: "Superior Room - reserved under Katy Hering"
+    94	             ),
+    95	             palette: peach),
+    96	
+    97	        step(id: 7, day: 1, dayLabel: "Day 1 · 7 of 9",
+    98	             hero: "dinner", title: "Dinner at\nJoe's Pizza",
+    99	             subtitle: "~15-20 min walk to 1435 Broadway\n\nWalk to Times Square after... or walk through Times Square to get there",
+   100	             ctas: [.openInGoogleMaps(destination: "Joe's Pizza, 1435 Broadway, New York, NY", label: "Open in Google Maps")],
+   101	             palette: dustyRose),
+   102	
+   103	        step(id: 8, day: 1, dayLabel: "Day 1 · 8 of 9",
+   104	             hero: "times_square", title: "Times Square",
+   105	             subtitle: "Very short walk from Joe's.\nBest at night when the lights are full.",
+   106	             ctas: [.openInGoogleMaps(destination: "Times Square, New York, NY", label: "Open in Google Maps")],
+   107	             palette: butterCream),
+   108	
+   109	        step(id: 9, day: 1, dayLabel: "Day 1 · 9 of 9",
+   110	             hero: "hotel_building", title: "Return to\nThe Jewel Hotel",
+   111	             subtitle: "Open Google Maps for directions from wherever you are",
+   112	             ctas: [.openInGoogleMaps(destination: "The Jewel Hotel, 11 W 51st St, New York, NY", label: "Open in Google Maps")],
+   113	             palette: wisteria),
+   114	    ]
+   115	
+   116	    static let day2: [Step] = [
+   117	        step(id: 10, day: 2, dayLabel: "Day 2 · 1 of 9",
+   118	             hero: "breakfast", title: "Breakfast at\nBlue Box Café",
+   119	             subtitle: "8-min walk from the hotel.",
+   120	             reservation: ReservationDetail(
+   121	                time: "10:00am (arrive by 10:15)",
+   122	                address: "727 5th Ave - 6th Floor of Tiffany & Co.",
+   123	                confirmation: "Reserved under Katy Hering",
+   124	                extra: "Breakfast for 2"
+   125	             ),
+   126	             ctas: [.openInGoogleMaps(destination: "Tiffany & Co., 727 5th Ave, New York, NY", label: "Open in Google Maps")],
+   127	             palette: cream),
+   128	
+   129	        step(id: 11, day: 2, dayLabel: "Day 2 · 2 of 9",
+   130	             hero: "jellycat", title: "Jellycat Diner\nat FAO Schwarz",
+   131	             subtitle: "10-min walk from Breakfast.",
+   132	             reservation: ReservationDetail(
+   133	                time: "11:50am",
+   134	                address: "30 Rockefeller Plaza, FAO Schwarz building",
+   135	                confirmation: "Booking #351207910",
+   136	                extra: "Arrive 11:30-12:00 (no later than 12:00)"
+   137	             ),
+   138	             ctas: [.openInGoogleMaps(destination: "FAO Schwarz, 30 Rockefeller Plaza, New York, NY", label: "Open in Google Maps")],
+   139	             palette: blush),
+   140	
+   141	        step(id: 12, day: 2, dayLabel: "Day 2 · 3 of 9",
+   142	             hero: "train_station", title: "Visit Grand\nCentral Terminal",
+   143	             subtitle: "15-min walk from Jellycat\n(or skip ahead to Brandy Melville)",
+   144	             ctas: [.openInGoogleMaps(destination: "Grand Central Terminal, 89 E 42nd St, New York, NY", label: "Open in Google Maps")],
+   145	             palette: butterCream),
+   146	
+   147	        step(id: 13, day: 2, dayLabel: "Day 2 · 4 of 9",
+   148	             hero: "nyc_shopping", title: "Brandy Melville",
+   149	             subtitle: "1172 3rd Ave (68th & 3rd), Upper East Side\n~15-min walk up from Grand Central, or a short cab.",
+   150	             ctas: [.openInGoogleMaps(destination: "Brandy Melville, 1172 3rd Ave, New York, NY", label: "Open in Google Maps")],
+   151	             palette: dustyRose),
+   152	
+   153	        step(id: 14, day: 2, dayLabel: "Day 2 · 5 of 9",
+   154	             hero: "lunch", title: "OPTIONAL: Lunch at\nVia Quadronno",
+   155	             subtitle: "25 E 73rd St\n(steps from Central Park east entrance)",
+   156	             ctas: [.openInUber(destination: "Via Quadronno, 25 E 73rd St, New York, NY", latitude: 40.7727446, longitude: -73.9651572, label: "Cab or Uber")],
+   157	             palette: clay),
+   158	
+   159	        step(id: 15, day: 2, dayLabel: "Day 2 · 6 of 9",
+   160	             hero: "central_park_spring", title: "Visit Central Park",
+   161	             subtitle: "(or skip back to the Upper East Side)\n\nDepending where you are,\nwalk (Google Maps) or grab a cab / Uber.",
+   162	             ctas: [
+   163	                .openInGoogleMaps(destination: "Bethesda Fountain, Central Park, New York, NY", label: "Walk it (Google Maps)"),
+   164	                .openInUber(destination: "Bethesda Fountain, Central Park, New York, NY", latitude: 40.774122, longitude: -73.971136, label: "Cab or Uber")
+   165	             ],
+   166	             palette: sageCream),
+   167	
+   168	        step(id: 16, day: 2, dayLabel: "Day 2 · 7 of 9",
+   169	             hero: "nyc_shopping", title: "Herald Square\n& Macy's",
+   170	             subtitle: "Cab or Uber from Central Park\nor 20-min walk from Grand Central.",
+   171	             ctas: [
+   172	                .openInGoogleMaps(destination: "Macy's Herald Square, 151 W 34th St, New York, NY", label: "Walk it (Google Maps)"),
+   173	                .openInUber(destination: "Macy's Herald Square, 151 W 34th St, New York, NY", latitude: 40.750797, longitude: -73.989578, label: "Cab or Uber")
+   174	             ],
+   175	             palette: dustyRose),
+   176	
+   177	        step(id: 17, day: 2, dayLabel: "Day 2 · 8 of 9",
+   178	             hero: "hotel_building", title: "Back to hotel\nbefore dinner",
+   179	             subtitle: "25-minute walk from Macy's\nor grab a cab / Uber.",
+   180	             ctas: [
+   181	                .openInGoogleMaps(destination: "The Jewel Hotel, 11 W 51st St, New York, NY", label: "Walk it (Google Maps)"),
+   182	                .openInUber(destination: "The Jewel Hotel, 11 W 51st St, New York, NY", latitude: 40.7597381, longitude: -73.9777528, label: "Cab or Uber")
+   183	             ],
+   184	             palette: wisteria),
+   185	
+   186	        step(id: 18, day: 2, dayLabel: "Day 2 · 9 of 9",
+   187	             hero: "dinner", title: "Dinner at\nTAO Uptown",
+   188	             subtitle: "~13-min walk from hotel.",
+   189	             reservation: ReservationDetail(
+   190	                time: "6:30pm (must arrive by 6:45)",
+   191	                address: "42 E 58th St",
+   192	                confirmation: "Confirmation #: 2112064704",
+   193	                extra: nil
+   194	             ),
+   195	             ctas: [.openInGoogleMaps(destination: "TAO Uptown, 42 E 58th St, New York, NY", label: "Open in Google Maps")],
+   196	             palette: dustyRose),
+   197	    ]
+   198	
+   199	    static let day3: [Step] = [
+   200	        step(id: 19, day: 3, dayLabel: "Day 3 · 1 of 11",
+   201	             hero: "breakfast", title: "Cinnamon rolls at\nSunday Morning",
+   202	             subtitle: "11 W 25th St · about a 25-min walk, or take the subway (next screen).\n\nNot feeling the walk? Grab Starbucks near the hotel instead.",
+   203	             ctas: [
+   204	                .openInGoogleMaps(destination: "Sunday Morning Bakehouse, 11 W 25th St, New York, NY 10010", label: "Walk there (Google Maps)"),
+   205	                .openInGoogleMaps(destination: "Starbucks, 1290 Sixth Avenue, New York, NY", label: "Starbucks instead")
+   206	             ],
+   207	             palette: butterCream),
+   208	
+   209	        step(id: 20, day: 3, dayLabel: "Day 3 · 2 of 11",
+   210	             hero: "subway_train", title: "Subway option:\nhotel → Sunday Morning",
+   211	             subtitle: "Walk to 47–50 Sts–Rockefeller Center (6th Ave).\n\nTake a downtown F or M train only — not B or D — 3 stops to 23 St.\n\nWalk north to 25th St, turn right.",
+   212	             ctas: [.openInGoogleMaps(destination: "47-50 Sts–Rockefeller Center Station, New York, NY", label: "Open station in Google Maps")],
+   213	             palette: mistBlue),
+   214	
+   215	        step(id: 21, day: 3, dayLabel: "Day 3 · 3 of 11",
+   216	             hero: "ice_cream_cone", title: "Museum of\nIce Cream",
+   217	             subtitle: "Hail a cab from breakfast — or take the subway (next screen).",
+   218	             reservation: ReservationDetail(
+   219	                time: "11:30am reservation",
+   220	                address: "558 Broadway, at Prince St (SoHo)",
+   221	                confirmation: "Booking ID: FJ9*YPFVFMP*",
+   222	                extra: "Mobile ticket (email). Waivers are signed."
+   223	             ),
+   224	             ctas: [.openInUber(destination: "Museum of Ice Cream, 558 Broadway, New York, NY", latitude: 40.7238545, longitude: -73.9979167, label: "Backup: open Uber")],
+   225	             palette: dustyRose),
+   226	
+   227	        step(id: 22, day: 3, dayLabel: "Day 3 · 4 of 11",
+   228	             hero: "subway_train", title: "Subway option:\nto the museum",
+   229	             subtitle: "Take the downtown R or W train only to Prince St — NOT the N or Q (they skip Prince St). The museum is steps from the exit.\n\nFrom Sunday Morning, board at 23 St. From the hotel/Starbucks, board at 49 St.",
+   230	             ctas: [
+   231	                .openInGoogleMaps(destination: "23 St Station (R/W), Broadway & W 23rd St, New York, NY", label: "From breakfast: 23 St"),
+   232	                .openInGoogleMaps(destination: "49 St Station (R/W), W 49th St & 7th Ave, New York, NY", label: "From the hotel: 49 St")
+   233	             ],
+   234	             palette: mistBlue),
+   235	
+   236	        step(id: 23, day: 3, dayLabel: "Day 3 · 5 of 11",
+   237	             hero: "lunch", title: "OPTIONAL: Lunch at\nJack's Wife Freda",
+   238	             subtitle: "226 Lafayette St · steps from the museum.\nMediterranean-American, casual.",
+   239	             ctas: [.openInGoogleMaps(destination: "Jack's Wife Freda, 226 Lafayette St, New York, NY", label: "Open in Google Maps")],
+   240	             palette: cream),
+   241	
+   242	        step(id: 24, day: 3, dayLabel: "Day 3 · 6 of 11",
+   243	             hero: "nyc_shopping", title: "SoHo shopping",
+   244	             subtitle: "Start around Prince & Mercer. Walk Prince → Greene → Spring → Wooster — the classic cobblestone boutique blocks — dipping over to Broadway for the bigger stores.\n\nWorth a look: Aritzia (560 Broadway), MoMA Design Store (81 Spring), Mure + Grand (155 Spring), Pearl River Mart (452 Broadway).",
+   245	             ctas: [.openInGoogleMaps(destination: "Prince St & Mercer St, New York, NY", label: "Open start point in Maps")],
+   246	             palette: blush),
+   247	
+   248	        step(id: 25, day: 3, dayLabel: "Day 3 · 7 of 11",
+   249	             hero: "nyc_shopping", title: "Canal Street",
+   250	             subtitle: "Start at Broadway & Canal, then walk east on Canal toward Lafayette/Centre.\n\nThe classic busy-Canal stretch — crowded sidewalks, souvenir shops, bargain finds. A fun browse more than serious shopping.",
+   251	             ctas: [.openInGoogleMaps(destination: "Canal St & Broadway, New York, NY", label: "Open start point in Maps")],
+   252	             palette: clay),
+   253	
+   254	        step(id: 26, day: 3, dayLabel: "Day 3 · 8 of 11",
+   255	             hero: "hotel_building", title: "Hail a cab\nback to the hotel",
+   256	             subtitle: "Freshen up before evening.\nGrab a yellow cab — or use Uber as a backup.",
+   257	             ctas: [.openInUber(destination: "The Jewel Hotel, 11 W 51st St, New York, NY", latitude: 40.7597381, longitude: -73.9777528, label: "Backup: open Uber")],
+   258	             palette: wisteria),
+   259	
+   260	        step(id: 27, day: 3, dayLabel: "Day 3 · 9 of 11",
+   261	             hero: "subway_train", title: "Subway option:\nCanal St → hotel",
+   262	             subtitle: "At Broadway & Canal, take an uptown N, R, or W train to 49 St — not the Q.\n\nExit at 7th Ave & 49th, walk north to 51st St, turn right.",
+   263	             ctas: [.openInGoogleMaps(destination: "Canal St Station, Broadway & Canal St, New York, NY", label: "Open station in Google Maps")],
+   264	             palette: mistBlue),
+   265	
+   266	        step(id: 28, day: 3, dayLabel: "Day 3 · 10 of 11",
+   267	             hero: "fifth_ave_sign", title: "Evening walk\n5th Ave & Madison Ave",
+   268	             subtitle: "2-min walk from hotel.\n(or skip ahead to dinner)",
+   269	             palette: peach),
+   270	
+   271	        step(id: 29, day: 3, dayLabel: "Day 3 · 11 of 11",
+   272	             hero: "dinner", title: "Dinner time",
+   273	             subtitle: "(or skip back to 5th Ave and Madison Ave)",
+   274	             ctas: [.openInGoogleMaps(destination: nil, label: "Open Google Maps")],
+   275	             palette: clay),
+   276	    ]
+   277	
+   278	    static let day4: [Step] = [
+   279	        step(id: 30, day: 4, dayLabel: "Day 4 · 1 of 6",
+   280	             hero: "breakfast", title: "Breakfast at\nLiberty Bagels",
+   281	             subtitle: "~7-min walk from hotel.",
+   282	             ctas: [.openInGoogleMaps(destination: "Liberty Bagels Grand Central, 5 E 47th St, New York, NY", label: "Open in Google Maps")],
+   283	             palette: butterCream),
+   284	
+   285	        step(id: 31, day: 4, dayLabel: "Day 4 · 2 of 6",
+   286	             hero: "hotel_building", title: "Back to hotel\nto check out",
+   287	             subtitle: "Checkout by 12pm.",
+   288	             ctas: [.openInGoogleMaps(destination: "The Jewel Hotel, 11 W 51st St, New York, NY", label: "Open in Google Maps")],
+   289	             palette: peach),
+   290	
+   291	        step(id: 32, day: 4, dayLabel: "Day 4 · 3 of 6",
+   292	             hero: "uber_car", title: "Hail a cab to\nPenn Station",
+   293	             subtitle: "Too far to walk with bags (~30 min).\nGrab a yellow cab — or use Uber as a backup.",
+   294	             ctas: [.openInUber(destination: "Penn Station, 31st St & 8th Ave, New York, NY", latitude: 40.750568, longitude: -73.994235, label: "Backup: open Uber")],
+   295	             palette: clay),
+   296	
+   297	        step(id: 33, day: 4, dayLabel: "Day 4 · 4 of 6",
+   298	             hero: "subway_train", title: "Subway option:\nhotel → Penn Station",
+   299	             subtitle: "Walk to 5 Av/53 St (E/F). Take the downtown E train only (toward World Trade Center) — not the F — 4 stops to 34 St–Penn Station.\n\nWeekday mornings 6:30–10:30am the 5 Av/53 St entrance is closed for repairs — enter at 7 Av (53rd & 7th) instead.",
+   300	             ctas: [
+   301	                .openInGoogleMaps(destination: "7 Av Station, W 53rd St & 7th Ave, New York, NY", label: "Before 10:30am: 7 Av"),
+   302	                .openInGoogleMaps(destination: "5 Av/53 St Station, New York, NY", label: "After 10:30am: 5 Av/53 St")
+   303	             ],
+   304	             palette: mistBlue),
+   305	
+   306	        step(id: 34, day: 4, dayLabel: "Day 4 · 5 of 6",
+   307	             hero: "subway_train", title: "Take the train\nto Metropark",
+   308	             subtitle: "Northeast Corridor line ~35-50 min\n\nActivate your tickets at the platform.",
+   309	             ctas: [.openNJTransit(label: "Open NJ Transit app")],
+   310	             palette: sageCream),
+   311	
+   312	        step(id: 35, day: 4, dayLabel: "Day 4 · 6 of 6",
+   313	             hero: "sedan_car", title: "~10 hr drive home",
+   314	             subtitle: "NexPass reads your license plate on the way out - no ticket, don't need to pay.",
+   315	             ctas: [.openInGoogleMaps(destination: "16206 Gemma Pass, Huntertown, IN", label: "Open in Google Maps")],
+   316	             palette: mistBlue),
+   317	    ]
+   318	
+   319	    static let allSteps: [Step] = [welcomeStep] + day1 + day2 + day3 + day4 + [closingStep]
+   320	
+   321	    /// Set of all asset names referenced by `allSteps`. Used in tests to verify every
+   322	    /// hero name resolves to a bundled image.
+   323	    static var referencedHeroNames: Set<String> { Set(allSteps.map(\.hero)) }
+   324	}
+
+ succeeded in 0ms:
+     1	diff --git a/NYCTrip2026/NYCTrip2026/Content/Trip.swift b/NYCTrip2026/NYCTrip2026/Content/Trip.swift
+     2	index 0e61404..fd60406 100644
+     3	--- a/NYCTrip2026/NYCTrip2026/Content/Trip.swift
+     4	+++ b/NYCTrip2026/NYCTrip2026/Content/Trip.swift
+     5	@@ -55,30 +55,36 @@ enum Trip {
+     6	     )
+     7	 
+     8	     static let day1: [Step] = [
+     9	-        step(id: 1, day: 1, dayLabel: "Day 1 · 1 of 8",
+    10	+        step(id: 1, day: 1, dayLabel: "Day 1 · 1 of 9",
+    11	              hero: "sedan_car", title: "Drive to\nMetropark Station",
+    12	              subtitle: "~10 hr drive to Iselin, NJ",
+    13	              ctas: [.openInGoogleMaps(destination: "Metropark Station, Iselin, NJ", label: "Open in Google Maps")],
+    14	              palette: mistBlue),
+    15	 
+    16	-        step(id: 2, day: 1, dayLabel: "Day 1 · 2 of 8",
+    17	+        step(id: 2, day: 1, dayLabel: "Day 1 · 2 of 9",
+    18	              hero: "sedan_car", title: "Park in the Metropark parking garage",
+    19	              subtitle: "No ticket required. Just drive in.",
+    20	              palette: butterCream),
+    21	 
+    22	-        step(id: 3, day: 1, dayLabel: "Day 1 · 3 of 8",
+    23	+        step(id: 3, day: 1, dayLabel: "Day 1 · 3 of 9",
+    24	              hero: "subway_train", title: "Train to Penn Station",
+    25	              subtitle: "Northeast Corridor line ~35-50 min\n\nActivate your tickets at the platform.",
+    26	              ctas: [.openNJTransit(label: "Open NJ Transit app")],
+    27	              palette: sageCream),
+    28	 
+    29	-        step(id: 4, day: 1, dayLabel: "Day 1 · 4 of 8",
+    30	-             hero: "uber_car", title: "Uber to \nThe Jewel Hotel",
+    31	-             subtitle: "~15 min ride to 11 W 51st St",
+    32	-             ctas: [.openInUber(destination: "The Jewel Hotel, 11 W 51st St, New York, NY", latitude: 40.7597381, longitude: -73.9777528, label: "Open in Uber")],
+    33	+        step(id: 4, day: 1, dayLabel: "Day 1 · 4 of 9",
+    34	+             hero: "uber_car", title: "Hail a cab to\nThe Jewel Hotel",
+    35	+             subtitle: "~15 min ride to 11 W 51st St.\nGrab a yellow cab outside Penn — or use Uber as a backup.",
+    36	+             ctas: [.openInUber(destination: "The Jewel Hotel, 11 W 51st St, New York, NY", latitude: 40.7597381, longitude: -73.9777528, label: "Backup: open Uber")],
+    37	              palette: clay),
+    38	 
+    39	-        step(id: 5, day: 1, dayLabel: "Day 1 · 5 of 8",
+    40	+        step(id: 5, day: 1, dayLabel: "Day 1 · 5 of 9",
+    41	+             hero: "subway_train", title: "Or take the subway\nto the hotel",
+    42	+             subtitle: "Inside Penn, follow signs to the 8th Ave A·C·E subway.\n\nTake the uptown E train only (toward Queens) — not the A or C — 4 stops to 5 Av/53 St.\n\nExit toward 5th Ave, walk south to 51st St, turn right.",
+    43	+             ctas: [.openInGoogleMaps(destination: "The Jewel Hotel, 11 W 51st St, New York, NY", label: "Open hotel in Google Maps")],
+    44	+             palette: mistBlue),
+    45	+
+    46	+        step(id: 6, day: 1, dayLabel: "Day 1 · 6 of 9",
+    47	              hero: "hotel_building", title: "Check in at\nThe Jewel Hotel",
+    48	              reservation: ReservationDetail(
+    49	                 time: "Check-in after 3pm",
+    50	@@ -88,19 +94,19 @@ enum Trip {
+    51	              ),
+    52	              palette: peach),
+    53	 
+    54	-        step(id: 6, day: 1, dayLabel: "Day 1 · 6 of 8",
+    55	+        step(id: 7, day: 1, dayLabel: "Day 1 · 7 of 9",
+    56	              hero: "dinner", title: "Dinner at\nJoe's Pizza",
+    57	              subtitle: "~15-20 min walk to 1435 Broadway\n\nWalk to Times Square after... or walk through Times Square to get there",
+    58	              ctas: [.openInGoogleMaps(destination: "Joe's Pizza, 1435 Broadway, New York, NY", label: "Open in Google Maps")],
+    59	              palette: dustyRose),
+    60	 
+    61	-        step(id: 7, day: 1, dayLabel: "Day 1 · 7 of 8",
+    62	+        step(id: 8, day: 1, dayLabel: "Day 1 · 8 of 9",
+    63	              hero: "times_square", title: "Times Square",
+    64	              subtitle: "Very short walk from Joe's.\nBest at night when the lights are full.",
+    65	              ctas: [.openInGoogleMaps(destination: "Times Square, New York, NY", label: "Open in Google Maps")],
+    66	              palette: butterCream),
+    67	 
+    68	-        step(id: 8, day: 1, dayLabel: "Day 1 · 8 of 8",
+    69	+        step(id: 9, day: 1, dayLabel: "Day 1 · 9 of 9",
+    70	              hero: "hotel_building", title: "Return to\nThe Jewel Hotel",
+    71	              subtitle: "Open Google Maps for directions from wherever you are",
+    72	              ctas: [.openInGoogleMaps(destination: "The Jewel Hotel, 11 W 51st St, New York, NY", label: "Open in Google Maps")],
+    73	@@ -108,7 +114,7 @@ enum Trip {
+    74	     ]
+    75	 
+    76	     static let day2: [Step] = [
+    77	-        step(id: 9, day: 2, dayLabel: "Day 2 · 1 of 8",
+    78	+        step(id: 10, day: 2, dayLabel: "Day 2 · 1 of 9",
+    79	              hero: "breakfast", title: "Breakfast at\nBlue Box Café",
+    80	              subtitle: "8-min walk from the hotel.",
+    81	              reservation: ReservationDetail(
+    82	@@ -120,7 +126,7 @@ enum Trip {
+    83	              ctas: [.openInGoogleMaps(destination: "Tiffany & Co., 727 5th Ave, New York, NY", label: "Open in Google Maps")],
+    84	              palette: cream),
+    85	 
+    86	-        step(id: 10, day: 2, dayLabel: "Day 2 · 2 of 8",
+    87	+        step(id: 11, day: 2, dayLabel: "Day 2 · 2 of 9",
+    88	              hero: "jellycat", title: "Jellycat Diner\nat FAO Schwarz",
+    89	              subtitle: "10-min walk from Breakfast.",
+    90	              reservation: ReservationDetail(
+    91	@@ -132,46 +138,52 @@ enum Trip {
+    92	              ctas: [.openInGoogleMaps(destination: "FAO Schwarz, 30 Rockefeller Plaza, New York, NY", label: "Open in Google Maps")],
+    93	              palette: blush),
+    94	 
+    95	-        step(id: 11, day: 2, dayLabel: "Day 2 · 3 of 8",
+    96	+        step(id: 12, day: 2, dayLabel: "Day 2 · 3 of 9",
+    97	              hero: "train_station", title: "Visit Grand\nCentral Terminal",
+    98	-             subtitle: "15-min walk from Jellycat\n(or skip ahead to Central Park)",
+    99	+             subtitle: "15-min walk from Jellycat\n(or skip ahead to Brandy Melville)",
+   100	              ctas: [.openInGoogleMaps(destination: "Grand Central Terminal, 89 E 42nd St, New York, NY", label: "Open in Google Maps")],
+   101	              palette: butterCream),
+   102	 
+   103	-        step(id: 12, day: 2, dayLabel: "Day 2 · 4 of 8",
+   104	+        step(id: 13, day: 2, dayLabel: "Day 2 · 4 of 9",
+   105	+             hero: "nyc_shopping", title: "Brandy Melville",
+   106	+             subtitle: "1172 3rd Ave (68th & 3rd), Upper East Side\n~15-min walk up from Grand Central, or a short cab.",
+   107	+             ctas: [.openInGoogleMaps(destination: "Brandy Melville, 1172 3rd Ave, New York, NY", label: "Open in Google Maps")],
+   108	+             palette: dustyRose),
+   109	+
+   110	+        step(id: 14, day: 2, dayLabel: "Day 2 · 5 of 9",
+   111	              hero: "lunch", title: "OPTIONAL: Lunch at\nVia Quadronno",
+   112	              subtitle: "25 E 73rd St\n(steps from Central Park east entrance)",
+   113	-             ctas: [.openInUber(destination: "Via Quadronno, 25 E 73rd St, New York, NY", latitude: 40.7727446, longitude: -73.9651572, label: "Open in Uber")],
+   114	+             ctas: [.openInUber(destination: "Via Quadronno, 25 E 73rd St, New York, NY", latitude: 40.7727446, longitude: -73.9651572, label: "Cab or Uber")],
+   115	              palette: clay),
+   116	 
+   117	-        step(id: 13, day: 2, dayLabel: "Day 2 · 5 of 8",
+   118	+        step(id: 15, day: 2, dayLabel: "Day 2 · 6 of 9",
+   119	              hero: "central_park_spring", title: "Visit Central Park",
+   120	-             subtitle: "(or skip back to Grand Central Terminal)\n\nDepending where you are,\nwalk (Google Maps) or ride (Uber).",
+   121	+             subtitle: "(or skip back to the Upper East Side)\n\nDepending where you are,\nwalk (Google Maps) or grab a cab / Uber.",
+   122	              ctas: [
+   123	                 .openInGoogleMaps(destination: "Bethesda Fountain, Central Park, New York, NY", label: "Walk it (Google Maps)"),
+   124	-                .openInUber(destination: "Bethesda Fountain, Central Park, New York, NY", latitude: 40.774122, longitude: -73.971136, label: "Drive it (Uber)")
+   125	+                .openInUber(destination: "Bethesda Fountain, Central Park, New York, NY", latitude: 40.774122, longitude: -73.971136, label: "Cab or Uber")
+   126	              ],
+   127	              palette: sageCream),
+   128	 
+   129	-        step(id: 14, day: 2, dayLabel: "Day 2 · 6 of 8",
+   130	+        step(id: 16, day: 2, dayLabel: "Day 2 · 7 of 9",
+   131	              hero: "nyc_shopping", title: "Herald Square\n& Macy's",
+   132	-             subtitle: "Uber ride from Central Park\nor 20-min walk from Grand Central.",
+   133	+             subtitle: "Cab or Uber from Central Park\nor 20-min walk from Grand Central.",
+   134	              ctas: [
+   135	                 .openInGoogleMaps(destination: "Macy's Herald Square, 151 W 34th St, New York, NY", label: "Walk it (Google Maps)"),
+   136	-                .openInUber(destination: "Macy's Herald Square, 151 W 34th St, New York, NY", latitude: 40.750797, longitude: -73.989578, label: "Drive it (Uber)")
+   137	+                .openInUber(destination: "Macy's Herald Square, 151 W 34th St, New York, NY", latitude: 40.750797, longitude: -73.989578, label: "Cab or Uber")
+   138	              ],
+   139	              palette: dustyRose),
+   140	 
+   141	-        step(id: 15, day: 2, dayLabel: "Day 2 · 7 of 8",
+   142	+        step(id: 17, day: 2, dayLabel: "Day 2 · 8 of 9",
+   143	              hero: "hotel_building", title: "Back to hotel\nbefore dinner",
+   144	-             subtitle: "25-minute walk from Macy's\nor take an Uber.",
+   145	+             subtitle: "25-minute walk from Macy's\nor grab a cab / Uber.",
+   146	              ctas: [
+   147	                 .openInGoogleMaps(destination: "The Jewel Hotel, 11 W 51st St, New York, NY", label: "Walk it (Google Maps)"),
+   148	-                .openInUber(destination: "The Jewel Hotel, 11 W 51st St, New York, NY", latitude: 40.7597381, longitude: -73.9777528, label: "Drive it (Uber)")
+   149	+                .openInUber(destination: "The Jewel Hotel, 11 W 51st St, New York, NY", latitude: 40.7597381, longitude: -73.9777528, label: "Cab or Uber")
+   150	              ],
+   151	              palette: wisteria),
+   152	 
+   153	-        step(id: 16, day: 2, dayLabel: "Day 2 · 8 of 8",
+   154	+        step(id: 18, day: 2, dayLabel: "Day 2 · 9 of 9",
+   155	              hero: "dinner", title: "Dinner at\nTAO Uptown",
+   156	              subtitle: "~13-min walk from hotel.",
+   157	              reservation: ReservationDetail(
+   158	@@ -185,54 +197,78 @@ enum Trip {
+   159	     ]
+   160	 
+   161	     static let day3: [Step] = [
+   162	-        step(id: 17, day: 3, dayLabel: "Day 3 · 1 of 8",
+   163	+        step(id: 19, day: 3, dayLabel: "Day 3 · 1 of 11",
+   164	              hero: "breakfast", title: "Cinnamon rolls at\nSunday Morning",
+   165	-             subtitle: "11 W 25th St\nToo far to walk - take an Uber.",
+   166	-             ctas: [.openInUber(destination: "Sunday Morning Bakehouse, 11 W 25th St, New York, NY 10010", latitude: 40.74339, longitude: -73.98971, label: "Open in Uber")],
+   167	+             subtitle: "11 W 25th St · about a 25-min walk, or take the subway (next screen).\n\nNot feeling the walk? Grab Starbucks near the hotel instead.",
+   168	+             ctas: [
+   169	+                .openInGoogleMaps(destination: "Sunday Morning Bakehouse, 11 W 25th St, New York, NY 10010", label: "Walk there (Google Maps)"),
+   170	+                .openInGoogleMaps(destination: "Starbucks, 1290 Sixth Avenue, New York, NY", label: "Starbucks instead")
+   171	+             ],
+   172	              palette: butterCream),
+   173	 
+   174	-        step(id: 18, day: 3, dayLabel: "Day 3 · 2 of 8",
+   175	-             hero: "nyc_shopping", title: "SoHo shopping",
+   176	-             subtitle: "Too far to walk - take an Uber.",
+   177	-             ctas: [.openInUber(destination: "SoHo, Broadway & Spring St, New York, NY", latitude: 40.72350, longitude: -73.99830, label: "Open in Uber")],
+   178	-             palette: blush),
+   179	-
+   180	-        step(id: 19, day: 3, dayLabel: "Day 3 · 3 of 8",
+   181	-             hero: "nyc_shopping", title: "Canal Street",
+   182	-             subtitle: "~10-min walk from SoHo.",
+   183	-             ctas: [.openInGoogleMaps(destination: "Canal Street, Chinatown, New York, NY", label: "Open in Google Maps")],
+   184	-             palette: clay),
+   185	-
+   186	-        step(id: 20, day: 3, dayLabel: "Day 3 · 4 of 8",
+   187	-             hero: "lunch", title: "Lunch at\nJack's Wife Freda",
+   188	-             subtitle: "226 Lafayette St · 10-min walk\nMediterranean-American, casual.",
+   189	-             ctas: [.openInGoogleMaps(destination: "Jack's Wife Freda, 226 Lafayette St, New York, NY", label: "Open in Google Maps")],
+   190	-             palette: cream),
+   191	+        step(id: 20, day: 3, dayLabel: "Day 3 · 2 of 11",
+   192	+             hero: "subway_train", title: "Subway option:\nhotel → Sunday Morning",
+   193	+             subtitle: "Walk to 47–50 Sts–Rockefeller Center (6th Ave).\n\nTake a downtown F or M train only — not B or D — 3 stops to 23 St.\n\nWalk north to 25th St, turn right.",
+   194	+             ctas: [.openInGoogleMaps(destination: "47-50 Sts–Rockefeller Center Station, New York, NY", label: "Open station in Google Maps")],
+   195	+             palette: mistBlue),
+   196	 
+   197	-        step(id: 21, day: 3, dayLabel: "Day 3 · 5 of 8",
+   198	+        step(id: 21, day: 3, dayLabel: "Day 3 · 3 of 11",
+   199	              hero: "ice_cream_cone", title: "Museum of\nIce Cream",
+   200	-             subtitle: "Short walk from lunch.",
+   201	+             subtitle: "Hail a cab from breakfast — or take the subway (next screen).",
+   202	              reservation: ReservationDetail(
+   203	-                time: "2:00pm reservation (enter by 3:30pm)",
+   204	-                address: "558 Broadway",
+   205	+                time: "11:30am reservation",
+   206	+                address: "558 Broadway, at Prince St (SoHo)",
+   207	                 confirmation: "Booking ID: FJ9*YPFVFMP*",
+   208	                 extra: "Mobile ticket (email). Waivers are signed."
+   209	              ),
+   210	-             ctas: [.openInGoogleMaps(destination: "Museum of Ice Cream, 558 Broadway, New York, NY", label: "Open in Google Maps")],
+   211	+             ctas: [.openInUber(destination: "Museum of Ice Cream, 558 Broadway, New York, NY", latitude: 40.7238545, longitude: -73.9979167, label: "Backup: open Uber")],
+   212	              palette: dustyRose),
+   213	 
+   214	-        step(id: 22, day: 3, dayLabel: "Day 3 · 6 of 8",
+   215	-             hero: "hotel_building", title: "Uber back\nto the hotel",
+   216	-             subtitle: "Freshen up before evening.",
+   217	-             ctas: [.openInUber(destination: "The Jewel Hotel, 11 W 51st St, New York, NY", latitude: 40.7597381, longitude: -73.9777528, label: "Open in Uber")],
+   218	+        step(id: 22, day: 3, dayLabel: "Day 3 · 4 of 11",
+   219	+             hero: "subway_train", title: "Subway option:\nto the museum",
+   220	+             subtitle: "Take the downtown R or W train only to Prince St — NOT the N or Q (they skip Prince St). The museum is steps from the exit.\n\nFrom Sunday Morning, board at 23 St. From the hotel/Starbucks, board at 49 St.",
+   221	+             ctas: [
+   222	+                .openInGoogleMaps(destination: "23 St Station (R/W), Broadway & W 23rd St, New York, NY", label: "From breakfast: 23 St"),
+   223	+                .openInGoogleMaps(destination: "49 St Station (R/W), W 49th St & 7th Ave, New York, NY", label: "From the hotel: 49 St")
+   224	+             ],
+   225	+             palette: mistBlue),
+   226	+
+   227	+        step(id: 23, day: 3, dayLabel: "Day 3 · 5 of 11",
+   228	+             hero: "lunch", title: "OPTIONAL: Lunch at\nJack's Wife Freda",
+   229	+             subtitle: "226 Lafayette St · steps from the museum.\nMediterranean-American, casual.",
+   230	+             ctas: [.openInGoogleMaps(destination: "Jack's Wife Freda, 226 Lafayette St, New York, NY", label: "Open in Google Maps")],
+   231	+             palette: cream),
+   232	+
+   233	+        step(id: 24, day: 3, dayLabel: "Day 3 · 6 of 11",
+   234	+             hero: "nyc_shopping", title: "SoHo shopping",
+   235	+             subtitle: "Start around Prince & Mercer. Walk Prince → Greene → Spring → Wooster — the classic cobblestone boutique blocks — dipping over to Broadway for the bigger stores.\n\nWorth a look: Aritzia (560 Broadway), MoMA Design Store (81 Spring), Mure + Grand (155 Spring), Pearl River Mart (452 Broadway).",
+   236	+             ctas: [.openInGoogleMaps(destination: "Prince St & Mercer St, New York, NY", label: "Open start point in Maps")],
+   237	+             palette: blush),
+   238	+
+   239	+        step(id: 25, day: 3, dayLabel: "Day 3 · 7 of 11",
+   240	+             hero: "nyc_shopping", title: "Canal Street",
+   241	+             subtitle: "Start at Broadway & Canal, then walk east on Canal toward Lafayette/Centre.\n\nThe classic busy-Canal stretch — crowded sidewalks, souvenir shops, bargain finds. A fun browse more than serious shopping.",
+   242	+             ctas: [.openInGoogleMaps(destination: "Canal St & Broadway, New York, NY", label: "Open start point in Maps")],
+   243	+             palette: clay),
+   244	+
+   245	+        step(id: 26, day: 3, dayLabel: "Day 3 · 8 of 11",
+   246	+             hero: "hotel_building", title: "Hail a cab\nback to the hotel",
+   247	+             subtitle: "Freshen up before evening.\nGrab a yellow cab — or use Uber as a backup.",
+   248	+             ctas: [.openInUber(destination: "The Jewel Hotel, 11 W 51st St, New York, NY", latitude: 40.7597381, longitude: -73.9777528, label: "Backup: open Uber")],
+   249	              palette: wisteria),
+   250	 
+   251	-        step(id: 23, day: 3, dayLabel: "Day 3 · 7 of 8",
+   252	+        step(id: 27, day: 3, dayLabel: "Day 3 · 9 of 11",
+   253	+             hero: "subway_train", title: "Subway option:\nCanal St → hotel",
+   254	+             subtitle: "At Broadway & Canal, take an uptown N, R, or W train to 49 St — not the Q.\n\nExit at 7th Ave & 49th, walk north to 51st St, turn right.",
+   255	+             ctas: [.openInGoogleMaps(destination: "Canal St Station, Broadway & Canal St, New York, NY", label: "Open station in Google Maps")],
+   256	+             palette: mistBlue),
+   257	+
+   258	+        step(id: 28, day: 3, dayLabel: "Day 3 · 10 of 11",
+   259	              hero: "fifth_ave_sign", title: "Evening walk\n5th Ave & Madison Ave",
+   260	              subtitle: "2-min walk from hotel.\n(or skip ahead to dinner)",
+   261	-             palette: mistBlue),
+   262	+             palette: peach),
+   263	 
+   264	-        step(id: 24, day: 3, dayLabel: "Day 3 · 8 of 8",
+   265	+        step(id: 29, day: 3, dayLabel: "Day 3 · 11 of 11",
+   266	              hero: "dinner", title: "Dinner time",
+   267	              subtitle: "(or skip back to 5th Ave and Madison Ave)",
+   268	              ctas: [.openInGoogleMaps(destination: nil, label: "Open Google Maps")],
+   269	@@ -240,31 +276,40 @@ enum Trip {
+   270	     ]
+   271	 
+   272	     static let day4: [Step] = [
+   273	-        step(id: 25, day: 4, dayLabel: "Day 4 · 1 of 5",
+   274	+        step(id: 30, day: 4, dayLabel: "Day 4 · 1 of 6",
+   275	              hero: "breakfast", title: "Breakfast at\nLiberty Bagels",
+   276	              subtitle: "~7-min walk from hotel.",
+   277	              ctas: [.openInGoogleMaps(destination: "Liberty Bagels Grand Central, 5 E 47th St, New York, NY", label: "Open in Google Maps")],
+   278	              palette: butterCream),
+   279	 
+   280	-        step(id: 26, day: 4, dayLabel: "Day 4 · 2 of 5",
+   281	+        step(id: 31, day: 4, dayLabel: "Day 4 · 2 of 6",
+   282	              hero: "hotel_building", title: "Back to hotel\nto check out",
+   283	              subtitle: "Checkout by 12pm.",
+   284	              ctas: [.openInGoogleMaps(destination: "The Jewel Hotel, 11 W 51st St, New York, NY", label: "Open in Google Maps")],
+   285	              palette: peach),
+   286	 
+   287	-        step(id: 27, day: 4, dayLabel: "Day 4 · 3 of 5",
+   288	-             hero: "uber_car", title: "Uber to\nPenn Station",
+   289	-             subtitle: "Too far to walk with bags (30-min).",
+   290	-             ctas: [.openInUber(destination: "Penn Station, 31st St & 8th Ave, New York, NY", latitude: 40.750568, longitude: -73.994235, label: "Open in Uber")],
+   291	+        step(id: 32, day: 4, dayLabel: "Day 4 · 3 of 6",
+   292	+             hero: "uber_car", title: "Hail a cab to\nPenn Station",
+   293	+             subtitle: "Too far to walk with bags (~30 min).\nGrab a yellow cab — or use Uber as a backup.",
+   294	+             ctas: [.openInUber(destination: "Penn Station, 31st St & 8th Ave, New York, NY", latitude: 40.750568, longitude: -73.994235, label: "Backup: open Uber")],
+   295	              palette: clay),
+   296	 
+   297	-        step(id: 28, day: 4, dayLabel: "Day 4 · 4 of 5",
+   298	+        step(id: 33, day: 4, dayLabel: "Day 4 · 4 of 6",
+   299	+             hero: "subway_train", title: "Subway option:\nhotel → Penn Station",
+   300	+             subtitle: "Walk to 5 Av/53 St (E/F). Take the downtown E train only (toward World Trade Center) — not the F — 4 stops to 34 St–Penn Station.\n\nWeekday mornings 6:30–10:30am the 5 Av/53 St entrance is closed for repairs — enter at 7 Av (53rd & 7th) instead.",
+   301	+             ctas: [
+   302	+                .openInGoogleMaps(destination: "7 Av Station, W 53rd St & 7th Ave, New York, NY", label: "Before 10:30am: 7 Av"),
+   303	+                .openInGoogleMaps(destination: "5 Av/53 St Station, New York, NY", label: "After 10:30am: 5 Av/53 St")
+   304	+             ],
+   305	+             palette: mistBlue),
+   306	+
+   307	+        step(id: 34, day: 4, dayLabel: "Day 4 · 5 of 6",
+   308	              hero: "subway_train", title: "Take the train\nto Metropark",
+   309	              subtitle: "Northeast Corridor line ~35-50 min\n\nActivate your tickets at the platform.",
+   310	              ctas: [.openNJTransit(label: "Open NJ Transit app")],
+   311	              palette: sageCream),
+   312	 
+   313	-        step(id: 29, day: 4, dayLabel: "Day 4 · 5 of 5",
+   314	+        step(id: 35, day: 4, dayLabel: "Day 4 · 6 of 6",
+   315	              hero: "sedan_car", title: "~10 hr drive home",
+   316	              subtitle: "NexPass reads your license plate on the way out - no ticket, don't need to pay.",
+   317	              ctas: [.openInGoogleMaps(destination: "16206 Gemma Pass, Huntertown, IN", label: "Open in Google Maps")],
+   318	diff --git a/NYCTrip2026/NYCTrip2026Tests/TripContentTests.swift b/NYCTrip2026/NYCTrip2026Tests/TripContentTests.swift
+   319	index d880287..fb41264 100644
+   320	--- a/NYCTrip2026/NYCTrip2026Tests/TripContentTests.swift
+   321	+++ b/NYCTrip2026/NYCTrip2026Tests/TripContentTests.swift
+   322	@@ -50,8 +50,7 @@ struct TripContentTests {
+   323	             "Via Quadronno, 25 E 73rd St, New York, NY": (40.7727446, -73.9651572),
+   324	             "Bethesda Fountain, Central Park, New York, NY": (40.774122, -73.971136),
+   325	             "Macy's Herald Square, 151 W 34th St, New York, NY": (40.750797, -73.989578),
+   326	-            "Sunday Morning Bakehouse, 11 W 25th St, New York, NY 10010": (40.74339, -73.98971),
+   327	-            "SoHo, Broadway & Spring St, New York, NY": (40.72350, -73.99830),
+   328	+            "Museum of Ice Cream, 558 Broadway, New York, NY": (40.7238545, -73.9979167),
+   329	             "Penn Station, 31st St & 8th Ave, New York, NY": (40.750568, -73.994235)
+   330	         ]
+   331	 
+   332	@@ -79,9 +78,9 @@ struct TripContentTests {
+   333	         }
+   334	     }
+   335	 
+   336	-    @Test("Total step count is 31 (welcome + 29 + closing)")
+   337	+    @Test("Total step count is 37 (welcome + 35 + closing)")
+   338	     func totalCount() {
+   339	-        #expect(Trip.allSteps.count == 31)
+   340	+        #expect(Trip.allSteps.count == 37)
+   341	     }
+   342	 
+   343	     @Test("Every step's hero name is non-empty")
+
+exec
+/bin/zsh -lc 'nl -ba docs/superpowers/specs/2026-06-15-nyc-trip-app-revisions-design.md' in /Users/jkher/Documents/Claude/NYC Trip 2026
+ succeeded in 0ms:
+     1	# NYC Trip 2026 — App Revisions Design
+     2	
+     3	**Date:** 2026-06-15
+     4	**Status:** Awaiting user review
+     5	**Scope:** Content/structure revisions to the existing SwiftUI app after Katy walked through v1. No architecture changes.
+     6	
+     7	## Trip dates (confirmed day-of-week, matters for subway service)
+     8	
+     9	- **Day 1 — Sun Jun 21** (arrival)
+    10	- **Day 2 — Mon Jun 22**
+    11	- **Day 3 — Tue Jun 23**
+    12	- **Day 4 — Wed Jun 24** (departure)
+    13	
+    14	Only Day 1's subway leg falls on a weekend (Sunday). It uses the **E train**, which runs 7 days/week, so weekend-only service gaps (the W train) don't affect it. Day 3 and Day 4 legs are weekdays = full service. **Action: verify mta.info "Weekender" for Sun 6/21 before the trip** — that's the one residual subway risk research can't lock down in advance.
+    15	
+    16	## Goals
+    17	
+    18	1. Add **subway** as an option on specific legs, via dedicated swipe-past screens.
+    19	2. Reframe rides: **hail a yellow cab is the primary plan; Uber is the backup.**
+    20	3. Add a **walking** option + a **Starbucks** alternative to the Day 3 breakfast.
+    21	4. **Move Museum of Ice Cream to 11:30am** and reorder Day 3 around it.
+    22	5. Add **detailed SoHo and Canal Street** shopping-route screens.
+    23	6. Add **Brandy Melville** to Day 2 (Upper East Side).
+    24	
+    25	## Architecture (unchanged)
+    26	
+    27	Linear paged `TabView` of `Step`s defined in `Content/Trip.swift`. There is **no branching navigation** — "optional" screens are just screens the user swipes *past*. Subway screens, the Starbucks alternative, etc. are all ordinary `Step`s. The `Step` model, `StepView`, `DeepLinker`, and CTA types are reused as-is. No new types needed; all CTAs use existing `.openInGoogleMaps` / `.openInUber` cases.
+    28	
+    29	**Screen-count impact:** 31 → **37** screens (Welcome + Day1 9 + Day2 9 + Day3 11 + Day4 6 + Closing).
+    30	
+    31	## Cross-cutting change: taxi-first ride treatment
+    32	
+    33	Every screen that currently offers Uber changes so the **primary action is hailing a yellow cab** (a physical action, described in copy) and **Uber is a clearly-labeled backup button** (keeps the existing `.openInUber` deep link with its verified coordinates).
+    34	
+    35	- **Dedicated ride screens** (single mode): headline becomes "Hail a yellow cab to X"; the one CTA is relabeled **"Backup: open Uber."**
+    36	- **Two-mode walk/ride screens** (Day 2): the ride button is relabeled **"Cab or Uber"** (still deep-links to Uber as the bookable fallback); the "Walk it (Google Maps)" button is unchanged. Layout cap of 2 CTAs is respected.
+    37	
+    38	## Cross-cutting pattern: subway screens
+    39	
+    40	Each subway leg adds one dedicated `Step` placed adjacent to that leg's existing screen. Plain-language, reassuring instructions in the subtitle; `subway_train` hero (reused); a Google Maps CTA to the relevant station. She swipes to it if taking the subway, past it otherwise.
+    41	
+    42	Routes below are **verified** (corroborated against MTA line data + an external review on 2026-06-15). The Broadway-line "spine" insight is narrower than first thought: for SoHo-bound legs the train is the **R or W local** (the N/Q run express and skip Prince St). Two service realities baked in below: the **Dec 8 2025 F/M tunnel swap** (5 Av/53 St is now **E/F**) and the **5 Av/53 St morning entrance closure**.
+    43	
+    44	### The six subway legs
+    45	
+    46	**A) Penn Station → The Jewel Hotel** — *Day 1, Sun*
+    47	> Inside Penn, follow signs to the **8th Ave "A C E"** subway. Take the **uptown E train ONLY** (toward Queens/Jamaica — *not* the A or C) **4 stops to 5 Av/53 St** (42 St–Port Authority → 50 St → 7 Av → 5 Av/53 St). Exit toward 5th Ave, walk south to 51st St, turn right — the hotel is mid-block. ~15–20 min.
+    48	> CTA: *Open in Google Maps → The Jewel Hotel, 11 W 51st St, New York, NY* (she's already inside Penn, so link the destination for the walk from the exit).
+    49	
+    50	**B) The Jewel Hotel → Sunday Morning Bakehouse** — *Day 3, Tue*
+    51	> Walk to **47–50 Sts–Rockefeller Center** (6th Ave). Take a **downtown F or M train ONLY** (*not* B or D — they skip 23 St) **3 stops to 23 St.** Walk north to 25th St, turn right — bakery is mid-block. ~15 min.
+    52	> CTA: *Open in Google Maps → 47-50 Sts–Rockefeller Center Station, New York, NY*
+    53	
+    54	**C) → Museum of Ice Cream** (serves both breakfast paths) — *Day 3, Tue*
+    55	> Take the **downtown R or W train ONLY to Prince St** — **NOT the N or Q** (they run express and skip Prince St). The museum is steps from the exit. **From Sunday Morning, board at 23 St (R/W). From the hotel/Starbucks, board at 49 St (R/W).** ~15–20 min.
+    56	> CTAs (2): *From breakfast → 23 St Station (R/W), Broadway & W 23rd St, NY* · *From the hotel → 49 St Station (R/W), W 49th St & 7th Ave, NY*
+    57	
+    58	**D) Canal St → The Jewel Hotel** — *Day 3, Tue*
+    59	> At Broadway & Canal, take an **uptown N, R, or W train to 49 St** (*not* the Q — it veers off to the Upper East Side). Here N is fine: 49 St is north of the express zone, so the N runs local and stops there. Exit at 7th Ave & 49th, walk north to 51st, turn right. ~22–25 min.
+    60	> CTA: *Open in Google Maps → Canal St Station, Broadway & Canal St, New York, NY*
+    61	
+    62	**E) The Jewel Hotel → Penn Station** — *Day 4, Wed (a MORNING trip)*
+    63	> Walk to **5 Av/53 St** (E/F). Take the **downtown E train ONLY** (toward World Trade Center — *not* the F, which goes to Herald Sq, not Penn) **4 stops to 34 St–Penn Station** — drops you inside the Penn complex. ~15–20 min.
+    64	> **Morning closure:** on weekdays **6:30–10:30am** the 5 Av/53 St entrance is **closed** (escalator work, exit-only — active through the trip dates). If leaving in that window, **enter at 7 Av Station (53rd St & 7th Ave)** instead and take the downtown E 3 stops to Penn.
+    65	> CTAs (2): *Before 10:30am → 7 Av Station (E), W 53rd St & 7th Ave, New York, NY* · *After 10:30am → 5 Av/53 St Station (E/F), New York, NY*
+    66	> *(Decided: two-CTA version. "Before 10:30am" listed first since the train home is a morning trip.)*
+    67	
+    68	## Full screen sequence
+    69	
+    70	Legend: **[NEW]** added · **[CHG]** changed · **[OPT]** swipe-past optional · *(unch)* unchanged
+    71	
+    72	### Day 1 — Sun Jun 21 (9 screens)
+    73	1. Drive to Metropark *(unch)*
+    74	2. Park in garage *(unch)*
+    75	3. Train to Penn Station — NJ Transit *(unch)*
+    76	4. **[CHG]** **Hail a cab to The Jewel Hotel** — subtitle notes ~15 min ride; CTA *Backup: open Uber* (existing hotel coords)
+    77	5. **[NEW][OPT]** Subway: Penn → The Jewel Hotel (Leg A)
+    78	6. Check in at The Jewel Hotel (reservation) *(unch)*
+    79	7. Dinner at Joe's Pizza *(unch)*
+    80	8. Times Square *(unch)*
+    81	9. Return to The Jewel Hotel *(unch)*
+    82	
+    83	### Day 2 — Mon Jun 22 (9 screens)
+    84	1. Breakfast at Blue Box Café (reservation) *(unch)*
+    85	2. Jellycat Diner at FAO Schwarz (reservation) *(unch)*
+    86	3. Grand Central Terminal *(unch)*
+    87	4. **[NEW]** **Brandy Melville** — 1172 3rd Ave (68th & 3rd, UES). Slots here: coming north from Grand Central you reach Brandy (68th) before Via Quadronno (73rd) before the park. CTA: *Open in Google Maps* (walk) — UES is walkable from Grand Central, or a short cab.
+    88	5. **[CHG]** (optional) Lunch at Via Quadronno — ride button relabeled *Cab or Uber*
+    89	6. **[CHG]** Central Park — *Walk it (Maps)* / *Cab or Uber*
+    90	7. **[CHG]** Herald Square & Macy's — *Walk it (Maps)* / *Cab or Uber*
+    91	8. **[CHG]** Back to hotel before dinner — *Walk it (Maps)* / *Cab or Uber*
+    92	9. Dinner at TAO Uptown (reservation) *(unch)*
+    93	
+    94	### Day 3 — Tue Jun 23 (11 screens) — reordered around the 11:30 museum
+    95	1. **[CHG]** Breakfast — **Sunday Morning** (cinnamon rolls). CTAs (2): *Walk there (Maps)* · *Starbucks instead (Maps)*. Subtitle: ~25-min walk or take the subway (next screen). *(No cab CTA here — walk/subway/Starbucks cover it within the 2-CTA cap.)*
+    96	2. **[NEW][OPT]** Subway: Hotel → Sunday Morning (Leg B)
+    97	3. **[CHG][moved]** **Museum of Ice Cream — 11:30am** (reservation, time updated). Subtitle: hail a cab (or subway, next screen). CTA: *Backup: open Uber*. *(Reservation + 1 CTA = within layout rules.)*
+    98	4. **[NEW][OPT]** Subway → Museum of Ice Cream (Leg C, two boarding points)
+    99	5. **[CHG][moved]** (optional) Lunch — Jack's Wife Freda, 226 Lafayette (steps from the museum). CTA: *Open in Google Maps*
+   100	6. **[CHG][detailed]** **SoHo shopping** — see route below. CTA: *Open in Google Maps* → start point
+   101	7. **[CHG][detailed]** **Canal Street** — see route below. CTA: *Open in Google Maps* → Pearl River Mart / Canal & Broadway
+   102	8. **[CHG]** Back to the hotel — **Hail a cab**; CTA *Backup: open Uber* (existing hotel coords)
+   103	9. **[NEW][OPT]** Subway: Canal St → Hotel (Leg D)
+   104	10. Evening walk, 5th & Madison *(unch)*
+   105	11. Dinner *(unch — still open-ended)*
+   106	
+   107	### Day 4 — Wed Jun 24 (6 screens)
+   108	1. Breakfast at Liberty Bagels *(unch)*
+   109	2. Back to hotel to check out *(unch)*
+   110	3. **[CHG]** **Hail a cab to Penn Station** — CTA *Backup: open Uber* (existing Penn coords)
+   111	4. **[NEW][OPT]** Subway: Hotel → Penn Station (Leg E)
+   112	5. Take the train to Metropark — NJ Transit *(unch)*
+   113	6. ~10 hr drive home *(unch)*
+   114	
+   115	## Shopping-route screen content (drafts)
+   116	
+   117	Both screens are **route-guidance first** (which blocks to walk), not shopping checklists. Named stores appear only as light "worth a look" flavor on SoHo; Canal is pure navigation.
+   118	
+   119	**SoHo screen** (route-forward):
+   120	> Start around **Prince & Mercer**, walk **Prince → Greene → Spring → Wooster** — the classic cobblestone boutique blocks — dipping over to **Broadway** for the bigger stores. Drift east toward **Lafayette/Bowery** if you want to keep going.
+   121	> *Worth a look along the way:* Aritzia (560 Broadway), MoMA Design Store (81 Spring St), Mure + Grand (155 Spring St), Pearl River Mart (452 Broadway).
+   122	> Maps CTA → start point: **Prince St & Mercer St, New York, NY**.
+   123	
+   124	**Canal Street screen** (route only, no named destinations):
+   125	> Start at **Broadway & Canal**, then walk **east on Canal toward Lafayette/Centre** — the classic busy-Canal stretch: crowded sidewalks, souvenir shops, bargain accessories. Treat it as a fun browse more than serious shopping.
+   126	> Maps CTA → start corner: **Canal St & Broadway, New York, NY**.
+   127	
+   128	## Resolved decisions (user, 2026-06-15)
+   129	
+   130	1. **Starbucks → 1290 Sixth Ave** (street-level, ~3 blocks, easy to find). Day 3 breakfast "Starbucks instead" CTA points here: `Starbucks, 1290 Sixth Avenue, New York, NY`.
+   131	2. **Kith dropped** from the SoHo screen (men's-only). User's intent: SoHo/Canal screens guide a *general walking route*, not specific stores.
+   132	3. **Mure + Grand kept** as light flavor on the SoHo screen (155 Spring St).
+   133	4. **Canal screen routes to no named store** — Pearl River Mart removed from Canal; the screen gives block-by-block navigation only (Canal & Broadway → east toward Lafayette/Centre).
+   134	
+   135	## Testing impact
+   136	
+   137	- `TripContentTests` total-count assertion **31 → 37**.
+   138	- `dayLabelsMatchPosition` auto-derives "Day X · N of M" from position, so it self-corrects as long as the `Day X · N of M` format is preserved. All `dayLabel` strings get rewritten to the new per-day counts (Day1 …of 9, Day2 …of 9, Day3 …of 11, Day4 …of 6).
+   139	- CTA caps: every new/changed screen respects ≤2 CTAs, and ≤1 CTA when a reservation is present (verified screen-by-screen above).
+   140	- `DeepLinkerTests` / `TripContentTests` Uber-coordinate locks: existing Uber coords are **reused unchanged** (hotel, Penn). New subway CTAs are `.openInGoogleMaps` with station strings — no new coordinates to lock. New Maps destinations (Brandy Melville, Jack's Wife Freda, SoHo/Canal stores, Starbucks) are string-based.
+   141	- Re-run full `xcodebuild test`; build green + tests passing is necessary-not-sufficient — final check is on Katy's iPhone.
+   142	
+   143	## Out of scope (explicitly)
+   144	
+   145	- Real photographs of destinations — deferred to a later pass per user; illustrated heroes stay for now.
+   146	- The HTML trip-planning site (`index.html`, `nyc-trip-plan.html`) — untouched.
+   147	- Day 3 dinner remains open-ended (no change requested).
+
+codex
+I’ve finished the first pass. The likely issues are concentrated in subway copy fidelity and one Day 2 walking-time claim; I’m doing the requested second subway reconciliation now before finalizing.
+hook: PreToolUse
+hook: PreToolUse
+hook: PreToolUse
+hook: PreToolUse Completed
+hook: PreToolUse Completed
+hook: PreToolUse Completed
+exec
+/bin/zsh -lc 'rg -n "E train|F or M|R or W|N, R, or W|Prince St|47|49 St|5 Av/53|7 Av|Canal St|Sunday Morning|Penn Station" NYCTrip2026/NYCTrip2026/Content/Trip.swift' in /Users/jkher/Documents/Claude/NYC Trip 2026
+exec
+/bin/zsh -lc 'rg -n "E train|F or M|R or W|N, R, or W|Prince St|47|49 St|5 Av/53|7 Av|Canal St|Sunday Morning|Penn Station" docs/superpowers/specs/2026-06-15-nyc-trip-app-revisions-design.md' in /Users/jkher/Documents/Claude/NYC Trip 2026
+ succeeded in 0ms:
+70:             hero: "subway_train", title: "Train to Penn Station",
+83:             subtitle: "Inside Penn, follow signs to the 8th Ave A·C·E subway.\n\nTake the uptown E train only (toward Queens) — not the A or C — 4 stops to 5 Av/53 St.\n\nExit toward 5th Ave, walk south to 51st St, turn right.",
+92:                confirmation: "Expedia itinerary #73447998588498",
+192:                confirmation: "Confirmation #: 2112064704",
+201:             hero: "breakfast", title: "Cinnamon rolls at\nSunday Morning",
+204:                .openInGoogleMaps(destination: "Sunday Morning Bakehouse, 11 W 25th St, New York, NY 10010", label: "Walk there (Google Maps)"),
+210:             hero: "subway_train", title: "Subway option:\nhotel → Sunday Morning",
+211:             subtitle: "Walk to 47–50 Sts–Rockefeller Center (6th Ave).\n\nTake a downtown F or M train only — not B or D — 3 stops to 23 St.\n\nWalk north to 25th St, turn right.",
+212:             ctas: [.openInGoogleMaps(destination: "47-50 Sts–Rockefeller Center Station, New York, NY", label: "Open station in Google Maps")],
+220:                address: "558 Broadway, at Prince St (SoHo)",
+229:             subtitle: "Take the downtown R or W train only to Prince St — NOT the N or Q (they skip Prince St). The museum is steps from the exit.\n\nFrom Sunday Morning, board at 23 St. From the hotel/Starbucks, board at 49 St.",
+232:                .openInGoogleMaps(destination: "49 St Station (R/W), W 49th St & 7th Ave, New York, NY", label: "From the hotel: 49 St")
+245:             ctas: [.openInGoogleMaps(destination: "Prince St & Mercer St, New York, NY", label: "Open start point in Maps")],
+249:             hero: "nyc_shopping", title: "Canal Street",
+251:             ctas: [.openInGoogleMaps(destination: "Canal St & Broadway, New York, NY", label: "Open start point in Maps")],
+261:             hero: "subway_train", title: "Subway option:\nCanal St → hotel",
+262:             subtitle: "At Broadway & Canal, take an uptown N, R, or W train to 49 St — not the Q.\n\nExit at 7th Ave & 49th, walk north to 51st St, turn right.",
+263:             ctas: [.openInGoogleMaps(destination: "Canal St Station, Broadway & Canal St, New York, NY", label: "Open station in Google Maps")],
+282:             ctas: [.openInGoogleMaps(destination: "Liberty Bagels Grand Central, 5 E 47th St, New York, NY", label: "Open in Google Maps")],
+292:             hero: "uber_car", title: "Hail a cab to\nPenn Station",
+294:             ctas: [.openInUber(destination: "Penn Station, 31st St & 8th Ave, New York, NY", latitude: 40.750568, longitude: -73.994235, label: "Backup: open Uber")],
+298:             hero: "subway_train", title: "Subway option:\nhotel → Penn Station",
+299:             subtitle: "Walk to 5 Av/53 St (E/F). Take the downtown E train only (toward World Trade Center) — not the F — 4 stops to 34 St–Penn Station.\n\nWeekday mornings 6:30–10:30am the 5 Av/53 St entrance is closed for repairs — enter at 7 Av (53rd & 7th) instead.",
+301:                .openInGoogleMaps(destination: "7 Av Station, W 53rd St & 7th Ave, New York, NY", label: "Before 10:30am: 7 Av"),
+302:                .openInGoogleMaps(destination: "5 Av/53 St Station, New York, NY", label: "After 10:30am: 5 Av/53 St")
+
+ succeeded in 0ms:
+14:Only Day 1's subway leg falls on a weekend (Sunday). It uses the **E train**, which runs 7 days/week, so weekend-only service gaps (the W train) don't affect it. Day 3 and Day 4 legs are weekdays = full service. **Action: verify mta.info "Weekender" for Sun 6/21 before the trip** — that's the one residual subway risk research can't lock down in advance.
+22:5. Add **detailed SoHo and Canal Street** shopping-route screens.
+42:Routes below are **verified** (corroborated against MTA line data + an external review on 2026-06-15). The Broadway-line "spine" insight is narrower than first thought: for SoHo-bound legs the train is the **R or W local** (the N/Q run express and skip Prince St). Two service realities baked in below: the **Dec 8 2025 F/M tunnel swap** (5 Av/53 St is now **E/F**) and the **5 Av/53 St morning entrance closure**.
+46:**A) Penn Station → The Jewel Hotel** — *Day 1, Sun*
+47:> Inside Penn, follow signs to the **8th Ave "A C E"** subway. Take the **uptown E train ONLY** (toward Queens/Jamaica — *not* the A or C) **4 stops to 5 Av/53 St** (42 St–Port Authority → 50 St → 7 Av → 5 Av/53 St). Exit toward 5th Ave, walk south to 51st St, turn right — the hotel is mid-block. ~15–20 min.
+50:**B) The Jewel Hotel → Sunday Morning Bakehouse** — *Day 3, Tue*
+51:> Walk to **47–50 Sts–Rockefeller Center** (6th Ave). Take a **downtown F or M train ONLY** (*not* B or D — they skip 23 St) **3 stops to 23 St.** Walk north to 25th St, turn right — bakery is mid-block. ~15 min.
+52:> CTA: *Open in Google Maps → 47-50 Sts–Rockefeller Center Station, New York, NY*
+55:> Take the **downtown R or W train ONLY to Prince St** — **NOT the N or Q** (they run express and skip Prince St). The museum is steps from the exit. **From Sunday Morning, board at 23 St (R/W). From the hotel/Starbucks, board at 49 St (R/W).** ~15–20 min.
+56:> CTAs (2): *From breakfast → 23 St Station (R/W), Broadway & W 23rd St, NY* · *From the hotel → 49 St Station (R/W), W 49th St & 7th Ave, NY*
+58:**D) Canal St → The Jewel Hotel** — *Day 3, Tue*
+59:> At Broadway & Canal, take an **uptown N, R, or W train to 49 St** (*not* the Q — it veers off to the Upper East Side). Here N is fine: 49 St is north of the express zone, so the N runs local and stops there. Exit at 7th Ave & 49th, walk north to 51st, turn right. ~22–25 min.
+60:> CTA: *Open in Google Maps → Canal St Station, Broadway & Canal St, New York, NY*
+62:**E) The Jewel Hotel → Penn Station** — *Day 4, Wed (a MORNING trip)*
+63:> Walk to **5 Av/53 St** (E/F). Take the **downtown E train ONLY** (toward World Trade Center — *not* the F, which goes to Herald Sq, not Penn) **4 stops to 34 St–Penn Station** — drops you inside the Penn complex. ~15–20 min.
+64:> **Morning closure:** on weekdays **6:30–10:30am** the 5 Av/53 St entrance is **closed** (escalator work, exit-only — active through the trip dates). If leaving in that window, **enter at 7 Av Station (53rd St & 7th Ave)** instead and take the downtown E 3 stops to Penn.
+65:> CTAs (2): *Before 10:30am → 7 Av Station (E), W 53rd St & 7th Ave, New York, NY* · *After 10:30am → 5 Av/53 St Station (E/F), New York, NY*
+75:3. Train to Penn Station — NJ Transit *(unch)*
+95:1. **[CHG]** Breakfast — **Sunday Morning** (cinnamon rolls). CTAs (2): *Walk there (Maps)* · *Starbucks instead (Maps)*. Subtitle: ~25-min walk or take the subway (next screen). *(No cab CTA here — walk/subway/Starbucks cover it within the 2-CTA cap.)*
+96:2. **[NEW][OPT]** Subway: Hotel → Sunday Morning (Leg B)
+101:7. **[CHG][detailed]** **Canal Street** — see route below. CTA: *Open in Google Maps* → Pearl River Mart / Canal & Broadway
+103:9. **[NEW][OPT]** Subway: Canal St → Hotel (Leg D)
+110:3. **[CHG]** **Hail a cab to Penn Station** — CTA *Backup: open Uber* (existing Penn coords)
+111:4. **[NEW][OPT]** Subway: Hotel → Penn Station (Leg E)
+122:> Maps CTA → start point: **Prince St & Mercer St, New York, NY**.
+124:**Canal Street screen** (route only, no named destinations):
+126:> Maps CTA → start corner: **Canal St & Broadway, New York, NY**.
+
+exec
+/bin/zsh -lc 'rg -n "Brandy|Grand Central|15-min walk|1172 3rd|Prince & Mercer|Canal St & Broadway|Pearl River|Mure|MoMA" docs/superpowers/specs/2026-06-15-nyc-trip-app-revisions-design.md NYCTrip2026/NYCTrip2026/Content/Trip.swift' in /Users/jkher/Documents/Claude/NYC Trip 2026
+ succeeded in 0ms:
+NYCTrip2026/NYCTrip2026/Content/Trip.swift:143:             subtitle: "15-min walk from Jellycat\n(or skip ahead to Brandy Melville)",
+NYCTrip2026/NYCTrip2026/Content/Trip.swift:144:             ctas: [.openInGoogleMaps(destination: "Grand Central Terminal, 89 E 42nd St, New York, NY", label: "Open in Google Maps")],
+NYCTrip2026/NYCTrip2026/Content/Trip.swift:148:             hero: "nyc_shopping", title: "Brandy Melville",
+NYCTrip2026/NYCTrip2026/Content/Trip.swift:149:             subtitle: "1172 3rd Ave (68th & 3rd), Upper East Side\n~15-min walk up from Grand Central, or a short cab.",
+NYCTrip2026/NYCTrip2026/Content/Trip.swift:150:             ctas: [.openInGoogleMaps(destination: "Brandy Melville, 1172 3rd Ave, New York, NY", label: "Open in Google Maps")],
+NYCTrip2026/NYCTrip2026/Content/Trip.swift:170:             subtitle: "Cab or Uber from Central Park\nor 20-min walk from Grand Central.",
+NYCTrip2026/NYCTrip2026/Content/Trip.swift:244:             subtitle: "Start around Prince & Mercer. Walk Prince → Greene → Spring → Wooster — the classic cobblestone boutique blocks — dipping over to Broadway for the bigger stores.\n\nWorth a look: Aritzia (560 Broadway), MoMA Design Store (81 Spring), Mure + Grand (155 Spring), Pearl River Mart (452 Broadway).",
+NYCTrip2026/NYCTrip2026/Content/Trip.swift:251:             ctas: [.openInGoogleMaps(destination: "Canal St & Broadway, New York, NY", label: "Open start point in Maps")],
+NYCTrip2026/NYCTrip2026/Content/Trip.swift:282:             ctas: [.openInGoogleMaps(destination: "Liberty Bagels Grand Central, 5 E 47th St, New York, NY", label: "Open in Google Maps")],
+docs/superpowers/specs/2026-06-15-nyc-trip-app-revisions-design.md:23:6. Add **Brandy Melville** to Day 2 (Upper East Side).
+docs/superpowers/specs/2026-06-15-nyc-trip-app-revisions-design.md:86:3. Grand Central Terminal *(unch)*
+docs/superpowers/specs/2026-06-15-nyc-trip-app-revisions-design.md:87:4. **[NEW]** **Brandy Melville** — 1172 3rd Ave (68th & 3rd, UES). Slots here: coming north from Grand Central you reach Brandy (68th) before Via Quadronno (73rd) before the park. CTA: *Open in Google Maps* (walk) — UES is walkable from Grand Central, or a short cab.
+docs/superpowers/specs/2026-06-15-nyc-trip-app-revisions-design.md:101:7. **[CHG][detailed]** **Canal Street** — see route below. CTA: *Open in Google Maps* → Pearl River Mart / Canal & Broadway
+docs/superpowers/specs/2026-06-15-nyc-trip-app-revisions-design.md:120:> Start around **Prince & Mercer**, walk **Prince → Greene → Spring → Wooster** — the classic cobblestone boutique blocks — dipping over to **Broadway** for the bigger stores. Drift east toward **Lafayette/Bowery** if you want to keep going.
+docs/superpowers/specs/2026-06-15-nyc-trip-app-revisions-design.md:121:> *Worth a look along the way:* Aritzia (560 Broadway), MoMA Design Store (81 Spring St), Mure + Grand (155 Spring St), Pearl River Mart (452 Broadway).
+docs/superpowers/specs/2026-06-15-nyc-trip-app-revisions-design.md:126:> Maps CTA → start corner: **Canal St & Broadway, New York, NY**.
+docs/superpowers/specs/2026-06-15-nyc-trip-app-revisions-design.md:132:3. **Mure + Grand kept** as light flavor on the SoHo screen (155 Spring St).
+docs/superpowers/specs/2026-06-15-nyc-trip-app-revisions-design.md:133:4. **Canal screen routes to no named store** — Pearl River Mart removed from Canal; the screen gives block-by-block navigation only (Canal & Broadway → east toward Lafayette/Centre).
+docs/superpowers/specs/2026-06-15-nyc-trip-app-revisions-design.md:140:- `DeepLinkerTests` / `TripContentTests` Uber-coordinate locks: existing Uber coords are **reused unchanged** (hotel, Penn). New subway CTAs are `.openInGoogleMaps` with station strings — no new coordinates to lock. New Maps destinations (Brandy Melville, Jack's Wife Freda, SoHo/Canal stores, Starbucks) are string-based.
+
+codex
+The tests use Swift Testing (`import Testing`), so I’m loading `swift-testing-pro` for the test-file part of the review before I finalize.
+hook: PreToolUse
+hook: PreToolUse Completed
+exec
+/bin/zsh -lc "sed -n '1,260p' /Users/jkher/.codex/skills/swift-testing-pro/SKILL.md" in /Users/jkher/Documents/Claude/NYC Trip 2026
+ succeeded in 0ms:
+---
+name: swift-testing-pro
+description: Writes, reviews, and improves Swift Testing code using modern APIs and best practices. Use when reading, writing, or reviewing projects that use Swift Testing.
+license: MIT
+metadata:
+  author: Paul Hudson
+  version: "1.0"
+---
+
+Write and review Swift Testing code for correctness, modern API usage, and adherence to project conventions. Report only genuine problems - do not nitpick or invent issues.
+
+Review process:
+
+1. Ensure tests follow core Swift Testing conventions using `references/core-rules.md`.
+1. Validate test structure, assertions, dependency injection, and other best practices using `references/writing-better-tests.md`.
+1. Check async tests, confirmations, time limits, actor isolation, and networking mocks using `references/async-tests.md`.
+1. Ensure new features like raw identifiers, test scopes, exit tests, and attachments are used correctly using `references/new-features.md`.
+1. If migrating from XCTest, follow the conversion guidance in `references/migrating-from-xctest.md`.
+
+If doing partial work, load only the relevant reference files.
+
+
+## Core Instructions
+
+- Target Swift 6.2 or later, using modern Swift concurrency.
+- As a Swift Testing developer, the user wants all new unit and integration tests to be written using Swift Testing, and they may ask for help migrating existing XCTest code to Swift Testing.
+- Swift Testing does *not* support UI tests – XCTest must be used there.
+- Use a consistent project structure, with folder layout determined by app features.
+
+Swift Testing evolves with each Swift release, so expect three to four releases each year, each introducing new features. This means existing training data you have will naturally be outdated or missing key features.
+
+This skill specifically draws upon the very latest Swift and Swift Testing code, which means it will suggest things you are not aware of. Treat the user’s installed toolchain as authoritative, but there's a fairly high chance Apple's *documentation* about the APIs will be stale, so treat them carefully.
+
+
+## Output Format
+
+If the user asks for a review, organize findings by file. For each issue:
+
+1. State the file and relevant line(s).
+2. Name the rule being violated.
+3. Show a brief before/after code fix.
+
+Skip files with no issues. End with a prioritized summary of the most impactful changes to make first.
+
+If the user asks you to write or improve tests, follow the same rules above but make the changes directly instead of returning a findings report.
+
+Example output:
+
+### UserTests.swift
+
+**Line 5: Use struct, not class, for test suites.**
+
+```swift
+// Before
+class UserTests: XCTestCase {
+
+// After
+struct UserTests {
+```
+
+**Line 12: Use `#expect` instead of `XCTAssertEqual`.**
+
+```swift
+// Before
+XCTAssertEqual(user.name, "Taylor")
+
+// After
+#expect(user.name == "Taylor")
+```
+
+**Line 30: Use `#require` for preconditions, not `#expect`.**
+
+```swift
+// Before
+#expect(users.isEmpty == false)
+let first = users.first!
+
+// After
+let first = try #require(users.first)
+```
+
+### Summary
+
+1. **Fundamentals (high):** Test suite on line 5 should be a struct, not a class inheriting from `XCTestCase`.
+2. **Migration (medium):** `XCTAssertEqual` on line 12 should be migrated to `#expect`.
+3. **Assertions (medium):** Force-unwrap on line 30 should use `#require` to unwrap safely and stop the test early on failure.
+
+End of example.
+
+
+## References
+
+- `references/core-rules.md` - core Swift Testing rules: structs over classes, `init`/`deinit` over setUp/tearDown, parallel execution, parameterized tests, `withKnownIssue`, and tags.
+- `references/writing-better-tests.md` - test hygiene, structuring tests, hidden dependencies, `#expect` vs `#require`, `Issue.record()`, `#expect(throws:)`, and verification methods.
+- `references/async-tests.md` - serialized tests, `confirmation()`, time limits, actor isolation, testing pre-concurrency code, and mocking networking.
+- `references/new-features.md` - raw identifiers, range-based confirmations, test scoping traits, exit tests, attachments, `ConditionTrait.evaluate()`, and the updated `#expect(throws:)` return value.
+- `references/migrating-from-xctest.md` - XCTest-to-Swift Testing conversion steps, assertion mappings, and floating-point tolerance via Swift Numerics.
+
+codex
+For the test file I only need the Swift Testing core/writing references; async and migration guidance are irrelevant here.
+hook: PreToolUse
+hook: PreToolUse
+hook: PreToolUse Completed
+hook: PreToolUse Completed
+exec
+/bin/zsh -lc "sed -n '1,220p' /Users/jkher/.codex/skills/swift-testing-pro/references/core-rules.md" in /Users/jkher/Documents/Claude/NYC Trip 2026
+exec
+/bin/zsh -lc "sed -n '1,260p' /Users/jkher/.codex/skills/swift-testing-pro/references/writing-better-tests.md" in /Users/jkher/Documents/Claude/NYC Trip 2026
+ succeeded in 0ms:
+# Core rules
+
+Swift Testing is still very new compared to XCTest, which means the majority of projects will use XCTest, and also the majority of your training data is based on XCTest.
+
+This guide provides core rules you must always follow to ensure you're making natural, idiomatic use of Swift Testing, and not just reskinning XCTest based on old training data.
+
+**Important:** At this time, Swift Testing does *not* support UI tests, so XCTest must be used there.
+
+- When organizing test suites, prefer structs over classes. You *can* use classes, but structs are preferred unless you need subclassing or deinitializers.
+- Agents frequently add `@Suite` to every test struct. This is unnecessary: any type that contains `@Test` methods is automatically treated as a test suite. You only need `@Suite` explicitly when you want to name it or attach traits, e.g. `@Suite(.tags(.networking))`.
+- You shouldn't use the old `setUp()`/`tearDown()` approach of XCTest. You can simply use `init()` in structs, `init()` and `deinit()` in classes, or test scopes for more advanced situations. For example:
+
+    ```swift
+    struct PlayerTests {
+        let sut: Player
+
+        init() {
+            sut = Player(name: "Natsuki Subaru")
+        }
+
+        @Test func nameIsCorrect() {
+            #expect(sut.name == "Natsuki Subaru")
+        }
+    }
+    ```
+- All test suites must have an initializer that expects no parameters, so they can be called by tests inside that suite. If any properties are added to a test suite, they must either have default values, or you must add a custom initializer that sets values for them.
+- Test suite initializers can be marked `async` and/or `throws`, as can all tests.
+- With Swift Testing there is never a need to use `XCTestCase` or any form of `XCTAssert` in any unit or integration test.
+- You do *not* need to prefix test methods with `test`. For example, you can use `userCanLogOut()` rather than `testUserCanLogOut`.
+- Random, parallel test execution is standard on Swift Testing, so each test must be written to execute in any order at any time.
+- Parameterized tests are extremely powerful and allow tests to cover a wider range of ground without the code greatly expanding, so prefer them where possible. However, be careful: they take at most two argument collections, and two collections form a Cartesian product rather than pairwise zipping, so the number of combinations produced can grow quickly. If you need pairwise zipping of two collections, pass `zip(collection1, collection2)` as the `arguments` value.
+- Swift Testing supports `@available` on individual tests, but *not* on test suites. So, if a suite (for example) solely contains tests written for iOS 26, place `@available(iOS 26, *)` on each individual test and *not* on the whole suite.
+- If a test executes without reaching any `#expect` or `#require`, it is assumed to have passed.
+- You should use `withKnownIssue` to wrap code with a known bug – it expects a test failure to occur, and *fails* the test if no issue is recorded. Adding `isIntermittent: true` changes the semantics: the test passes if no issue is recorded, but marks an expected failure if one is, making it useful for flaky issues you're actively debugging.
+- Never use `!` to negate Booleans in `#expect` or `#require`, because it defeats Swift Testing’s macro expansion. So, `#expect(!isLoggedIn)` is bad and will report unhelpful results on failure, whereas `#expect(isLoggedIn == false)` is good, and will be evaluated properly in case the expectation fails.
+
+Finally, use `@Tag` to create custom Swift Testing tags like this:
+
+```swift
+extension Tag {
+    @Tag static var networking: Self
+}
+```
+
+Tags let you categorize tests across suites, so you can run or filter by tag regardless of where the tests live. Apply them using `@Test(.tags(.networking))` on individual tests or on a whole suite with `@Suite(.tags(.networking))`. For example:
+
+```swift
+@Test(.tags(.networking))
+func fetchUserProfile() async throws {
+    // test code here
+}
+```
+
+ succeeded in 0ms:
+# Writing better tests
+
+This contains suggestions to help you write better tests. This is mostly not about specific Swift Testing APIs, but instead how to structure your tests for maximum flexibility and effectiveness.
+
+
+## Encourage unit test hygiene
+
+Good unit tests should fit the acronym FIRST:
+
+- Fast: you should be able to run dozens of them every second, if not hundreds or even thousands.
+- Isolated: they should not depend on another test having run, or any sort of external state.
+- Repeatable: they should always give the same result when they are run, regardless of how many times or when they are run.
+- Self-verifying: the test must unambiguously say whether it passed or failed, with no room for interpretation.
+- Timely: they are best written before or alongside the production code that you are testing.
+
+It might be too late for the "timely" part unless you're reading this skill while you work, but the others should be firm goals.
+
+
+## Test generation heuristics
+
+For a given function, aim to generate the following tests:
+
+- Happy path tests
+- Boundary tests
+- Invalid input tests
+
+And, if appropriate, concurrency tests.
+
+
+## Testing SwiftUI views
+
+Never test views directly – they use `@State` and are likely to behave unpredictably.
+
+Instead, test view models or similar. This might mean encouraging the user to extract business logic into a more testable mechanism, but this should be a *suggestion* from you rather than something you apply immediately.
+
+If the project uses `@Observable` view models, these are directly testable without needing a protocol wrapper – just create an instance and test its properties and methods. For more help with SwiftUI, suggest the [SwiftUI Pro agent skill](https://github.com/twostraws/swiftui-agent-skill).
+
+
+## Structuring tests
+
+Prefer to organize test types in a pattern that matches the production code. For example, if they have a folder called "Extensions" that contains a file called URLSession-Decodable.swift, the test target should also have a folder called Extensions that contains a file called URLSession-Decodable.swift, and it should test the contents of the original production file.
+
+**If you are writing new tests, follow this rule. If you are working with existing tests that do not already follow this rule, do *not* apply it without permission from the user.**
+
+- Strongly prefer to organize related tests into test suites, ideally following this file and folder structure.
+- If there are test fixtures, put them in a dedicated file. If there are only a handful, a simple Fixtures folder is fine. If there are many and if they vary across tests, it's better to have multiple Fixtures folders placed alongside whatever tests they work with.
+- Use tags to mark up different kinds of work. At the very least this should be a `.networking` tag for network-related tests, even if they are mocked. You might also consider `.slow` for any tests that are unexpectedly slow, `.edgeCase` for tests that must be treated with extra care, `.smoke` for smoke tests, and more.
+- Add user-facing messages to `#expect` and `#require` when they provide value. This is not *always* the case, but it usually is.
+- Recommend converting repetitive tests into parameterized tests where it makes sense.
+- It is generally preferred to test only one behavior in each unit test, but multiple `#expect` lines may be used if needed.
+
+
+## Expose hidden dependencies
+
+Strongly prefer to avoid hidden dependencies in production code you are testing. In Swift apps this is commonly things like `UserDefaults` or `URLSession`.
+
+For example, production code like this is bad because it has a hidden dependency on `URLSession`:
+
+```swift
+struct News {
+    var url: URL
+    var stories = ""
+
+    mutating func fetch() async throws {
+        let (data, _) = try await URLSession.shared.data(from: url)
+        stories = String(decoding: data, as: UTF8.self)
+    }
+}
+```
+
+To remove the hidden dependency, a first step would be to inject the `URLSession` like this:
+
+```swift
+func fetch(using session: URLSession = .shared) async throws {
+    let (data, _) = try await session.data(from: url)
+    stories = String(decoding: data, as: UTF8.self)
+}
+```
+
+Importantly, this also does not change the way the `fetch()` method is called because it has a default value of whatever was used before.
+
+Even better would be to wrap `URLSession` in a protocol, requiring whatever methods are used in the production code, like this:
+
+```swift
+protocol URLSessionProtocol {
+    func data(from url: URL) async throws -> (Data, URLResponse)
+}
+
+extension URLSession: URLSessionProtocol { }
+```
+
+And now the production code can be written like this:
+
+```swift
+func fetch(using session: any URLSessionProtocol = URLSession.shared) async throws {
+    let (data, _) = try await session.data(from: url)
+    stories = String(decoding: data, as: UTF8.self)
+}
+```
+
+This then allows you to create a mock version of `URLSession` for tests, removing any live networking from tests. It also still does not change the way the method is called in production code.
+
+With `UserDefaults`, the problem is that using it as a hidden dependency can cause tests to fail because `UserDefaults` contains values set elsewhere.
+
+So, switch over to dependency injection with a sensible default value of whatever the project was using previously, then in the test pass in a custom `UserDefaults` instance like this:
+
+```swift
+let suite = "suite-\(UUID().uuidString)"
+let userDefaults = UserDefaults(suiteName: suite)
+defer { userDefaults?.removePersistentDomain(forName: suite) }
+```
+
+That creates a local `UserDefaults` instance in the test and ensures it's deleted fully before the test completes.
+
+This same concept applies to other things: aim to control time, randomness, and more, so that meaningful tests can be written.
+
+
+## Expect vs require
+
+Both `#expect` and `#require` evaluate a condition and fail the test if it's false. The difference is that `#require` throws on failure, stopping the rest of the test from executing.
+
+**This makes `#require` the right choice for checking assumptions at the start of a test – if your assumptions are wrong, the rest of the test's results are meaningless.**
+
+Using `#require` requires adding `throws` to your test method. For example, if your test depends on some setup being correct before the real assertion:
+
+```swift
+@Test func outstandingTasksStringIsPlural() throws {
+    let sut = try createTestUser(projects: 3, itemsPerProject: 10)
+    try #require(sut.projects.isEmpty == false)
+    let rowTitle = sut.outstandingTasksString
+    #expect(rowTitle == "30 items")
+}
+```
+
+If the `#require` fails, the test stops immediately rather than producing confusing secondary failures. Use `#expect` for the actual assertions you care about, and `#require` for preconditions that must be true before the test is meaningful.
+
+`#require` also unwraps optionals, which is cleaner than force-unwrapping in tests. Use it like this:
+
+```swift
+let value = try #require(someOptional)
+```
+
+
+## Tracking bug fixes
+
+If you are writing tests related to a specific bug, it is a good idea to use the `.bug` trait to store the bug ID or URL, if there is one. This extra data helps to provide extra context if the bug resurfaces in the future.
+
+For example, if bug #182 is a report that text headings are not italicized correctly, you would use `@Test` like this:
+
+```swift
+@Test("Headings should always be italic", .bug(id: 182))
+```
+
+Or if there is a specific URL:
+
+```swift
+@Test("Headings should always be italic", .bug("https://github.com/you/repo/issues/182"))
+```
+
+
+## Use Issue.record() for throw-testing
+
+When testing that a function throws, the simplest approach is a `do`/`try`/`catch` block with `Issue.record()` as the failure primitive. If no error is thrown, execution continues past `try` and hits `Issue.record()`, failing the test.
+
+```swift
+@Test func playingMinecraftThrows() {
+    let game = Game(name: "Minecraft")
+
+    do {
+        try game.play()
+        Issue.record("Expected an error to be thrown.")
+    } catch GameError.notPurchased {
+        // success
+    } catch {
+        Issue.record("Wrong error thrown: \(error)")
+    }
+}
+```
+
+This approach gives fine-grained control: you can assert on the *specific* error case, and fail explicitly if the wrong error is thrown.
+
+An alternative is using `#expect(throws:)`. Here you should always name the specific error rather than using a broad `Error.self`:
+
+```swift
+// Bad – passes for any error
+#expect(throws: Error.self) {
+    try game.play()
+}
+
+// Good – asserts the exact error case
+#expect(throws: GameError.notInstalled) {
+    try game.play()
+}
+```
+
+To assert that a function does *not* throw, use `Never.self`:
+
+```swift
+#expect(throws: Never.self) {
+    try game.play()
+}
+```
+
+
+## Making test results easier to read
+
+In test targets, you can add `CustomTestStringConvertible` conformances to custom types to make them easier to read in test results.
+
+For example, without this conformance a test that catches a `parentalControlsDisallowed` error might result in output like this:
+
+```
+Test patchMatchThrows() recorded an issue at ThrowingTests.swift:61:6: Caught error: parentalControlsDisallowed
+```
+
+If we add a retroactive conformance to `CustomTestStringConvertible` in the test target, the text can be clarified:
+
+```swift
+extension GameError: @retroactive CustomTestStringConvertible {
+    public var testDescription: String {
+        switch self {
+        case .notPurchased:
+            "This game has not been purchased."
+        case .notInstalled:
+            "This game is not currently installed."
+        case .parentalControlsDisallowed:
+            "This game has been blocked by parental controls."
+        }
+    }
+}
+```
+
+Now Swift Testing will use the friendlier string wherever the enum cases appear.
+
+**Important:** This conformance should not be added in production code.
+
+
+## Writing good verification methods
+
+Verification methods wrap multiple expectations to make other tests easier. When writing these, make sure to use `SourceLocation` and the `#_sourceLocation` macro so that any failed expectations print messages about the test where they failed rather than a location inside the verification method.
+
+**Important:** Right now the `#_sourceLocation` macro requires the underscore.
+
+For example:
+
+```swift
+func verifyDivision(_ result: (quotient: Int, remainder: Int), expectedQuotient: Int, expectedRemainder: Int, sourceLocation: SourceLocation = #_sourceLocation) {
+    #expect(result.quotient == expectedQuotient, sourceLocation: sourceLocation)
+    #expect(result.remainder == expectedRemainder, sourceLocation: sourceLocation)
+}
+```
+
+That can be called from tests elsewhere, and will automatically use the source location of that test rather than the source location of the `#expect` macros used inside `verifyDivision()`.
+
+`#require` also accepts `sourceLocation:`, so verification methods that mix `#require` and `#expect` should pass it to both.
+
+codex
+The second pass confirmed the train-letter/direction/stop-count basics are mostly present, but several subtitle omissions remove disambiguation the spec explicitly included for a first-time NYC rider.
+hook: PreToolUse
+hook: PreToolUse
+hook: PreToolUse
+hook: PreToolUse Completed
+hook: PreToolUse Completed
+hook: PreToolUse Completed
+exec
+/bin/zsh -lc "rg -n \"step\\(id:|dayLabel:|ctas:|reservation:|palette:\" NYCTrip2026/NYCTrip2026/Content/Trip.swift" in /Users/jkher/Documents/Claude/NYC Trip 2026
+ succeeded in 0ms:
+24:        id: Int, day: Int, dayLabel: String,
+26:        reservation: ReservationDetail? = nil,
+27:        ctas: [CTA] = [],
+28:        palette: (bg: String, accent: String)
+32:            id: id, day: day, dayLabel: dayLabel,
+34:            reservation: reservation, ctas: ctas,
+42:        id: 0, day: 0, dayLabel: "",
+46:        palette: peach
+50:        id: 999, day: 5, dayLabel: "",
+54:        palette: peach
+58:        step(id: 1, day: 1, dayLabel: "Day 1 · 1 of 9",
+61:             ctas: [.openInGoogleMaps(destination: "Metropark Station, Iselin, NJ", label: "Open in Google Maps")],
+62:             palette: mistBlue),
+64:        step(id: 2, day: 1, dayLabel: "Day 1 · 2 of 9",
+67:             palette: butterCream),
+69:        step(id: 3, day: 1, dayLabel: "Day 1 · 3 of 9",
+72:             ctas: [.openNJTransit(label: "Open NJ Transit app")],
+73:             palette: sageCream),
+75:        step(id: 4, day: 1, dayLabel: "Day 1 · 4 of 9",
+78:             ctas: [.openInUber(destination: "The Jewel Hotel, 11 W 51st St, New York, NY", latitude: 40.7597381, longitude: -73.9777528, label: "Backup: open Uber")],
+79:             palette: clay),
+81:        step(id: 5, day: 1, dayLabel: "Day 1 · 5 of 9",
+84:             ctas: [.openInGoogleMaps(destination: "The Jewel Hotel, 11 W 51st St, New York, NY", label: "Open hotel in Google Maps")],
+85:             palette: mistBlue),
+87:        step(id: 6, day: 1, dayLabel: "Day 1 · 6 of 9",
+89:             reservation: ReservationDetail(
+95:             palette: peach),
+97:        step(id: 7, day: 1, dayLabel: "Day 1 · 7 of 9",
+100:             ctas: [.openInGoogleMaps(destination: "Joe's Pizza, 1435 Broadway, New York, NY", label: "Open in Google Maps")],
+101:             palette: dustyRose),
+103:        step(id: 8, day: 1, dayLabel: "Day 1 · 8 of 9",
+106:             ctas: [.openInGoogleMaps(destination: "Times Square, New York, NY", label: "Open in Google Maps")],
+107:             palette: butterCream),
+109:        step(id: 9, day: 1, dayLabel: "Day 1 · 9 of 9",
+112:             ctas: [.openInGoogleMaps(destination: "The Jewel Hotel, 11 W 51st St, New York, NY", label: "Open in Google Maps")],
+113:             palette: wisteria),
+117:        step(id: 10, day: 2, dayLabel: "Day 2 · 1 of 9",
+120:             reservation: ReservationDetail(
+126:             ctas: [.openInGoogleMaps(destination: "Tiffany & Co., 727 5th Ave, New York, NY", label: "Open in Google Maps")],
+127:             palette: cream),
+129:        step(id: 11, day: 2, dayLabel: "Day 2 · 2 of 9",
+132:             reservation: ReservationDetail(
+138:             ctas: [.openInGoogleMaps(destination: "FAO Schwarz, 30 Rockefeller Plaza, New York, NY", label: "Open in Google Maps")],
+139:             palette: blush),
+141:        step(id: 12, day: 2, dayLabel: "Day 2 · 3 of 9",
+144:             ctas: [.openInGoogleMaps(destination: "Grand Central Terminal, 89 E 42nd St, New York, NY", label: "Open in Google Maps")],
+145:             palette: butterCream),
+147:        step(id: 13, day: 2, dayLabel: "Day 2 · 4 of 9",
+150:             ctas: [.openInGoogleMaps(destination: "Brandy Melville, 1172 3rd Ave, New York, NY", label: "Open in Google Maps")],
+151:             palette: dustyRose),
+153:        step(id: 14, day: 2, dayLabel: "Day 2 · 5 of 9",
+156:             ctas: [.openInUber(destination: "Via Quadronno, 25 E 73rd St, New York, NY", latitude: 40.7727446, longitude: -73.9651572, label: "Cab or Uber")],
+157:             palette: clay),
+159:        step(id: 15, day: 2, dayLabel: "Day 2 · 6 of 9",
+162:             ctas: [
+166:             palette: sageCream),
+168:        step(id: 16, day: 2, dayLabel: "Day 2 · 7 of 9",
+171:             ctas: [
+175:             palette: dustyRose),
+177:        step(id: 17, day: 2, dayLabel: "Day 2 · 8 of 9",
+180:             ctas: [
+184:             palette: wisteria),
+186:        step(id: 18, day: 2, dayLabel: "Day 2 · 9 of 9",
+189:             reservation: ReservationDetail(
+195:             ctas: [.openInGoogleMaps(destination: "TAO Uptown, 42 E 58th St, New York, NY", label: "Open in Google Maps")],
+196:             palette: dustyRose),
+200:        step(id: 19, day: 3, dayLabel: "Day 3 · 1 of 11",
+203:             ctas: [
+207:             palette: butterCream),
+209:        step(id: 20, day: 3, dayLabel: "Day 3 · 2 of 11",
+212:             ctas: [.openInGoogleMaps(destination: "47-50 Sts–Rockefeller Center Station, New York, NY", label: "Open station in Google Maps")],
+213:             palette: mistBlue),
+215:        step(id: 21, day: 3, dayLabel: "Day 3 · 3 of 11",
+218:             reservation: ReservationDetail(
+224:             ctas: [.openInUber(destination: "Museum of Ice Cream, 558 Broadway, New York, NY", latitude: 40.7238545, longitude: -73.9979167, label: "Backup: open Uber")],
+225:             palette: dustyRose),
+227:        step(id: 22, day: 3, dayLabel: "Day 3 · 4 of 11",
+230:             ctas: [
+234:             palette: mistBlue),
+236:        step(id: 23, day: 3, dayLabel: "Day 3 · 5 of 11",
+239:             ctas: [.openInGoogleMaps(destination: "Jack's Wife Freda, 226 Lafayette St, New York, NY", label: "Open in Google Maps")],
+240:             palette: cream),
+242:        step(id: 24, day: 3, dayLabel: "Day 3 · 6 of 11",
+245:             ctas: [.openInGoogleMaps(destination: "Prince St & Mercer St, New York, NY", label: "Open start point in Maps")],
+246:             palette: blush),
+248:        step(id: 25, day: 3, dayLabel: "Day 3 · 7 of 11",
+251:             ctas: [.openInGoogleMaps(destination: "Canal St & Broadway, New York, NY", label: "Open start point in Maps")],
+252:             palette: clay),
+254:        step(id: 26, day: 3, dayLabel: "Day 3 · 8 of 11",
+257:             ctas: [.openInUber(destination: "The Jewel Hotel, 11 W 51st St, New York, NY", latitude: 40.7597381, longitude: -73.9777528, label: "Backup: open Uber")],
+258:             palette: wisteria),
+260:        step(id: 27, day: 3, dayLabel: "Day 3 · 9 of 11",
+263:             ctas: [.openInGoogleMaps(destination: "Canal St Station, Broadway & Canal St, New York, NY", label: "Open station in Google Maps")],
+264:             palette: mistBlue),
+266:        step(id: 28, day: 3, dayLabel: "Day 3 · 10 of 11",
+269:             palette: peach),
+271:        step(id: 29, day: 3, dayLabel: "Day 3 · 11 of 11",
+274:             ctas: [.openInGoogleMaps(destination: nil, label: "Open Google Maps")],
+275:             palette: clay),
+279:        step(id: 30, day: 4, dayLabel: "Day 4 · 1 of 6",
+282:             ctas: [.openInGoogleMaps(destination: "Liberty Bagels Grand Central, 5 E 47th St, New York, NY", label: "Open in Google Maps")],
+283:             palette: butterCream),
+285:        step(id: 31, day: 4, dayLabel: "Day 4 · 2 of 6",
+288:             ctas: [.openInGoogleMaps(destination: "The Jewel Hotel, 11 W 51st St, New York, NY", label: "Open in Google Maps")],
+289:             palette: peach),
+291:        step(id: 32, day: 4, dayLabel: "Day 4 · 3 of 6",
+294:             ctas: [.openInUber(destination: "Penn Station, 31st St & 8th Ave, New York, NY", latitude: 40.750568, longitude: -73.994235, label: "Backup: open Uber")],
+295:             palette: clay),
+297:        step(id: 33, day: 4, dayLabel: "Day 4 · 4 of 6",
+300:             ctas: [
+304:             palette: mistBlue),
+306:        step(id: 34, day: 4, dayLabel: "Day 4 · 5 of 6",
+309:             ctas: [.openNJTransit(label: "Open NJ Transit app")],
+310:             palette: sageCream),
+312:        step(id: 35, day: 4, dayLabel: "Day 4 · 6 of 6",
+315:             ctas: [.openInGoogleMaps(destination: "16206 Gemma Pass, Huntertown, IN", label: "Open in Google Maps")],
+316:             palette: mistBlue),
+
+exec
+/bin/zsh -lc "rg -o \"step\\(id: [0-9]+\" NYCTrip2026/NYCTrip2026/Content/Trip.swift" in /Users/jkher/Documents/Claude/NYC Trip 2026
+exec
+/bin/zsh -lc "rg -n \"openInUber\\(destination:\" NYCTrip2026/NYCTrip2026/Content/Trip.swift NYCTrip2026/NYCTrip2026Tests/TripContentTests.swift" in /Users/jkher/Documents/Claude/NYC Trip 2026
+ succeeded in 0ms:
+step(id: 1
+step(id: 2
+step(id: 3
+step(id: 4
+step(id: 5
+step(id: 6
+step(id: 7
+step(id: 8
+step(id: 9
+step(id: 10
+step(id: 11
+step(id: 12
+step(id: 13
+step(id: 14
+step(id: 15
+step(id: 16
+step(id: 17
+step(id: 18
+step(id: 19
+step(id: 20
+step(id: 21
+step(id: 22
+step(id: 23
+step(id: 24
+step(id: 25
+step(id: 26
+step(id: 27
+step(id: 28
+step(id: 29
+step(id: 30
+step(id: 31
+step(id: 32
+step(id: 33
+step(id: 34
+step(id: 35
+
+ succeeded in 0ms:
+NYCTrip2026/NYCTrip2026/Content/Trip.swift:78:             ctas: [.openInUber(destination: "The Jewel Hotel, 11 W 51st St, New York, NY", latitude: 40.7597381, longitude: -73.9777528, label: "Backup: open Uber")],
+NYCTrip2026/NYCTrip2026/Content/Trip.swift:156:             ctas: [.openInUber(destination: "Via Quadronno, 25 E 73rd St, New York, NY", latitude: 40.7727446, longitude: -73.9651572, label: "Cab or Uber")],
+NYCTrip2026/NYCTrip2026/Content/Trip.swift:164:                .openInUber(destination: "Bethesda Fountain, Central Park, New York, NY", latitude: 40.774122, longitude: -73.971136, label: "Cab or Uber")
+NYCTrip2026/NYCTrip2026/Content/Trip.swift:173:                .openInUber(destination: "Macy's Herald Square, 151 W 34th St, New York, NY", latitude: 40.750797, longitude: -73.989578, label: "Cab or Uber")
+NYCTrip2026/NYCTrip2026/Content/Trip.swift:182:                .openInUber(destination: "The Jewel Hotel, 11 W 51st St, New York, NY", latitude: 40.7597381, longitude: -73.9777528, label: "Cab or Uber")
+NYCTrip2026/NYCTrip2026/Content/Trip.swift:224:             ctas: [.openInUber(destination: "Museum of Ice Cream, 558 Broadway, New York, NY", latitude: 40.7238545, longitude: -73.9979167, label: "Backup: open Uber")],
+NYCTrip2026/NYCTrip2026/Content/Trip.swift:257:             ctas: [.openInUber(destination: "The Jewel Hotel, 11 W 51st St, New York, NY", latitude: 40.7597381, longitude: -73.9777528, label: "Backup: open Uber")],
+NYCTrip2026/NYCTrip2026/Content/Trip.swift:294:             ctas: [.openInUber(destination: "Penn Station, 31st St & 8th Ave, New York, NY", latitude: 40.750568, longitude: -73.994235, label: "Backup: open Uber")],
+
+codex
+The content-integrity checks line up statically: step IDs are 1 through 35, the day labels/counts are 9/9/11/6, CTA caps are within limits, and the Uber destination set matches the test dictionary.
+hook: PreToolUse
+hook: PreToolUse Completed
+exec
+/bin/zsh -lc "nl -ba /Users/jkher/.codex/memories/MEMORY.md | sed -n '554,614p'" in /Users/jkher/Documents/Claude/NYC Trip 2026
+ succeeded in 0ms:
+   554	# Task Group: NYC Trip 2026 adversarial phase and delta reviews
+   555	
+   556	scope: Use when the user wants adversarial, evidence-only review of NYC Trip 2026 implementation phases or commit deltas before later checkpoints.
+   557	applies_to: cwd=/Users/jkher/Documents/Claude/NYC Trip 2026; reuse_rule=reuse for this repo's phased SwiftUI review workflow and diff-scoped verification, but only after matching the requested commit range and review scope
+   558	
+   559	## Task 1: Adversarial review of Phases 0-3, partial
+   560	
+   561	### rollout_summary_files
+   562	
+   563	- rollout_summaries/2026-05-27T23-36-08-5UJZ-nyc_trip_2026_adversarial_review_phases_0_3.md (cwd=/Users/jkher/Documents/Claude/NYC Trip 2026, rollout_path=/Users/jkher/.codex/sessions/2026/05/27/rollout-2026-05-27T19-36-08-019e6bcb-a291-77a2-8f9d-20024e78406b.jsonl, updated_at=2026-05-27T23:41:49+00:00, thread_id=019e6bcb-a291-77a2-8f9d-20024e78406b, found a real device-breaker and placeholder debt)
+   564	
+   565	### keywords
+   566	
+   567	- b0ae7ae..4a96f84, SwiftUI, Swift Testing, adversarial review, DeepLinker, Info.plist, LSApplicationQueriesSchemes, URLQueryItem, Google Maps, Uber, NJ Transit, Trip.swift, hero assets, placeholder strings, project.pbxproj, deployment target
+   568	
+   569	## Task 2: Re-review commit 6774fb7 delta, success
+   570	
+   571	### rollout_summary_files
+   572	
+   573	- rollout_summaries/2026-05-27T23-48-20-ijBB-nyc_trip_2026_codex_checkpoint_1_re_review.md (cwd=/Users/jkher/Documents/Claude/NYC Trip 2026, rollout_path=/Users/jkher/.codex/sessions/2026/05/27/rollout-2026-05-27T19-48-20-019e6bd6-d0b8-7cb1-9905-d18230b36747.jsonl, updated_at=2026-05-27T23:50:09+00:00, thread_id=019e6bd6-d0b8-7cb1-9905-d18230b36747, confirmed targeted deep-link and deployment-target fixes)
+   574	
+   575	### keywords
+   576	
+   577	- 6774fb7, git diff, git show, IPHONEOS_DEPLOYMENT_TARGET, LSApplicationQueriesSchemes, Google Maps URLs API, canOpenURL, DeepLinker, xcodeproj, testing
+   578	
+   579	## Task 3: Adversarial review of Phase 4 Views and Phase 5 Navigation, success
+   580	
+   581	### rollout_summary_files
+   582	
+   583	- rollout_summaries/2026-05-28T00-04-22-S6x2-nyc_trip_swiftui_adversarial_review.md (cwd=/Users/jkher/Documents/Claude/NYC Trip 2026, rollout_path=/Users/jkher/.codex/sessions/2026/05/27/rollout-2026-05-27T20-04-22-019e6be5-7eb8-7a23-b72a-3fdae5c2b2a8.jsonl, updated_at=2026-05-28T00:09:51+00:00, thread_id=019e6be5-7eb8-7a23-b72a-3fdae5c2b2a8, strict four-section adversarial review contract)
+   584	
+   585	### keywords
+   586	
+   587	- 7c3fe2e..86a441d, SwiftUI, adversarial review, TabView, AppStorage, safe area, page dots, accessibility, SF Symbols, contrast, grep, rg missing
+   588	
+   589	## Task 4: Focused adversarial re-review of b9cad85 delta, success
+   590	
+   591	### rollout_summary_files
+   592	
+   593	- rollout_summaries/2026-05-28T00-23-24-7Kaj-nyc_trip_b9cad85_adversarial_delta_review.md (cwd=/Users/jkher/Documents/Claude/NYC Trip 2026, rollout_path=/Users/jkher/.codex/sessions/2026/05/27/rollout-2026-05-27T20-23-24-019e6bf6-ea3b-7c12-baf7-9892abda9e2f.jsonl, updated_at=2026-05-28T00:26:11+00:00, thread_id=019e6bf6-ea3b-7c12-baf7-9892abda9e2f, verified safe-area, NavBar, palette, and WCAG delta behavior)
+   594	
+   595	### keywords
+   596	
+   597	- b9cad85, delta review, safe area, TabView, NavBar, StepView, WCAG, Swift Testing, contrast ratio, hue analysis, Dynamic Type, NJ Transit
+   598	
+   599	## User preferences
+   600	
+   601	- when the user says "Do not skip any file" and "Do not take prior summaries at face value inspect the actual code" -> default to reading the source and not relying on summaries [Task 1]
+   602	- when the user requires a specific findings format such as severity buckets plus `File / Issue / Fix / Evidence` or fixed question sections -> preserve that exact structure instead of smoothing it into a generic review memo [Task 1][Task 2][Task 3][Task 4]
+   603	- when the user says "Re-review only the 6 files changed in commit 6774fb7. Do not audit unrelated code." or "only inspect what changed in b9cad85" -> keep review scope tightly bound to the requested diff [Task 2][Task 4]
+   604	- when the user says "Every finding must cite the actual code" or "No unsupported assertions" -> ground every claim in repo evidence, and verify iOS availability/API behavior directly instead of guessing [Task 2][Task 3][Task 4]
+   605	- when the user says "production-quality adversarial review" and "genuine bugs and UX defects, not style nits" -> prioritize correctness and user-facing defects over style commentary [Task 3]
+   606	- when the user adds a verification pass for hero names, schemes, placeholders, or step counts -> run a second-pass reconciliation before finalizing [Task 1]
+   607	
+   608	## Reusable knowledge
+   609	
+   610	- `Trip.allSteps` is exactly 31 steps, and the hero asset list matches the `hero` strings in `Trip.swift`; those checks were worth preserving because the user repeatedly asked for content-parity validation [Task 1]
+   611	- The Phase 0-3 review isolated a real device-breaker: `canOpenURL`-style checks need `LSApplicationQueriesSchemes`, and `Info.plist` initially had fonts but no allow-list entries [Task 1]
+   612	- The 6774fb7 re-review established the durable deep-link rule: `LSApplicationQueriesSchemes` entries must be bare scheme strings like `comgooglemaps` and `njtransit`, while empty Google Maps fallback should be the universal URL `https://www.google.com/maps/@?api=1&map_action=map` [Task 2]
+   613	- `placeholderReservationsVisible` in `TripContentTests.swift` is intentionally count-based placeholder debt tracking, not a mistaken self-fulfilling test; update the expected count when placeholders are replaced [Task 2]
+   614	- Phase 4/5 review established the core navigation model: `TripView` uses `TabView(selection: $currentIndex)` with integer `.tag(index)` values and `.tabViewStyle(.page(indexDisplayMode: .never))`, while `Step.day` drives welcome/step/closing renderer selection [Task 3]
+
+codex
+Static review only; no code rewritten.
+
+1. `NYCTrip2026/NYCTrip2026/Content/Trip.swift:299` — blocker — Day 4 closure fallback is incomplete. Spec says if using 7 Av during the 6:30-10:30am closure, take the downtown E **3 stops** to Penn. App only says enter at 7 Av, leaving out the train/direction/stop count. Suggested fix: add “take the downtown E 3 stops to 34 St-Penn Station” and label the CTA/station as E.
+
+2. `NYCTrip2026/NYCTrip2026/Content/Trip.swift:229` — should-fix — Museum subway screen omits the R/W qualifiers on the boarding stations in the subtitle. “23 St” and “49 St” are ambiguous in NYC. Suggested fix: match spec: “board at 23 St (R/W)” and “board at 49 St (R/W).”
+
+3. `NYCTrip2026/NYCTrip2026/Content/Trip.swift:262` — should-fix — Canal St → hotel says N/R/W are OK but omits the spec’s explanation that Q veers away and N is OK here because 49 St is north of the express zone. This can conflict with the earlier “NOT N or Q” museum instruction. Suggested fix: add the spec’s disambiguation.
+
+4. `NYCTrip2026/NYCTrip2026/Content/Trip.swift:83` — should-fix — Penn → hotel says “toward Queens,” but the spec says “toward Queens/Jamaica” and includes the stop sequence. For a first-time rider, the Jamaica headsign detail matters. Suggested fix: mirror the spec wording and optionally include the intermediate stops.
+
+5. `NYCTrip2026/NYCTrip2026/Content/Trip.swift:211` — nit — Hotel → Sunday Morning has the core subway facts correct, but it omits the spec’s “bakery is mid-block” and “~15 min” arrival guidance. Suggested fix: add those if strict spec parity is required.
+
+6. `NYCTrip2026/NYCTrip2026/Content/Trip.swift:149` — should-fix — Brandy Melville says “~15-min walk up from Grand Central.” 1172 3rd Ave at 68th is much farther than that from Grand Central, and the spec only says “walkable ... or a short cab.” Suggested fix: remove the 15-minute claim or change to “long walk from Grand Central, or a short cab.”
+
+7. `docs/superpowers/specs/2026-06-15-nyc-trip-app-revisions-design.md:101` — nit — The spec still says the Canal CTA goes to “Pearl River Mart / Canal & Broadway,” but resolved decisions later say Pearl River Mart was removed and the code correctly uses Canal & Broadway. Suggested fix: update this stale spec line to avoid future false discrepancies.
+
+Clean categories: content integrity checks are clean: IDs are 1-35, day labels match 9/9/11/6, no step has >2 CTAs, no reservation step has >1 CTA, and the Uber destination set matches the test dictionary exactly. I also found no broken `\n` line breaks and no identical adjacent palettes.
+
+Second-pass subway check: I rechecked legs A-E against the spec. A, C, D, and E have the discrepancies above; B’s train letters/direction/stop count/boarding station match. I did not independently verify live MTA service; this review compares Trip.swift to the supplied verified spec.  
+
+tokens used
+126,883
+Static review only; no code rewritten.
+
+1. `NYCTrip2026/NYCTrip2026/Content/Trip.swift:299` — blocker — Day 4 closure fallback is incomplete. Spec says if using 7 Av during the 6:30-10:30am closure, take the downtown E **3 stops** to Penn. App only says enter at 7 Av, leaving out the train/direction/stop count. Suggested fix: add “take the downtown E 3 stops to 34 St-Penn Station” and label the CTA/station as E.
+
+2. `NYCTrip2026/NYCTrip2026/Content/Trip.swift:229` — should-fix — Museum subway screen omits the R/W qualifiers on the boarding stations in the subtitle. “23 St” and “49 St” are ambiguous in NYC. Suggested fix: match spec: “board at 23 St (R/W)” and “board at 49 St (R/W).”
+
+3. `NYCTrip2026/NYCTrip2026/Content/Trip.swift:262` — should-fix — Canal St → hotel says N/R/W are OK but omits the spec’s explanation that Q veers away and N is OK here because 49 St is north of the express zone. This can conflict with the earlier “NOT N or Q” museum instruction. Suggested fix: add the spec’s disambiguation.
+
+4. `NYCTrip2026/NYCTrip2026/Content/Trip.swift:83` — should-fix — Penn → hotel says “toward Queens,” but the spec says “toward Queens/Jamaica” and includes the stop sequence. For a first-time rider, the Jamaica headsign detail matters. Suggested fix: mirror the spec wording and optionally include the intermediate stops.
+
+5. `NYCTrip2026/NYCTrip2026/Content/Trip.swift:211` — nit — Hotel → Sunday Morning has the core subway facts correct, but it omits the spec’s “bakery is mid-block” and “~15 min” arrival guidance. Suggested fix: add those if strict spec parity is required.
+
+6. `NYCTrip2026/NYCTrip2026/Content/Trip.swift:149` — should-fix — Brandy Melville says “~15-min walk up from Grand Central.” 1172 3rd Ave at 68th is much farther than that from Grand Central, and the spec only says “walkable ... or a short cab.” Suggested fix: remove the 15-minute claim or change to “long walk from Grand Central, or a short cab.”
+
+7. `docs/superpowers/specs/2026-06-15-nyc-trip-app-revisions-design.md:101` — nit — The spec still says the Canal CTA goes to “Pearl River Mart / Canal & Broadway,” but resolved decisions later say Pearl River Mart was removed and the code correctly uses Canal & Broadway. Suggested fix: update this stale spec line to avoid future false discrepancies.
+
+Clean categories: content integrity checks are clean: IDs are 1-35, day labels match 9/9/11/6, no step has >2 CTAs, no reservation step has >1 CTA, and the Uber destination set matches the test dictionary exactly. I also found no broken `\n` line breaks and no identical adjacent palettes.
+
+Second-pass subway check: I rechecked legs A-E against the spec. A, C, D, and E have the discrepancies above; B’s train letters/direction/stop count/boarding station match. I did not independently verify live MTA service; this review compares Trip.swift to the supplied verified spec.  
+

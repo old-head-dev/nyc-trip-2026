@@ -98,7 +98,7 @@ Legend: **[NEW]** added · **[CHG]** changed · **[OPT]** swipe-past optional ·
 4. **[NEW][OPT]** Subway → Museum of Ice Cream (Leg C, two boarding points)
 5. **[CHG][moved]** (optional) Lunch — Jack's Wife Freda, 226 Lafayette (steps from the museum). CTA: *Open in Google Maps*
 6. **[CHG][detailed]** **SoHo shopping** — see route below. CTA: *Open in Google Maps* → start point
-7. **[CHG][detailed]** **Canal Street** — see route below. CTA: *Open in Google Maps* → Pearl River Mart / Canal & Broadway
+7. **[CHG][detailed]** **Canal Street** — see route below. CTA: *Open in Google Maps* → Canal & Broadway (start corner)
 8. **[CHG]** Back to the hotel — **Hail a cab**; CTA *Backup: open Uber* (existing hotel coords)
 9. **[NEW][OPT]** Subway: Canal St → Hotel (Leg D)
 10. Evening walk, 5th & Madison *(unch)*

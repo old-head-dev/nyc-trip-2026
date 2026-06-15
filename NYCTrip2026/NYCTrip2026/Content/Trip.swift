@@ -80,7 +80,7 @@ enum Trip {
 
         step(id: 5, day: 1, dayLabel: "Day 1 · 5 of 9",
              hero: "subway_train", title: "Or take the subway\nto the hotel",
-             subtitle: "Inside Penn, follow signs to the 8th Ave A·C·E subway.\n\nTake the uptown E train only (toward Queens) — not the A or C — 4 stops to 5 Av/53 St.\n\nExit toward 5th Ave, walk south to 51st St, turn right.",
+             subtitle: "Inside Penn, follow signs to the 8th Ave A·C·E subway.\n\nTake the uptown E train only (toward Queens/Jamaica) — not the A or C — 4 stops to 5 Av/53 St.\n\nExit toward 5th Ave, walk south to 51st St, turn right.",
              ctas: [.openInGoogleMaps(destination: "The Jewel Hotel, 11 W 51st St, New York, NY", label: "Open hotel in Google Maps")],
              palette: mistBlue),
 
@@ -146,7 +146,7 @@ enum Trip {
 
         step(id: 13, day: 2, dayLabel: "Day 2 · 4 of 9",
              hero: "nyc_shopping", title: "Brandy Melville",
-             subtitle: "1172 3rd Ave (68th & 3rd), Upper East Side\n~15-min walk up from Grand Central, or a short cab.",
+             subtitle: "1172 3rd Ave (68th & 3rd), Upper East Side\nA longer walk up from Grand Central, or a short cab.",
              ctas: [.openInGoogleMaps(destination: "Brandy Melville, 1172 3rd Ave, New York, NY", label: "Open in Google Maps")],
              palette: dustyRose),
 
@@ -208,7 +208,7 @@ enum Trip {
 
         step(id: 20, day: 3, dayLabel: "Day 3 · 2 of 11",
              hero: "subway_train", title: "Subway option:\nhotel → Sunday Morning",
-             subtitle: "Walk to 47–50 Sts–Rockefeller Center (6th Ave).\n\nTake a downtown F or M train only — not B or D — 3 stops to 23 St.\n\nWalk north to 25th St, turn right.",
+             subtitle: "Walk to 47–50 Sts–Rockefeller Center (6th Ave).\n\nTake a downtown F or M train only — not B or D — 3 stops to 23 St.\n\nWalk north to 25th St, turn right — the bakery is mid-block. ~15 min.",
              ctas: [.openInGoogleMaps(destination: "47-50 Sts–Rockefeller Center Station, New York, NY", label: "Open station in Google Maps")],
              palette: mistBlue),
 
@@ -226,7 +226,7 @@ enum Trip {
 
         step(id: 22, day: 3, dayLabel: "Day 3 · 4 of 11",
              hero: "subway_train", title: "Subway option:\nto the museum",
-             subtitle: "Take the downtown R or W train only to Prince St — NOT the N or Q (they skip Prince St). The museum is steps from the exit.\n\nFrom Sunday Morning, board at 23 St. From the hotel/Starbucks, board at 49 St.",
+             subtitle: "Take the downtown R or W train only to Prince St — NOT the N or Q (they skip Prince St). The museum is steps from the exit.\n\nFrom Sunday Morning, board at 23 St (R/W). From the hotel/Starbucks, board at 49 St (R/W).",
              ctas: [
                 .openInGoogleMaps(destination: "23 St Station (R/W), Broadway & W 23rd St, New York, NY", label: "From breakfast: 23 St"),
                 .openInGoogleMaps(destination: "49 St Station (R/W), W 49th St & 7th Ave, New York, NY", label: "From the hotel: 49 St")
@@ -259,7 +259,7 @@ enum Trip {
 
         step(id: 27, day: 3, dayLabel: "Day 3 · 9 of 11",
              hero: "subway_train", title: "Subway option:\nCanal St → hotel",
-             subtitle: "At Broadway & Canal, take an uptown N, R, or W train to 49 St — not the Q.\n\nExit at 7th Ave & 49th, walk north to 51st St, turn right.",
+             subtitle: "At Broadway & Canal, take an uptown N, R, or W train to 49 St — not the Q (it veers off toward the Upper East Side). The N runs local this far north, so it's fine here.\n\nExit at 7th Ave & 49th, walk north to 51st St, turn right.",
              ctas: [.openInGoogleMaps(destination: "Canal St Station, Broadway & Canal St, New York, NY", label: "Open station in Google Maps")],
              palette: mistBlue),
 
@@ -296,7 +296,7 @@ enum Trip {
 
         step(id: 33, day: 4, dayLabel: "Day 4 · 4 of 6",
              hero: "subway_train", title: "Subway option:\nhotel → Penn Station",
-             subtitle: "Walk to 5 Av/53 St (E/F). Take the downtown E train only (toward World Trade Center) — not the F — 4 stops to 34 St–Penn Station.\n\nWeekday mornings 6:30–10:30am the 5 Av/53 St entrance is closed for repairs — enter at 7 Av (53rd & 7th) instead.",
+             subtitle: "Walk to 5 Av/53 St (E/F). Take the downtown E train only (toward World Trade Center) — not the F — 4 stops to 34 St–Penn Station.\n\nWeekday mornings 6:30–10:30am the 5 Av/53 St entrance is closed for repairs — enter at 7 Av (53rd & 7th) instead and take the downtown E 3 stops to Penn.",
              ctas: [
                 .openInGoogleMaps(destination: "7 Av Station, W 53rd St & 7th Ave, New York, NY", label: "Before 10:30am: 7 Av"),
                 .openInGoogleMaps(destination: "5 Av/53 St Station, New York, NY", label: "After 10:30am: 5 Av/53 St")
